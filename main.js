@@ -36,7 +36,6 @@ function create() {
     //  The 'mario' key here is the Loader key given in game.load.tilemap
     map = game.add.tilemap('map');
 
-
     //  The first parameter is the tileset name, as specified in the Tiled map editor (and in the tilemap json file)
     //  The second parameter maps this name to the Phaser.Cache key 'tiles'
     map.addTilesetImage('terrain_atlas', 'tiles');
