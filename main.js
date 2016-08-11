@@ -2,8 +2,22 @@
 var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea', { preload: preload, create: create, update: update, render: render });
 
 var circle;
+var GlobalPosi;
+var clickedPoint;
+var veloX;
+var veloY;
+var speed;
+
+var targetAngle = 0;
+var tempLogoAngle;
+var gap = 0;
+
 
 function preload() {
+    GlobalPosi = new Phaser.Point(game.world.centerX,game.world.centerY);
+    veloX = 0;
+    veloY = 0;
+    speed = 2;
 
     //  Tilemaps are split into two parts: The actual map data (usually stored in a CSV or JSON file)
     //  and the tileset/s used to render the map.
@@ -23,11 +37,12 @@ function preload() {
 
     game.load.image('tiles', 'terrain_atlas.png');
 
-    game.load.image('sorcier', 'sorcier.png');
+    game.load.image('sorcier', 'sorcier2.png');
 }
 
 var map;
 var layer;
+
 
 function create() {
 
@@ -45,25 +60,65 @@ function create() {
     layer = map.createLayer('MyMap');
 
 
-    circle = game.add.sprite(game.world.centerX, game.world.centerY, 'sorcier');
+    circle = game.add.sprite(GlobalPosi.x, GlobalPosi.y, 'sorcier');
+    clickedPoint = new Phaser.Point(circle.x, circle.y);
     game.physics.enable(circle, Phaser.Physics.ARCADE);
     // We set the pivot of the circle in the center of the sprite
-    circle.pivot.x = circle.width * .5;
+    circle.pivot.x = circle.width * .35;
     circle.pivot.y = circle.height * .5;
+
 
     //  This resizes the game world to match the layer dimensions
     layer.resizeWorld();
 
 }
 
+
 function update() {
     if (game.input.mousePointer.isDown) {
-        circle.rotation = game.physics.arcade.moveToPointer(circle)
+        clickedPoint = new Phaser.Point(game.input.x,game.input.y);
+     //   console.log(angle + ',' + deltaRotation);
+        veloX = (clickedPoint.x - circle.position.x) / circle.position.distance((clickedPoint));
+        veloY = (clickedPoint.y - circle.position.y) / circle.position.distance((clickedPoint));
+      //  circle.rotation = game.physics.arcade.moveToPointer(circle,100,Phaser.Input.activePointer,0);
+//        circle.body.velocity.x = circle.body.velocity.x + circle.body.velocity.x * 2;
+//        circle.body.velocity.y = circle.body.velocity.y + circle.body.velocity.y * 2;
     }
+    if ((Math.abs(circle.position.distance(clickedPoint)) <= 7 ))
+    {
+        veloX =0;
+        veloY= 0;
+    }
+    updateRotation();
+    UpdateMovement();
 }
 
 function render() {
-    game.debug.geom(circle, '#cfffff')
+    //game.debug.geom(point, '#cfffff')
+    game.debug.spriteInfo(circle,32,32);
 }
+
+function UpdateMovement(){
+    circle.position.x = circle.position.x + veloX * speed;
+    circle.position.y = circle.position.y + veloY * speed;
+
+}
+
+function updateRotation()
+{
+    targetAngle = (180 / Math.PI) * game.math.angleBetween(
+            circle.x, circle.y,
+            clickedPoint.x, clickedPoint.y) + 180;
+
+    tempLogoAngle = circle.angle + 180;
+    gap = (targetAngle - tempLogoAngle);
+
+    if(gap > 1)
+        circle.angle += 0.0015*gap*gap;
+    else if (gap < -1)
+        circle.angle -= 0.0015*gap*gap;
+}
+
+
 
 
