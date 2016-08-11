@@ -1,5 +1,7 @@
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
+var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.AUTO, 'phaser-example', { preload: preload, create: create,update:update,render:render });
+
+var circle;
 
 function preload() {
 
@@ -14,12 +16,14 @@ function preload() {
 
     //  The final one tells Phaser the foramt of the map data, in this case it's a JSON file exported from the Tiled map editor.
     //  This could be Phaser.Tilemap.CSV too.
-
     game.load.tilemap('map', 'map_lave_v0.json', null, Phaser.Tilemap.TILED_JSON);
 
     //  Next we load the tileset. This is just an image, loaded in via the normal way we load images:
 
     game.load.image('tiles', 'terrain_atlas.png');
+
+
+    //circle = new Phaser.Circle(game.world.centerX, 100,64);
 
 }
 
@@ -43,5 +47,15 @@ function create() {
 
     //  This resizes the game world to match the layer dimensions
     layer.resizeWorld();
+
+}
+
+function update()
+{
+
+}
+
+function render()
+{
 
 }
