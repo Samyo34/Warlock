@@ -1,5 +1,7 @@
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', { preload: preload, create: create });
+var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea', { preload: preload, create: create, update: update, render: render });
+
+var circle;
 
 function preload() {
 
@@ -21,6 +23,7 @@ function preload() {
 
     game.load.image('tiles', 'terrain_atlas.png');
 
+    game.load.image('sorcier', 'sorcier.png');
 }
 
 var map;
@@ -33,6 +36,7 @@ function create() {
     //  The 'mario' key here is the Loader key given in game.load.tilemap
     map = game.add.tilemap('map');
 
+
     //  The first parameter is the tileset name, as specified in the Tiled map editor (and in the tilemap json file)
     //  The second parameter maps this name to the Phaser.Cache key 'tiles'
     map.addTilesetImage('terrain_atlas', 'tiles');
@@ -41,7 +45,26 @@ function create() {
     //  A Layer is effectively like a Phaser.Sprite, so is added to the display list.
     layer = map.createLayer('MyMap');
 
+
+    circle = game.add.sprite(game.world.centerX, game.world.centerY, 'sorcier');
+    game.physics.enable(circle, Phaser.Physics.ARCADE);
+    // We set the pivot of the circle in the center of the sprite
+    circle.pivot.x = circle.width * .5;
+    circle.pivot.y = circle.height * .5;
+
     //  This resizes the game world to match the layer dimensions
     layer.resizeWorld();
 
 }
+
+function update() {
+    if (game.input.mousePointer.isDown) {
+        circle.rotation = game.physics.arcade.moveToPointer(circle)
+    }
+}
+
+function render() {
+    game.debug.geom(circle, '#cfffff')
+}
+
+
