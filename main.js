@@ -12,6 +12,7 @@ var point = new Phaser.Point(0, 0) ;
 var epsilon = 0.0001;
 var angleDesired;
 
+var fireballs;
 
 function preload() {
     GlobalPosi = new Phaser.Point(game.world.centerX,game.world.centerY);
@@ -34,7 +35,8 @@ function preload() {
 
     game.load.image('tiles', 'terrain_atlas.png');
 
-    game.load.image('sorcier', 'sorcier2.png');
+    game.load.image('sorcier', 'sorcier.png');
+    game.load.image('i_fireball', 'fireball.png');
 }
 
 var map;
@@ -58,7 +60,7 @@ function create() {
     circle.body.velocity.setTo(0, 0);
 
     // We set the pivot of the circle in the center of the sprite
-    circle.pivot.x = circle.width * .35;
+    circle.pivot.x = circle.width * .5;
     circle.pivot.y = circle.height * .5;
 
     // we set up the clicked point at the same position than the circle
@@ -66,20 +68,73 @@ function create() {
 
     //  This resizes the game world to match the layer dimensions
     layer.resizeWorld();
+
+    // Try for collisions:
+    //map.setCollision([368, 369, 370]);
+    //circle.body.collideWorldBounds = true;
+
+
+    // ========================== Try fireball ========================== //
+    // Create the group using the group factory
+    fireballs = game.add.group();
+    // To move the sprites later on, we have to enable the body
+    fireballs.enableBody = true;
+    // We're going to set the body type to the ARCADE physics, since we don't need any advanced physics
+    fireballs.physicsBodyType = Phaser.Physics.ARCADE;
+    /*
+
+     This will create 20 sprites and add it to the stage. They're inactive and invisible, but they're there for later use.
+     We only have 20 laser bullets available, and will 'clean' and reset they're off the screen.
+     This way we save on precious resources by not constantly adding & removing new sprites to the stage
+
+     */
+    fireballs.createMultiple(20, 'i_fireball');
+
+    /*
+
+     Behind the scenes, this will call the following function on all lasers:
+     - events.onOutOfBounds.add(resetLaser)
+     Every sprite has an 'events' property, where you can add callbacks to specific events.
+     Instead of looping over every sprite in the group manually, this function will do it for us.
+
+     */
+    fireballs.callAll('events.onOutOfBounds.add', 'events.onOutOfBounds', resetLaser);
+    // Same as above, set the anchor of every sprite to 0.5, 0.5
+    fireballs.callAll('anchor.setTo', 'anchor', 0.5, 0.5);
+
+    // This will set 'checkWorldBounds' to true on all sprites in the group
+    fireballs.setAll('checkWorldBounds', true);
+
+    // ...
+
+}
+
+function resetLaser(laser) {
+    // Destroy the laser
+    laser.kill();
 }
 
 
-function update() {
 
-    point.x = circle.position.x;
-    point.y = circle.position.y;
+function update() {
+    //game.physics.arcade.collide(circle, layer);
 
     if (game.input.mousePointer.isDown) {
         clickedPoint = new Phaser.Point(game.input.x, game.input.y);
     }
 
+    if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
+    {
+        fireLaser();
+    }
+
     UpdateMovement();
     UpdateRotation();
+
+    //console.log(((180/Math.PI)*circle.body.rotation)%360);
+    //console.log((Math.PI/180)*circle.angle);
+    //point.x = circle.x + 16*Math.cos((Math.PI/180)*circle.angle);
+    //point.y = circle.y + 16*Math.sin((Math.PI/180)*circle.angle);
 }
 
 function UpdateMovement(){
@@ -126,5 +181,18 @@ function render() {
     game.debug.text('velocity: ' + circle.body.velocity.x + " " + circle.body.velocity.y, 32, 328);
     game.debug.text('pointClicked: ' + clickedPoint, 32, 364);
     game.debug.text('circle.position: ' + circle.position, 32, 396);
-    game.debug.geom(point, 'rgba(255,255,255,1)');
+    //game.debug.geom(point, 'rgba(255,255,255,1)');
+}
+
+function fireLaser() {
+    // Get the first laser that's inactive, by passing 'false' as a parameter
+    var fb = fireballs.getFirstExists(false);
+    if (fb) {
+        // If we have a laser, set it to the starting position
+        fb.reset(circle.x + 16*Math.cos(circle.rotation),  circle.y + 16*Math.sin(circle.rotation));
+        // Give it a velocity of -500 so it starts shooting
+        fb.body.velocity.x = 500*Math.cos(circle.rotation);
+        fb.body.velocity.y = 500*Math.sin(circle.rotation);
+    }
+
 }
