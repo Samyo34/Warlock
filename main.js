@@ -4,20 +4,17 @@ var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.i
 var circle;
 var GlobalPosi;
 var clickedPoint;
-var veloX;
-var veloY;
-var speed;
+var speed = 100;
+var K = 1000;
+var error = 0;
 
-var targetAngle = 0;
-var tempLogoAngle;
-var gap = 0;
+var point = new Phaser.Point(0, 0) ;
+var epsilon = 0.0001;
+var angleDesired;
 
 
 function preload() {
     GlobalPosi = new Phaser.Point(game.world.centerX,game.world.centerY);
-    veloX = 0;
-    veloY = 0;
-    speed = 2;
 
     //  Tilemaps are split into two parts: The actual map data (usually stored in a CSV or JSON file)
     //  and the tileset/s used to render the map.
@@ -43,82 +40,91 @@ function preload() {
 var map;
 var layer;
 
-
 function create() {
 
-    game.stage.backgroundColor = '#787878';
-
-    //  The 'mario' key here is the Loader key given in game.load.tilemap
+    //  The 'map' key here is the Loader key given in game.load.tilemap
     map = game.add.tilemap('map');
 
     //  The first parameter is the tileset name, as specified in the Tiled map editor (and in the tilemap json file)
     //  The second parameter maps this name to the Phaser.Cache key 'tiles'
     map.addTilesetImage('terrain_atlas', 'tiles');
 
-    //  Creates a layer from the World1 layer in the map data.
+    //  Creates a layer from the MyMap layer in the map data.
     //  A Layer is effectively like a Phaser.Sprite, so is added to the display list.
     layer = map.createLayer('MyMap');
 
-
     circle = game.add.sprite(GlobalPosi.x, GlobalPosi.y, 'sorcier');
-    clickedPoint = new Phaser.Point(circle.x, circle.y);
     game.physics.enable(circle, Phaser.Physics.ARCADE);
+    circle.body.velocity.setTo(0, 0);
+
     // We set the pivot of the circle in the center of the sprite
     circle.pivot.x = circle.width * .35;
     circle.pivot.y = circle.height * .5;
 
+    // we set up the clicked point at the same position than the circle
+    clickedPoint = new Phaser.Point(circle.x, circle.y);
 
     //  This resizes the game world to match the layer dimensions
     layer.resizeWorld();
-
 }
 
 
 function update() {
-    if (game.input.mousePointer.isDown) {
-        clickedPoint = new Phaser.Point(game.input.x,game.input.y);
-     //   console.log(angle + ',' + deltaRotation);
-        veloX = (clickedPoint.x - circle.position.x) / circle.position.distance((clickedPoint));
-        veloY = (clickedPoint.y - circle.position.y) / circle.position.distance((clickedPoint));
-      //  circle.rotation = game.physics.arcade.moveToPointer(circle,100,Phaser.Input.activePointer,0);
-//        circle.body.velocity.x = circle.body.velocity.x + circle.body.velocity.x * 2;
-//        circle.body.velocity.y = circle.body.velocity.y + circle.body.velocity.y * 2;
-    }
-    if ((Math.abs(circle.position.distance(clickedPoint)) <= 7 ))
-    {
-        veloX =0;
-        veloY= 0;
-    }
-    updateRotation();
-    UpdateMovement();
-}
 
-function render() {
-    //game.debug.geom(point, '#cfffff')
-    game.debug.spriteInfo(circle,32,32);
+    point.x = circle.position.x;
+    point.y = circle.position.y;
+
+    if (game.input.mousePointer.isDown) {
+        clickedPoint = new Phaser.Point(game.input.x, game.input.y);
+    }
+
+    UpdateMovement();
+    UpdateRotation();
 }
 
 function UpdateMovement(){
-    circle.position.x = circle.position.x + veloX * speed;
-    circle.position.y = circle.position.y + veloY * speed;
 
+    // If circle is in close enough (2px) from the clicked point => velocity = 0
+    if (Math.abs(circle.position.x - clickedPoint.x) <= 7 && Math.abs(circle.position.y - clickedPoint.y) <= 7) {
+        circle.body.velocity.setTo(0, 0);
+    }
+    else { // else we set up the velocity
+        circle.body.velocity.setTo(speed * Math.cos(circle.rotation), speed * Math.sin(circle.rotation));
+    }
 }
 
-function updateRotation()
-{
-    targetAngle = (180 / Math.PI) * game.math.angleBetween(
-            circle.x, circle.y,
-            clickedPoint.x, clickedPoint.y) + 180;
+function UpdateRotation(){
 
-    tempLogoAngle = circle.angle + 180;
-    gap = (targetAngle - tempLogoAngle);
+    // we compute the desiredAngle towards the clicked point (in radians)
+    angleDesired = Math.atan2(clickedPoint.y - circle.y, clickedPoint.x - circle.x);
 
-    if(gap > 1)
-        circle.angle += 0.0015*gap*gap;
-    else if (gap < -1)
-        circle.angle -= 0.0015*gap*gap;
+    // we compute the gap in radians (circle.rotation is in radians and circle.angle in degrees)
+    error = angleDesired - circle.rotation;
+
+    // If the error is small enough, we set the angular velocity to zero
+    if (Math.abs(error) <= 0.001) {
+        circle.body.angularVelocity = 0;
+    }
+    else {
+        error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
+        circle.body.angularVelocity = K * error; // we multiply the error by a gain K in order to converge faster
+    }
 }
 
+function floatEquality(a, b) {
+    if(Math.abs(a - b) < epsilon)
+        return true;
+    return false
+}
 
-
-
+function render() {
+    game.debug.spriteInfo(circle, 32, 32);
+    game.debug.text('angularVelocity: ' + circle.body.angularVelocity, 32, 200);
+    game.debug.text('angularAcceleration: ' + circle.body.angularAcceleration, 32, 232);
+    game.debug.text('angularDrag: ' + circle.body.angularDrag, 32, 264);
+    game.debug.text('rotation: ' + circle.rotation, 32, 296);
+    game.debug.text('velocity: ' + circle.body.velocity.x + " " + circle.body.velocity.y, 32, 328);
+    game.debug.text('pointClicked: ' + clickedPoint, 32, 364);
+    game.debug.text('circle.position: ' + circle.position, 32, 396);
+    game.debug.geom(point, 'rgba(255,255,255,1)');
+}
