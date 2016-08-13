@@ -1,5 +1,6 @@
 
-var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea', { preload: preload, create: create, update: update, render: render });
+//var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio, Phaser.CANVAS, 'gameArea', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(800, 800, Phaser.CANVAS, 'gameArea', { preload: preload, create: create, update: update, render: render });
 
 var circle;
 var GlobalPosi;
@@ -8,6 +9,7 @@ var speed = 100;
 var K = 1000;
 var error = 0;
 
+var playerOnLava = false;
 
 var Spell = [];
 
@@ -15,9 +17,12 @@ var point = new Phaser.Point(0, 0) ;
 var epsilon = 0.0001;
 var angleDesired;
 
-var fireballs;
+var map_array = [369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369];
+var LAVA = 369;
+var TILE_WIDTH = 32;
+var TILE_HEIGHT = 32;
 
-function preload() {
+    function preload() {
     GlobalPosi = new Phaser.Point(game.world.centerX,game.world.centerY);
 
     //  Tilemaps are split into two parts: The actual map data (usually stored in a CSV or JSON file)
@@ -32,7 +37,7 @@ function preload() {
     //  The final one tells Phaser the foramt of the map data, in this case it's a JSON file exported from the Tiled map editor.
     //  This could be Phaser.Tilemap.CSV too.
 
-    game.load.tilemap('map', 'map_lave_v0.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('map', 'map_lave_v1.json', null, Phaser.Tilemap.TILED_JSON);
 
     //  Next we load the tileset. This is just an image, loaded in via the normal way we load images:
 
@@ -56,7 +61,7 @@ function create() {
 
     //  Creates a layer from the MyMap layer in the map data.
     //  A Layer is effectively like a Phaser.Sprite, so is added to the display list.
-    layer = map.createLayer('MyMap');
+    layer = map.createLayer('background');
 
     circle = game.add.sprite(GlobalPosi.x, GlobalPosi.y, 'sorcier');
     game.physics.enable(circle, Phaser.Physics.ARCADE);
@@ -76,6 +81,9 @@ function create() {
     //map.setCollision([368, 369, 370]);
     //circle.body.collideWorldBounds = true;
 
+    //map.setCollision(369);
+
+    //=========== SPELLS ======================
     // We add in the spell array the fireball
     Spell.push(new Spell.FireBall(this.game));
 
@@ -83,11 +91,36 @@ function create() {
     {
         Spell[i].visible = false;
     }
+
+    //  This will set Tile ID 368 (the lava) to call the hitLava function when collided with
+    //map.setTileIndexCallback(373, hitGround, this);
+    //map.setTileIndexCallback(369, hitLava, this);
 }
 
+function hitLava() {
+    playerOnLava = true;
+}
+
+var line;
+var column;
+
+function isPlayerOnLava() {
+    line = Math.floor(circle.x / TILE_WIDTH);
+    column = Math.floor(circle.y / TILE_HEIGHT);
+
+    var indexInMapArray = column*25 + line;
+    if (map_array[indexInMapArray] == LAVA)
+        return true;
+    return false
+}
 
 function update() {
     //game.physics.arcade.collide(circle, layer);
+
+    if (isPlayerOnLava())
+        console.log("PLAYER_ON_LAVA");
+    else
+        console.log("PLAYER_ON_GROUND");
 
     if (game.input.mousePointer.isDown) {
         clickedPoint = new Phaser.Point(game.input.x, game.input.y);
@@ -100,11 +133,6 @@ function update() {
 
     UpdateMovement();
     UpdateRotation();
-
-    //console.log(((180/Math.PI)*circle.body.rotation)%360);
-    //console.log((Math.PI/180)*circle.angle);
-    //point.x = circle.x + 16*Math.cos((Math.PI/180)*circle.angle);
-    //point.y = circle.y + 16*Math.sin((Math.PI/180)*circle.angle);
 }
 
 function UpdateMovement(){
@@ -144,13 +172,15 @@ function floatEquality(a, b) {
 
 function render() {
     game.debug.spriteInfo(circle, 32, 32);
-    game.debug.text('angularVelocity: ' + circle.body.angularVelocity, 32, 200);
-    game.debug.text('angularAcceleration: ' + circle.body.angularAcceleration, 32, 232);
-    game.debug.text('angularDrag: ' + circle.body.angularDrag, 32, 264);
-    game.debug.text('rotation: ' + circle.rotation, 32, 296);
-    game.debug.text('velocity: ' + circle.body.velocity.x + " " + circle.body.velocity.y, 32, 328);
+    //game.debug.text('angularVelocity: ' + circle.body.angularVelocity, 32, 200);
+    //game.debug.text('angularAcceleration: ' + circle.body.angularAcceleration, 32, 232);
+    //game.debug.text('angularDrag: ' + circle.body.angularDrag, 32, 264);
+    //game.debug.text('rotation: ' + circle.rotation, 32, 296);
+    //game.debug.text('velocity: ' + circle.body.velocity.x + " " + circle.body.velocity.y, 32, 328);
+    game.debug.text('[' + line + "," + column + "]", 32, 328);
     game.debug.text('pointClicked: ' + clickedPoint, 32, 364);
     game.debug.text('circle.position: ' + circle.position, 32, 396);
+    game.debug.text('onLava: ' + playerOnLava, 32, 430);
     //game.debug.geom(point, 'rgba(255,255,255,1)');
 }
 
