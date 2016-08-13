@@ -8,6 +8,9 @@ var speed = 100;
 var K = 1000;
 var error = 0;
 
+
+var Spell = [];
+
 var point = new Phaser.Point(0, 0) ;
 var epsilon = 0.0001;
 var angleDesired;
@@ -73,47 +76,14 @@ function create() {
     //map.setCollision([368, 369, 370]);
     //circle.body.collideWorldBounds = true;
 
+    // We add in the spell array the fireball
+    Spell.push(new Spell.FireBall(this.game));
 
-    // ========================== Try fireball ========================== //
-    // Create the group using the group factory
-    fireballs = game.add.group();
-    // To move the sprites later on, we have to enable the body
-    fireballs.enableBody = true;
-    // We're going to set the body type to the ARCADE physics, since we don't need any advanced physics
-    fireballs.physicsBodyType = Phaser.Physics.ARCADE;
-    /*
-
-     This will create 20 sprites and add it to the stage. They're inactive and invisible, but they're there for later use.
-     We only have 20 laser bullets available, and will 'clean' and reset they're off the screen.
-     This way we save on precious resources by not constantly adding & removing new sprites to the stage
-
-     */
-    fireballs.createMultiple(20, 'i_fireball');
-
-    /*
-
-     Behind the scenes, this will call the following function on all lasers:
-     - events.onOutOfBounds.add(resetLaser)
-     Every sprite has an 'events' property, where you can add callbacks to specific events.
-     Instead of looping over every sprite in the group manually, this function will do it for us.
-
-     */
-    fireballs.callAll('events.onOutOfBounds.add', 'events.onOutOfBounds', resetLaser);
-    // Same as above, set the anchor of every sprite to 0.5, 0.5
-    fireballs.callAll('anchor.setTo', 'anchor', 0.5, 0.5);
-
-    // This will set 'checkWorldBounds' to true on all sprites in the group
-    fireballs.setAll('checkWorldBounds', true);
-
-    // ...
-
+    for (var i = 1; i < Spell.length; i++)
+    {
+        Spell[i].visible = false;
+    }
 }
-
-function resetLaser(laser) {
-    // Destroy the laser
-    laser.kill();
-}
-
 
 
 function update() {
@@ -125,7 +95,7 @@ function update() {
 
     if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
     {
-        fireLaser();
+        Spell[0].fire(circle);
     }
 
     UpdateMovement();
@@ -184,15 +154,96 @@ function render() {
     //game.debug.geom(point, 'rgba(255,255,255,1)');
 }
 
-function fireLaser() {
-    // Get the first laser that's inactive, by passing 'false' as a parameter
-    var fb = fireballs.getFirstExists(false);
-    if (fb) {
-        // If we have a laser, set it to the starting position
-        fb.reset(circle.x + 16*Math.cos(circle.rotation),  circle.y + 16*Math.sin(circle.rotation));
-        // Give it a velocity of -500 so it starts shooting
-        fb.body.velocity.x = 500*Math.cos(circle.rotation);
-        fb.body.velocity.y = 500*Math.sin(circle.rotation);
+
+//======================================================================================================================
+//  Our core Bullet class
+//  This is a simple Sprite object that we set a few properties on
+//  It is fired by all of the Spell classes
+
+var Bullet = function (game, key) {
+
+    Phaser.Sprite.call(this, game, 0, 0, key);
+
+    this.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+
+    this.anchor.set(0.5);
+
+    this.checkWorldBounds = true;
+    this.outOfBoundsKill = true;
+    this.exists = false;
+
+    this.tracking = false;
+    this.scaleSpeed = 0;
+
+};
+
+Bullet.prototype = Object.create(Phaser.Sprite.prototype);
+Bullet.prototype.constructor = Bullet;
+
+Bullet.prototype.fire = function (x, y, angle, speed, gx, gy) {
+
+    gx = gx || 0;
+    gy = gy || 0;
+
+    this.reset(x, y);
+    this.scale.set(1);
+
+    this.game.physics.arcade.velocityFromAngle(angle, speed, this.body.velocity);
+
+    this.angle = angle;
+
+    this.body.gravity.set(gx, gy);
+
+};
+
+Bullet.prototype.update = function () {
+
+    if (this.tracking)
+    {
+        this.rotation = Math.atan2(this.body.velocity.y, this.body.velocity.x);
     }
 
-}
+    if (this.scaleSpeed > 0)
+    {
+        this.scale.x += this.scaleSpeed;
+        this.scale.y += this.scaleSpeed;
+    }
+
+};
+
+//======================================================================================================================
+//  Our core Spell class
+//  child class of Bullet class
+
+Spell.FireBall = function (game) {
+
+    Phaser.Group.call(this, game, game.world, 'FireBall', false, true, Phaser.Physics.ARCADE);
+
+    this.nextFire = 0;
+    this.bulletSpeed = 300;
+    this.fireRate = 5000; // 5 sec
+
+    for (var i = 0; i < 64; i++)
+    {
+        this.add(new Bullet(game, 'i_fireball'), true);
+    }
+
+    return this;
+
+};
+
+Spell.FireBall.prototype = Object.create(Phaser.Group.prototype);
+Spell.FireBall.prototype.constructor = Spell.FireBall;
+
+Spell.FireBall.prototype.fire = function (source) {
+
+    if (this.game.time.time < this.nextFire) { return; }
+
+    var x = source.x + 16*Math.cos(source.rotation);
+    var y = source.y + 16*Math.sin(source.rotation)
+
+    this.getFirstExists(false).fire(x, y, source.angle, this.bulletSpeed, 0, 0);
+
+    this.nextFire = this.game.time.time + this.fireRate;
+
+};
