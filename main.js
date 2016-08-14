@@ -2,7 +2,7 @@
 var game = new Phaser.Game(800, 800, Phaser.CANVAS, 'gameArea', { preload: preload, create: create, update: update, render: render });
 
 var GlobalPosi;
-var clickedPoint;
+var goalDestination;
 var speed = 100;
 var K = 1000;
 var error = 0;
@@ -16,6 +16,9 @@ var TILE_HEIGHT = 32;
 
 function preload() {
     GlobalPosi = new Phaser.Point(game.world.centerX,game.world.centerY);
+
+    // for FPS :
+    game.time.advancedTiming = true;
 
     //  Tilemaps are split into two parts: The actual map data (usually stored in a CSV or JSON file)
     //  and the tileset/s used to render the map.
@@ -37,11 +40,16 @@ function preload() {
 
     game.load.image('sorcier', 'sorcier.png');
     game.load.image('i_fireball', 'fireball.png');
+    game.load.image('target', 'spellarea.png');
+    game.load.image('fireball_spell_indicator', 'fireball-red-3.png');
+    game.load.image('spell_border', 'spell_border.png');
 }
 
 var map;
 var layer;
 var wizard = [];
+var target;
+var fireball_indicator;
 
 function create() {
 
@@ -57,10 +65,16 @@ function create() {
     layer = map.createLayer('background');
 
     // we set up the clicked point at the same position than the circle
-    clickedPoint = new Phaser.Point(GlobalPosi.x, GlobalPosi.y);
+    goalDestination = new Phaser.Point(GlobalPosi.x, GlobalPosi.y);
 
     //  This resizes the game world to match the layer dimensions
     layer.resizeWorld();
+
+    // for capturing left and right mouse clicks:
+    game.input.mouse.capture = true;
+
+    // I don't know yet why, but this disables the popup which appears after a right click on the web page
+    game.canvas.oncontextmenu = function (e) { e.preventDefault();};
 
     // Try for collisions:
     //map.setCollision([368, 369, 370]);
@@ -74,6 +88,8 @@ function create() {
     //var lol = new Wizard(game);
     //game.add.existing(lol);
     wizard[0] = new Wizard(game, GlobalPosi.x, GlobalPosi.y);
+    wizard[0].isActive = true;
+    wizard[1] = new Wizard(game, 600, 600);
 
     //=========== SPELLS ======================
     // We add in the spell array the fireball
@@ -87,14 +103,52 @@ function create() {
     //  This will set Tile ID 368 (the lava) to call the hitLava function when collided with
     //map.setTileIndexCallback(373, hitGround, this);
     //map.setTileIndexCallback(369, hitLava, this);
+
+    game.input.mouse.mouseDownCallback = function(){
+        wizard[0].isOrientationGood = false;
+        if(game.input.mouse.button === Phaser.Mouse.RIGHT_BUTTON)
+        {
+            console.log("Right click")
+            goalDestination = new Phaser.Point(game.input.x, game.input.y);
+        }
+
+        if(target.visible && game.input.mouse.button === Phaser.Mouse.LEFT_BUTTON)
+        {
+            console.log("Left click")
+            wizard[0].isShooting = true;
+            wizard[0].aimGoalPoint = new Phaser.Point(game.input.x, game.input.y);
+            wizard[0].prepareSpell("fireball");
+            target.visible = false;
+        }
+    };
+
+    game.input.keyboard.onDownCallback = function( e ){
+        if(e.keyCode == Phaser.Keyboard.A){
+            target.visible = true;
+        }
+    };
+
+    game.input.keyboard.onUpCallback = function( e ){
+        if(e.keyCode == Phaser.Keyboard.A){
+            target.visible = false;
+        }
+    };
+
+    // Sprite which will be display as a target for casting a spell
+    target = game.add.sprite(0, 0, 'target');
+    target.anchor.set(0.5);
+    target.scale.set(0.1)
+    target.visible = false;
+
+
 }
 
 var line;
 var column;
 
-
-
 function update() {
+    target.x = game.input.x;
+    target.y = game.input.y;
 
     for (var i=0; i<wizard.length; i++) {
         if (wizard[i].isOnLava())
@@ -102,22 +156,12 @@ function update() {
         else
             wizard[i].friction = 1;
     }
-
-    if (game.input.mousePointer.isDown) {
-        clickedPoint = new Phaser.Point(game.input.x, game.input.y);
-    }
-
-    if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT))
-    {
-        wizard[0].castSpell("fireball");
-    }
-
 }
 
 function render() {
-    game.debug.text('[' + line + "," + column + "]", 32, 32);
-    game.debug.text('pointClicked: ' + clickedPoint, 32, 64);
+    //game.debug.text('goalDestination: ' + goalDestination, 32, 64);
     //game.debug.geom(point, 'rgba(255,255,255,1)');
+    game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
 }
 
 
