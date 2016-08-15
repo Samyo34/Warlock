@@ -75,6 +75,7 @@ Spell.FireBall = function (game) {
     {
         this.add(new Bullet(game, 'i_fireball'), true);
     }
+    game.physics.enable(this, Phaser.Physics.ARCADE);
 
     return this;
 
