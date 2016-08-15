@@ -3,7 +3,7 @@
 //  This is a simple Sprite object that we set a few properties on
 //  It is fired by all of the Spell classes
 
-var Bullet = function (game, key) {
+var Bullet = function (game, key, actionRatio, actionDuring) {
 
     Phaser.Sprite.call(this, game, 0, 0, key);
 
@@ -17,6 +17,9 @@ var Bullet = function (game, key) {
 
     this.tracking = false;
     this.scaleSpeed = 0;
+
+    this.action =actionRatio;
+    this.actionTime = actionDuring;
 
 };
 
@@ -62,7 +65,6 @@ var Spell = [];
 Spell.FireBall = function (game) {
 
     Phaser.Group.call(this, game, game.world, 'FireBall', false, true, Phaser.Physics.ARCADE);
-
     this.indic = new SpellIndicator(game, 'fireball_spell_indicator', 65, 65);
     //this.indic.pie.progress = 0;
 
@@ -70,12 +72,16 @@ Spell.FireBall = function (game) {
     this.bulletSpeed = 300;
     this.fireRate = 2500;
     this.cooldown;
+    this.actionRatio = 200;
+    this.actionTime = 100000;
+
+    //this.actionRatio = 200;
 
     for (var i = 0; i < 64; i++)
     {
-        this.add(new Bullet(game, 'i_fireball'), true);
+        this.add(new Bullet(game, 'i_fireball',this.actionRatio,this.actionTime), true);
     }
-    game.physics.enable(this, Phaser.Physics.ARCADE);
+
 
     return this;
 
@@ -99,7 +105,7 @@ Spell.FireBall.prototype.fire = function (source) {
 Spell.FireBall.prototype.update = function () {
     if (this.game.time.time < this.nextFire) {
         this.cooldown = this.nextFire - this.game.time.time ;
-        console.log((100*this.cooldown)/this.fireRate)
+        //console.log((100*this.cooldown)/this.fireRate)
         this.indic.pie.progress = 1- (((100*this.cooldown)/this.fireRate) /100);
     }
     else
@@ -150,21 +156,31 @@ Wizard = function (game, x, y) {
     Phaser.Sprite.call(this, game, x, y, 'sorcier');
     //Phaser.Group.call(this, game, game.world, 'sorcier', false, true, Phaser.Physics.ARCADE);
 
-    game.physics.enable(this, Phaser.Physics.ARCADE);
+    game.physics.enable(this,Phaser.Physics.ARCADE);
     this.body.velocity.setTo(0, 0);
 
     this.anchor.setTo(0.5, 0.5);
     game.add.existing(this);
 
+    this.SPEED = 100;
+
     this.friction = 1;
-    this.speed = 100;
-    this.isActive = false;
+    this.currentSpeed = 0;
+    this.isActive = true;
     this.isOrientationGood = true;
     this.spellsToCast = [];
+    this.spellActionVelocity = new Phaser.Point(0,0);
 
     this.aimGoalPoint = new Phaser.Point(0,0);
 
-    this.body.setCircle(15);
+    this.goalDest = new Phaser.Point(this.body.position.x,this.body.position.y);
+
+    this.actionTime =0;
+    this.ratioSpeed = 1;
+    this.actionDuration=0;
+
+    //this.autoShoot = false;
+
 };
 
 Wizard.prototype = Object.create(Phaser.Sprite.prototype);
@@ -172,6 +188,22 @@ Wizard.prototype.constructor = Wizard;
 
 Wizard.prototype.update = function() {
     if(this.isActive) {
+      /*  if(this.autoShoot)
+        {
+            this.fire()
+        }*/
+        if(this.game.time.time < this.actionTime)
+        {
+            var cd = this.actionTime - this.game.time.time;
+            console.log('action time '+ this.actionTime + ' '+ this.game.time.time);
+            this.ratioSpeed =  (((100*cd)/this.actionDuration) /100);
+            this.spellActionVelocity.setTo((this.spellActionVelocity.x*this.ratioSpeed),(this.spellActionVelocity.y*this.ratioSpeed));
+            console.log('ratio speed ' + ((100*cd)/this.actionTime));
+            console.log('ratio ' +   this.ratioSpeed );
+        }
+        else{
+           // this.spellActionVelocity.setTo(0,0);
+        }
         if (this.isShooting) // we turn the wizard toward the aimGoalPoint
         {
             this.body.velocity.setTo(0, 0);
@@ -203,16 +235,19 @@ Wizard.prototype.update = function() {
         {
             //================ Update movement ================
             // If the wizard is in close enough (2px) from the clicked point => velocity = 0
-            if (Math.abs(this.position.x - goalDestination.x) <= 7 && Math.abs(this.position.y - goalDestination.y) <= 7) {
-                this.body.velocity.setTo(0, 0);
+
+            if ((Math.abs(this.position.x - this.goalDest.x) <= 7 && Math.abs(this.position.y - this.goalDest.y) <= 7 ))
+            {
+                this.body.velocity.setTo(this.spellActionVelocity.x, this.spellActionVelocity.y);
+                this.currentSpeed =0;
             }
             else { // else we set up the velocity
-                this.body.velocity.setTo(this.friction * this.speed * Math.cos(this.rotation), this.friction * this.speed * Math.sin(this.rotation));
+                console.log(this.currentSpeed);
+                this.body.velocity.setTo(this.friction * this.currentSpeed * Math.cos(this.rotation)+this.spellActionVelocity.x, this.friction * this.currentSpeed * Math.sin(this.rotation)+this.spellActionVelocity.y);
             }
-
             //================ Update rotation ================
             // we compute the desiredAngle towards the clicked point (in radians)
-            angleDesired = Math.atan2(goalDestination.y - this.y, goalDestination.x - this.x);
+            angleDesired = Math.atan2(this.goalDest.y - this.y, this.goalDest.x - this.x);
 
             // we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
             var error = angleDesired - this.rotation;
@@ -256,9 +291,15 @@ Wizard.prototype.isOnLava = function() {
 
 Wizard.prototype.onHit = function(source)
 {
+    var direction = Math.atan2(this.body.position.y - source.body.position.y,this.body.position.x - source.body.position.x);
+    this.actionDuration = source.actionTime;
+    this.actionTime = this.game.time.time + source.actionTime;
+    this.spellActionVelocity.x = source.action * Math.cos(direction);
+    this.spellActionVelocity.y = source.action * Math.sin(direction);
     this.scale.setTo(this.scale.x +1,this.scale.y+1);
-    source.visible = false;
+    source.kill();
 };
+
 
 //======================================================================================================================
 //  Our core Wizard class
