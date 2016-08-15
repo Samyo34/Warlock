@@ -95,6 +95,8 @@ function create() {
     wizard[2] = new Wizard(game, 500, 600);
     wizard[2].isActive = true;
 
+    wizard[1].isShooting = true;
+    wizard[1].autoShoot = true;
     //=========== SPELLS ======================
     // We add in the spell array the fireball
     Spell.push(new Spell.FireBall(game));
@@ -146,6 +148,8 @@ function create() {
     target.scale.set(0.1)
     target.visible = false;
 
+
+
 }
 
 var line;
@@ -154,8 +158,9 @@ var column;
 function update() {
     target.x = game.input.x;
     target.y = game.input.y;
+   // wizard[1].isShooting = true;
 
-    game.physics.arcade.overlap(Spell[0],wizard[1],onHit,processOverlap,this);
+    game.physics.arcade.overlap(Spell[0],wizard[0],onHit,processOverlap,this);
     //game.physics.arcade.collide(Spell[i],wizard[j],onHit);
 
 
@@ -171,8 +176,8 @@ function render() {
     //game.debug.text('goalDestination: ' + goalDestination, 32, 64);
     //game.debug.geom(point, 'rgba(255,255,255,1)');
     game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
-    game.debug.body(wizard[0]);
-    game.debug.body(wizard[1]);
+/*    game.debug.body(wizard[0]);
+    game.debug.body(wizard[1]);*/
 }
 
 function processOverlap(wizard,spell)

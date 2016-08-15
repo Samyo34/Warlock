@@ -73,7 +73,7 @@ Spell.FireBall = function (game) {
     this.fireRate = 2500;
     this.cooldown;
     this.actionRatio = 200;
-    this.actionTime = 100000;
+    this.actionTime = 50000;
 
     //this.actionRatio = 200;
 
@@ -171,7 +171,7 @@ Wizard = function (game, x, y) {
     this.spellsToCast = [];
     this.spellActionVelocity = new Phaser.Point(0,0);
 
-    this.aimGoalPoint = new Phaser.Point(0,0);
+    this.aimGoalPoint = new Phaser.Point(this.position.x+200,this.position.y);
 
     this.goalDest = new Phaser.Point(this.body.position.x,this.body.position.y);
 
@@ -179,7 +179,7 @@ Wizard = function (game, x, y) {
     this.ratioSpeed = 1;
     this.actionDuration=0;
 
-    //this.autoShoot = false;
+    this.autoShoot = false;
 
 };
 
@@ -188,10 +188,10 @@ Wizard.prototype.constructor = Wizard;
 
 Wizard.prototype.update = function() {
     if(this.isActive) {
-      /*  if(this.autoShoot)
+        if(this.autoShoot)
         {
-            this.fire()
-        }*/
+            this.prepareSpell('fireball');
+        }
         if(this.game.time.time < this.actionTime)
         {
             var cd = this.actionTime - this.game.time.time;
@@ -200,9 +200,7 @@ Wizard.prototype.update = function() {
             this.spellActionVelocity.setTo((this.spellActionVelocity.x*this.ratioSpeed),(this.spellActionVelocity.y*this.ratioSpeed));
             console.log('ratio speed ' + ((100*cd)/this.actionTime));
             console.log('ratio ' +   this.ratioSpeed );
-        }
-        else{
-           // this.spellActionVelocity.setTo(0,0);
+         //   this.scale.setTo(this.scale.x -(1-(((100*cd)/this.actionDuration) /100)),this.scale.y-(1-(((100*cd)/this.actionDuration) /100)));
         }
         if (this.isShooting) // we turn the wizard toward the aimGoalPoint
         {
@@ -211,7 +209,11 @@ Wizard.prototype.update = function() {
             if(this.isOrientationGood)
             {
                 this.castSpell();
-                this.isShooting = false;
+                if(this.autoShoot == false)
+                {
+                    this.isShooting = false;
+                }
+
             }
 
             //================ Update rotation ================
@@ -296,7 +298,7 @@ Wizard.prototype.onHit = function(source)
     this.actionTime = this.game.time.time + source.actionTime;
     this.spellActionVelocity.x = source.action * Math.cos(direction);
     this.spellActionVelocity.y = source.action * Math.sin(direction);
-    this.scale.setTo(this.scale.x +1,this.scale.y+1);
+   // this.scale.setTo(this.scale.x +1,this.scale.y+1);
     source.kill();
 };
 
