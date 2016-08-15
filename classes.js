@@ -75,6 +75,7 @@ Spell.FireBall = function (game) {
     {
         this.add(new Bullet(game, 'i_fireball'), true);
     }
+    game.physics.enable(this, Phaser.Physics.ARCADE);
 
     return this;
 
@@ -162,6 +163,8 @@ Wizard = function (game, x, y) {
     this.spellsToCast = [];
 
     this.aimGoalPoint = new Phaser.Point(0,0);
+
+    this.body.setCircle(15);
 };
 
 Wizard.prototype = Object.create(Phaser.Sprite.prototype);
@@ -251,6 +254,11 @@ Wizard.prototype.isOnLava = function() {
     return false
 };
 
+Wizard.prototype.onHit = function(source)
+{
+    this.scale.setTo(this.scale.x +1,this.scale.y+1);
+    source.visible = false;
+};
 
 //======================================================================================================================
 //  Our core Wizard class
