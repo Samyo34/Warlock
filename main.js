@@ -53,8 +53,6 @@ var fireball_indicator;
 
 function create() {
 
-    game.physics.startSystem(Phaser.Physics.ARCADE);
-
     //  The 'map' key here is the Loader key given in game.load.tilemap
     map = game.add.tilemap('map');
 
@@ -84,6 +82,7 @@ function create() {
 
     //map.setCollision(369);
 
+
     //=========== WIZARDS ======================
     // We add in the spell array the fireball
     //Wizard.push(new Wizard(game));
@@ -91,9 +90,13 @@ function create() {
     //game.add.existing(lol);
     wizard[0] = new Wizard(game, GlobalPosi.x, GlobalPosi.y);
     wizard[0].isActive = true;
-    wizard[1] = new Wizard(game, 600, 600);
+    wizard[1] = new Wizard(game, 300, 300);
+    wizard[1].isActive = true;
     wizard[2] = new Wizard(game, 500, 600);
+    wizard[2].isActive = true;
 
+    wizard[1].isShooting = true;
+    wizard[1].autoShoot = true;
     //=========== SPELLS ======================
     // We add in the spell array the fireball
     Spell.push(new Spell.FireBall(game));
@@ -113,6 +116,8 @@ function create() {
         {
             console.log("Right click")
             goalDestination = new Phaser.Point(game.input.x, game.input.y);
+            wizard[0].goalDest= goalDestination
+            wizard[0].currentSpeed = wizard[0].SPEED;
         }
 
         if(target.visible && game.input.mouse.button === Phaser.Mouse.LEFT_BUTTON)
@@ -144,6 +149,7 @@ function create() {
     target.visible = false;
 
 
+
 }
 
 var line;
@@ -152,14 +158,11 @@ var column;
 function update() {
     target.x = game.input.x;
     target.y = game.input.y;
+   // wizard[1].isShooting = true;
 
-    for(var i =0;i<Spell.length;i++)
-    {
-        for(var j=1;j<wizard.length;j++)
-        {
-            game.physics.arcade.collide(Spell[i],wizard[j],onHit);
-        }
-    }
+    game.physics.arcade.overlap(Spell[0],wizard[0],onHit,processOverlap,this);
+    //game.physics.arcade.collide(Spell[i],wizard[j],onHit);
+
 
     for (var i=0; i<wizard.length; i++) {
         if (wizard[i].isOnLava())
@@ -173,13 +176,20 @@ function render() {
     //game.debug.text('goalDestination: ' + goalDestination, 32, 64);
     //game.debug.geom(point, 'rgba(255,255,255,1)');
     game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
-    game.debug.body(wizard[0]);
-    game.debug.body(wizard[1]);
+/*    game.debug.body(wizard[0]);
+    game.debug.body(wizard[1]);*/
+}
+
+function processOverlap(wizard,spell)
+{
+    console.log('colison detected');
+    return true;
 }
 
 function onHit(wizard,spell)
 {
     wizard.onHit(spell);
+    return false;
 }
 
 
