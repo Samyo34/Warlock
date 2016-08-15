@@ -53,6 +53,8 @@ var fireball_indicator;
 
 function create() {
 
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
     //  The 'map' key here is the Loader key given in game.load.tilemap
     map = game.add.tilemap('map');
 
@@ -153,7 +155,6 @@ function update() {
 
     for(var i =0;i<Spell.length;i++)
     {
-
         for(var j=1;j<wizard.length;j++)
         {
             game.physics.arcade.collide(Spell[i],wizard[j],onHit);
@@ -172,12 +173,13 @@ function render() {
     //game.debug.text('goalDestination: ' + goalDestination, 32, 64);
     //game.debug.geom(point, 'rgba(255,255,255,1)');
     game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
+    game.debug.body(wizard[0]);
+    game.debug.body(wizard[1]);
 }
 
 function onHit(wizard,spell)
 {
-    spell.visible = false;
-    wizard.scale.setTo(wizard.scale.x+5,wizard.scale.y +5);
+    wizard.onHit(spell);
 }
 
 
