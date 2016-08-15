@@ -164,7 +164,6 @@ Wizard = function (game, x, y) {
 
     this.aimGoalPoint = new Phaser.Point(0,0);
 
-    this.body.setCircle(15);
 };
 
 Wizard.prototype = Object.create(Phaser.Sprite.prototype);
