@@ -62,10 +62,10 @@ Bullet.prototype.update = function () {
 //  child class of Bullet class
 var Spell = [];
 
-Spell.FireBall = function (game) {
+Spell.FireBall = function (game, x, y) {
 
     Phaser.Group.call(this, game, game.world, 'FireBall', false, true, Phaser.Physics.ARCADE);
-    this.indic = new SpellIndicator(game, 'fireball_spell_indicator', 65, 65);
+    this.indic = new SpellIndicator(game, 'fireball_spell_indicator', x, y);
     //this.indic.pie.progress = 0;
 
     this.nextFire = 0;
@@ -150,7 +150,7 @@ SpellIndicator.prototype.update = function () {
 //  Our core Wizard class
 //  This is a simple Sprite object that we set a few properties on
 //  It is fired by all of the Spell classes
-Wizard = function (game, x, y) {
+Wizard = function (game, x, y, xSpellIndic, ySpellIndic) {
 
     // creation of the sprite:
     Phaser.Sprite.call(this, game, x, y, 'sorcier');
@@ -180,6 +180,9 @@ Wizard = function (game, x, y) {
     this.actionDuration=0;
 
     this.autoShoot = false;
+
+    this.Spell = [];
+    this.Spell.push(new Spell.FireBall(game, xSpellIndic, ySpellIndic));
 
 };
 
@@ -271,7 +274,7 @@ Wizard.prototype.update = function() {
 Wizard.prototype.castSpell = function() {
     if(this.spellsToCast.length > 0)
     {
-        Spell[this.spellsToCast[0]].fire(this);
+        this.Spell[this.spellsToCast[0]].fire(this);
         this.spellsToCast.shift();
     }
 };

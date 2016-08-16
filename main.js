@@ -88,23 +88,23 @@ function create() {
     //Wizard.push(new Wizard(game));
     //var lol = new Wizard(game);
     //game.add.existing(lol);
-    wizard[0] = new Wizard(game, GlobalPosi.x, GlobalPosi.y);
+    wizard[0] = new Wizard(game, GlobalPosi.x, GlobalPosi.y, 65, 65);
     wizard[0].isActive = true;
-    wizard[1] = new Wizard(game, 300, 300);
+    wizard[1] = new Wizard(game, 300, 300, 400, 65);
     wizard[1].isActive = true;
-    wizard[2] = new Wizard(game, 500, 600);
-    wizard[2].isActive = true;
+    //wizard[2] = new Wizard(game, 500, 600);
+    //wizard[2].isActive = true;
 
     wizard[1].isShooting = true;
     wizard[1].autoShoot = true;
     //=========== SPELLS ======================
     // We add in the spell array the fireball
-    Spell.push(new Spell.FireBall(game));
+    //Spell.push(new Spell.FireBall(game));
 
-    for (var i = 1; i < Spell.length; i++)
-    {
-        Spell[i].visible = false;
-    }
+    //for (var i = 1; i < Spell.length; i++)
+    //{
+    //    Spell[i].visible = false;
+    //}
 
     //  This will set Tile ID 368 (the lava) to call the hitLava function when collided with
     //map.setTileIndexCallback(373, hitGround, this);
@@ -160,7 +160,8 @@ function update() {
     target.y = game.input.y;
    // wizard[1].isShooting = true;
 
-    game.physics.arcade.overlap(Spell[0],wizard[0],onHit,processOverlap,this);
+    game.physics.arcade.overlap(wizard[1].Spell[0],wizard[0],onHit,processOverlap,this);
+    game.physics.arcade.overlap(wizard[0].Spell[0],wizard[1],onHit,processOverlap,this);
     //game.physics.arcade.collide(Spell[i],wizard[j],onHit);
 
 
