@@ -199,12 +199,28 @@ Wizard.prototype.update = function() {
     // Check the health:
     if (this.health <= 0)
     {
+        this.health = 0;
         this.isDead = true;
         this.healthBar.kill();
         this.visible = false;
     }
     else if(this.isActive)
     {
+        // Check if the wizard is on the lava:
+        var line = Math.floor(this.x / TILE_WIDTH);
+        var column = Math.floor(this.y / TILE_HEIGHT);
+
+        var indexInMapArray = column*25 + line;
+        if (map_array[indexInMapArray] == LAVA) // player on lava
+        {
+            this.friction = 0.5;
+            this.health -= 0.5;
+        }
+        else
+        {
+            this.friction = 1;
+        }
+
         if(this.autoShoot)
         {
             this.prepareSpell('fireball');
@@ -307,12 +323,7 @@ Wizard.prototype.prepareSpell = function(name) {
 };
 
 Wizard.prototype.isOnLava = function() {
-    line = Math.floor(this.x / TILE_WIDTH);
-    column = Math.floor(this.y / TILE_HEIGHT);
 
-    var indexInMapArray = column*25 + line;
-    if (map_array[indexInMapArray] == LAVA)
-        return true;
     return false
 };
 

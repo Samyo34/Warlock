@@ -161,14 +161,6 @@ function update() {
     game.physics.arcade.overlap(wizard[1].Spell[0],wizard[0],onHit,processOverlap,this);
     game.physics.arcade.overlap(wizard[0].Spell[0],wizard[1],onHit,processOverlap,this);
     //game.physics.arcade.collide(Spell[i],wizard[j],onHit);
-
-    for (var i=0; i<wizard.length; i++)
-    {
-        if (wizard[i].isOnLava())
-            wizard[i].friction = 0.5;
-        else
-            wizard[i].friction = 1;
-    }
 }
 
 function render() {
