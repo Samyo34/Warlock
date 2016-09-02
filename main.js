@@ -116,7 +116,7 @@ function create() {
         {
             console.log("Right click")
             goalDestination = new Phaser.Point(game.input.x, game.input.y);
-            wizard[0].goalDest= goalDestination
+            wizard[0].goalDest = goalDestination;
             wizard[0].currentSpeed = wizard[0].SPEED;
         }
 
@@ -145,10 +145,8 @@ function create() {
     // Sprite which will be display as a target for casting a spell
     target = game.add.sprite(0, 0, 'target');
     target.anchor.set(0.5);
-    target.scale.set(0.1)
+    target.scale.set(0.1);
     target.visible = false;
-
-
 
 }
 
@@ -164,8 +162,8 @@ function update() {
     game.physics.arcade.overlap(wizard[0].Spell[0],wizard[1],onHit,processOverlap,this);
     //game.physics.arcade.collide(Spell[i],wizard[j],onHit);
 
-
-    for (var i=0; i<wizard.length; i++) {
+    for (var i=0; i<wizard.length; i++)
+    {
         if (wizard[i].isOnLava())
             wizard[i].friction = 0.5;
         else
@@ -177,13 +175,15 @@ function render() {
     //game.debug.text('goalDestination: ' + goalDestination, 32, 64);
     //game.debug.geom(point, 'rgba(255,255,255,1)');
     game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
-/*    game.debug.body(wizard[0]);
-    game.debug.body(wizard[1]);*/
+    game.debug.text(wizard[0].health, 200, 100, "#00ff00");
+    /*game.debug.body(wizard[1]);*/
 }
 
 function processOverlap(wizard,spell)
 {
-    console.log('colison detected');
+    console.log('Collison detected');
+    if (wizard.isDead) // if the wizard is dead, we don't collide
+        return false;
     return true;
 }
 

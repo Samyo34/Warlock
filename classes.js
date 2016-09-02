@@ -3,7 +3,7 @@
 //  This is a simple Sprite object that we set a few properties on
 //  It is fired by all of the Spell classes
 
-var Bullet = function (game, key, actionRatio, actionDuring) {
+var Bullet = function (game, key, actionRatio, actionDuring, damage) {
 
     Phaser.Sprite.call(this, game, 0, 0, key);
 
@@ -18,7 +18,9 @@ var Bullet = function (game, key, actionRatio, actionDuring) {
     this.tracking = false;
     this.scaleSpeed = 0;
 
-    this.action =actionRatio;
+    this.damage = damage;
+
+    this.action = actionRatio;
     this.actionTime = actionDuring;
 
 };
@@ -69,6 +71,7 @@ Spell.FireBall = function (game, x, y) {
     //this.indic.pie.progress = 0;
 
     this.nextFire = 0;
+    this.damage = 100;
     this.bulletSpeed = 300;
     this.fireRate = 2500;
     this.cooldown;
@@ -79,12 +82,10 @@ Spell.FireBall = function (game, x, y) {
 
     for (var i = 0; i < 64; i++)
     {
-        this.add(new Bullet(game, 'i_fireball',this.actionRatio,this.actionTime), true);
+        this.add(new Bullet(game, 'i_fireball',this.actionRatio, this.actionTime, this.damage), true);
     }
 
-
     return this;
-
 };
 
 Spell.FireBall.prototype = Object.create(Phaser.Group.prototype);
@@ -105,7 +106,6 @@ Spell.FireBall.prototype.fire = function (source) {
 Spell.FireBall.prototype.update = function () {
     if (this.game.time.time < this.nextFire) {
         this.cooldown = this.nextFire - this.game.time.time ;
-        //console.log((100*this.cooldown)/this.fireRate)
         this.indic.pie.progress = 1- (((100*this.cooldown)/this.fireRate) /100);
     }
     else
@@ -162,6 +162,11 @@ Wizard = function (game, x, y, xSpellIndic, ySpellIndic) {
     this.anchor.setTo(0.5, 0.5);
     game.add.existing(this);
 
+    this.isDead = false;
+
+    this.fullHealth = 200;
+    this.health = 200;
+
     this.SPEED = 100;
 
     this.friction = 1;
@@ -175,22 +180,31 @@ Wizard = function (game, x, y, xSpellIndic, ySpellIndic) {
 
     this.goalDest = new Phaser.Point(this.body.position.x,this.body.position.y);
 
-    this.actionTime =0;
+    this.actionTime = 0;
     this.ratioSpeed = 1;
-    this.actionDuration=0;
+    this.actionDuration = 0;
 
     this.autoShoot = false;
 
+    this.healthBar = new HealthBar(game, {x: x, y: y-25, width: 40, height : 5});
+
     this.Spell = [];
     this.Spell.push(new Spell.FireBall(game, xSpellIndic, ySpellIndic));
-
 };
 
 Wizard.prototype = Object.create(Phaser.Sprite.prototype);
 Wizard.prototype.constructor = Wizard;
 
 Wizard.prototype.update = function() {
-    if(this.isActive) {
+    // Check the health:
+    if (this.health <= 0)
+    {
+        this.isDead = true;
+        this.healthBar.kill();
+        this.visible = false;
+    }
+    else if(this.isActive)
+    {
         if(this.autoShoot)
         {
             this.prepareSpell('fireball');
@@ -198,12 +212,12 @@ Wizard.prototype.update = function() {
         if(this.game.time.time < this.actionTime)
         {
             var cd = this.actionTime - this.game.time.time;
-            console.log('action time '+ this.actionTime + ' '+ this.game.time.time);
+            //console.log('action time '+ this.actionTime + ' '+ this.game.time.time);
             this.ratioSpeed =  (((100*cd)/this.actionDuration) /100);
             this.spellActionVelocity.setTo((this.spellActionVelocity.x*this.ratioSpeed),(this.spellActionVelocity.y*this.ratioSpeed));
-            console.log('ratio speed ' + ((100*cd)/this.actionTime));
-            console.log('ratio ' +   this.ratioSpeed );
-         //   this.scale.setTo(this.scale.x -(1-(((100*cd)/this.actionDuration) /100)),this.scale.y-(1-(((100*cd)/this.actionDuration) /100)));
+            //console.log('ratio speed ' + ((100*cd)/this.actionTime));
+            //console.log('ratio ' +   this.ratioSpeed );
+            //this.scale.setTo(this.scale.x -(1-(((100*cd)/this.actionDuration) /100)),this.scale.y-(1-(((100*cd)/this.actionDuration) /100)));
         }
         if (this.isShooting) // we turn the wizard toward the aimGoalPoint
         {
@@ -216,7 +230,6 @@ Wizard.prototype.update = function() {
                 {
                     this.isShooting = false;
                 }
-
             }
 
             //================ Update rotation ================
@@ -227,11 +240,13 @@ Wizard.prototype.update = function() {
             var error = angleDesired - this.rotation;
 
             // If the error is small enough, we set the angular velocity to zero
-            if (Math.abs(error) <= 0.001) {
+            if (Math.abs(error) <= 0.001)
+            {
                 this.body.angularVelocity = 0;
                 this.isOrientationGood = true;
             }
-            else {
+            else
+            {
                 error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
                 this.body.angularVelocity = K * error; // we multiply the error by a gain K in order to converge faster
             }
@@ -246,8 +261,9 @@ Wizard.prototype.update = function() {
                 this.body.velocity.setTo(this.spellActionVelocity.x, this.spellActionVelocity.y);
                 this.currentSpeed =0;
             }
-            else { // else we set up the velocity
-                console.log(this.currentSpeed);
+            else  // else we set up the velocity
+            {
+                //console.log(this.currentSpeed);
                 this.body.velocity.setTo(this.friction * this.currentSpeed * Math.cos(this.rotation)+this.spellActionVelocity.x, this.friction * this.currentSpeed * Math.sin(this.rotation)+this.spellActionVelocity.y);
             }
             //================ Update rotation ================
@@ -258,16 +274,22 @@ Wizard.prototype.update = function() {
             var error = angleDesired - this.rotation;
 
             // If the error is small enough, we set the angular velocity to zero
-            if (Math.abs(error) <= 0.001) {
+            if (Math.abs(error) <= 0.001)
+            {
                 this.body.angularVelocity = 0;
                 this.isOrientationGood = true;
             }
-            else {
+            else
+            {
                 error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
                 this.body.angularVelocity = K * error; // we multiply the error by a gain K in order to converge faster
             }
         }
     }
+
+    // Update the position and the progress of the healthBar:
+    this.healthBar.setPosition(this.x, this.y - 25);
+    this.healthBar.setPercent((100 * this.health) / this.fullHealth);
 
 };
 
@@ -294,14 +316,16 @@ Wizard.prototype.isOnLava = function() {
     return false
 };
 
-Wizard.prototype.onHit = function(source)
-{
+Wizard.prototype.onHit = function(source) {
     var direction = Math.atan2(this.body.position.y - source.body.position.y,this.body.position.x - source.body.position.x);
     this.actionDuration = source.actionTime;
     this.actionTime = this.game.time.time + source.actionTime;
     this.spellActionVelocity.x = source.action * Math.cos(direction);
     this.spellActionVelocity.y = source.action * Math.sin(direction);
    // this.scale.setTo(this.scale.x +1,this.scale.y+1);
+    console.log(source.bulletSpeed)
+    this.health = this.health - source.damage;
+    //console.log(source)
     source.kill();
 };
 
