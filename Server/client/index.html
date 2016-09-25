@@ -8,7 +8,11 @@
 <body>
     <canvas id="canvas" width="800" height="560"></canvas>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="./client/js/jquery.js"></script>
     <script>
+        var clicY=0;
+        var clicX=0;
+        var id = 0;
        var socket = io.connect('http://localhost:2000');
 
        var ctx = document.getElementById("canvas").getContext("2d");
@@ -16,6 +20,7 @@
 
         socket.on('serverMsg',function(data){
             console.log(data.msg);
+            id=data.id;
         });
 
         socket.on('updateServer',function(data){
@@ -31,7 +36,21 @@
                 ctx.stroke();
             }
         });
+
+        //jQuery
+        $('#canvas').on('mousedown',function(e){
+            clicX = e.pageX - $(this).offset().left;
+            clicY = e.pageY - $(this).offset().top;
+            console.log(clicX + ' '+clicY);
+            socket.emit('mouseClick',{
+                x:clicX,
+                y:clicY,
+                id:id,
+            });
+
+        })
     </script>
+
    <!--
     <script src="../jquery.js"></script>
     <script src="../Player.js"></script>

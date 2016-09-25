@@ -5,11 +5,14 @@ var fs = require('fs');
 
 eval(fs.readFileSync('./client/js/Player.js')+'');
 
-app.get('/', function(req,res){
-    res.sendFile(__dirname +'/client/index.html');
+app.get('/',function(req, res){
+    res.sendFile(__dirname + '/client/index.html');
 });
 
-app.use('client/',express.static(__dirname+'client'));
+app.get( '/*' , function( req, res, next ) {
+    var file = req.params[0];
+    res.sendFile( __dirname + '/' + file );
+});
 
 server.listen(2000);
 var nbPlayer = 1;
@@ -30,11 +33,18 @@ io.sockets.on('connection',function(socket){
 
     socket.emit('serverMsg',{
         msg:'Hello Player '+nbPlayer,
+        id:player.id,
     });
 
     socket.on('disconnect',function(){
        delete PLAYERS[socket.id];
         delete SOCKETS[socket.id];
+    });
+
+    socket.on('mouseClick',function(data){
+        var player = PLAYERS[socket.id];
+        player.setGoalDest(data.x,data.y);
+        console.log('mouseCliked recived : '+data.x +':'+data.y);
     });
 });
 
@@ -62,3 +72,4 @@ setInterval(function(){
     }
 
 },1000/25);
+
