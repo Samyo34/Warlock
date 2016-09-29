@@ -280,7 +280,7 @@ Wizard.prototype.update = function() {
             else  // else we set up the velocity
             {
                 //console.log(this.currentSpeed);
-                this.body.velocity.setTo(this.friction * this.currentSpeed * Math.cos(this.rotation)+this.spellActionVelocity.x, this.friction * this.currentSpeed * Math.sin(this.rotation)+this.spellActionVelocity.y);
+                this.body.velocity.setTo(this.friction * this.currentSpeed * Math.cos(this.rotation*Math.PI/180)+this.spellActionVelocity.x, this.friction * this.currentSpeed * Math.sin(this.rotation*Math.PI/180)+this.spellActionVelocity.y);
             }
             //================ Update rotation ================
             // we compute the desiredAngle towards the clicked point (in radians)

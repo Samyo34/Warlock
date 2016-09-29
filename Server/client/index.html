@@ -27,8 +27,12 @@
             ctx.clearRect(0,0,800,560);
             for(var i in data)
             {
+               // ctx.rotate(data[i].rotation*Math.PI/180);
                 ctx.beginPath();
-                ctx.arc(data[i].x, data[i].y, 10, 0, 2 * Math.PI, false);
+                ctx.moveTo(data[i].x+0,data[i].y-10);
+                ctx.lineTo(data[i].x-10,data[i].y+0);
+                ctx.lineTo(data[i].x+10,data[i].y+0);
+                //ctx.arc(data[i].x, data[i].y, 10, 0, 2 * Math.PI, false);
                 ctx.fillStyle = 'green';
                 ctx.fill();
                 ctx.lineWidth = 5;

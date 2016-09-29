@@ -44,6 +44,7 @@ io.sockets.on('connection',function(socket){
     socket.on('mouseClick',function(data){
         var player = PLAYERS[socket.id];
         player.setGoalDest(data.x,data.y);
+        player.currentSpeed = player.SPEED;
         console.log('mouseCliked recived : '+data.x +':'+data.y);
     });
 });
@@ -61,6 +62,7 @@ setInterval(function(){
         pack.push({
             x:player.x,
             y:player.y,
+            rotation:player.rotation,
             id:player.id
         });
     }
