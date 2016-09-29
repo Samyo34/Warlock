@@ -52,7 +52,7 @@ var Player = function(id){
 
 Player.prototype.updatePosition = function()
 {
-    if(Math.abs(this.x - this.goalDest.x) <= 4 && Math.abs(this.y - this.goalDest.y) <= 4 )
+    if(Math.abs(this.x - this.goalDest.x) <= 8 && Math.abs(this.y - this.goalDest.y) <= 8 )
     {
         this.veloX=0;
         this.veloY=0;
@@ -68,7 +68,7 @@ Player.prototype.updatePosition = function()
 
     // we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
     var error = angleDesired - this.rotation;
-    console.log(error+ ' '+ angleDesired+ ' '+ this.rotation);
+
     // If the error is small enough, we set the angular velocity to zero
     if (Math.abs(error) <= 0.001)
     {
@@ -102,7 +102,7 @@ Player.prototype.updatePosition = function()
 
     this.x += this.veloX;
     this.y += this.veloY;
-    this.rotation = this.rotation;
+   // this.rotation = this.rotation;
 
     this.rotation += this.angularVelocity;
 

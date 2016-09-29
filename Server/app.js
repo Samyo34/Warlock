@@ -45,7 +45,6 @@ io.sockets.on('connection',function(socket){
         var player = PLAYERS[socket.id];
         player.setGoalDest(data.x,data.y);
         player.currentSpeed = player.SPEED;
-        console.log('mouseCliked recived : '+data.x +':'+data.y);
     });
 });
 

@@ -13,7 +13,7 @@
         var clicY=0;
         var clicX=0;
         var id = 0;
-       var socket = io.connect('http://localhost:2000');
+       var socket = io.connect('http://176.189.11.21:2000');
 
        var ctx = document.getElementById("canvas").getContext("2d");
        ctx.font='30px Arial';
@@ -24,20 +24,21 @@
         });
 
         socket.on('updateServer',function(data){
-            ctx.clearRect(0,0,800,560);
+
             for(var i in data)
             {
-               // ctx.rotate(data[i].rotation*Math.PI/180);
-                ctx.beginPath();
-                ctx.moveTo(data[i].x+0,data[i].y-10);
-                ctx.lineTo(data[i].x-10,data[i].y+0);
-                ctx.lineTo(data[i].x+10,data[i].y+0);
-                //ctx.arc(data[i].x, data[i].y, 10, 0, 2 * Math.PI, false);
+                ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+
+                ctx.save();
+                ctx.translate(data[i].x,data[i].y);
+                ctx.rotate(data[i].rotation*Math.PI/180);
+                console.log(data[i].x+':'+data[i].y+ ' '+ data[i].rotation);
+                ctx.fillRect(-10 ,-10, 20, 20);
                 ctx.fillStyle = 'green';
-                ctx.fill();
                 ctx.lineWidth = 5;
-                ctx.strokeStyle = '#003300';
-                ctx.stroke();
+                ctx.restore();
+                //ctx.strokeStyle = '#003300';
+               // ctx.stroke();
             }
         });
 
@@ -45,7 +46,6 @@
         $('#canvas').on('mousedown',function(e){
             clicX = e.pageX - $(this).offset().left;
             clicY = e.pageY - $(this).offset().top;
-            console.log(clicX + ' '+clicY);
             socket.emit('mouseClick',{
                 x:clicX,
                 y:clicY,
