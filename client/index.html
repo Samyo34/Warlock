@@ -47,6 +47,8 @@
 	var Img = {};
 	Img.player = new Image();
 	Img.player.src = '/client/img/sorcier.png';
+    Img.enemy = new Image();
+    Img.enemy.src = '/client/img/enemy.png';
 	
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
@@ -59,21 +61,37 @@
 		self.y = initPack.y;
 		self.rotation = initPack.rotation;
 		
-		self.draw = function(){	
-			var x = self.x;
-			var y = self.y;
-			
-			var width = Img.player.width*2;
-			var height = Img.player.height*2;
-			
-			ctx.save(); // save current state
-			ctx.translate(x,y);
-			//ctx.rotate(Player.list[i].rotation*Math.PI/180);
-			ctx.rotate(self.rotation); // rotate
-			ctx.drawImage(Img.player,
-				0,0,Img.player.width,Img.player.height,
-				-width/2,-height/2,width,height);
-			ctx.restore(); 
+		self.draw = function(){
+            var x = self.x;
+            var y = self.y;
+
+            if(self.id === selfId) {
+                var width = Img.player.width*2;
+                var height = Img.player.height*2;
+
+                ctx.save(); // save current state
+                ctx.translate(x,y);
+                //ctx.rotate(Player.list[i].rotation*Math.PI/180);
+                ctx.rotate(self.rotation); // rotate
+                ctx.drawImage(Img.player,
+                        0,0,Img.player.width,Img.player.height,
+                        -width/2,-height/2,width,height);
+                ctx.restore();
+            }
+            else {
+                var width = Img.enemy.width*2;
+                var height = Img.enemy.height*2;
+
+                ctx.save(); // save current state
+                ctx.translate(x,y);
+                //ctx.rotate(Player.list[i].rotation*Math.PI/180);
+                ctx.rotate(self.rotation); // rotate
+                ctx.drawImage(Img.enemy,
+                        0,0,Img.enemy.width,Img.enemy.height,
+                        -width/2,-height/2,width,height);
+                ctx.restore();
+            }
+
 		}
 		
 		Player.list[self.id] = self;
@@ -92,8 +110,11 @@
 	}
 	Bullet.list = {};
 	
-	
-	socket.on('init',function(data){	
+	var selfId = null;
+
+	socket.on('init',function(data){
+	    if(data.selfId)
+	        selfId = data.selfId;
 		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
 		for(var i = 0 ; i < data.player.length; i++){
 			new Player(data.player[i]);
