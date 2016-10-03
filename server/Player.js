@@ -44,8 +44,8 @@ var Player = function(id){
 	
 	var super_update = self.update;
 	self.update = function(){
-		self.updatePosition();
         self.updateFriction();
+	    self.updatePosition();
 
         super_update();
 
@@ -84,7 +84,7 @@ var Player = function(id){
 		}	
 	};
 	
-	self.setGoalDest = function(destX,destY){
+	self.setGoalDest = function(destX, destY){
 		self.goalDest.x = destX;
 		self.goalDest.y = destY;
 	};
