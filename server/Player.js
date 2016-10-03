@@ -47,18 +47,20 @@ var Player = function(id){
 	var super_update = self.update;
 	self.update = function(){
 		self.updatePosition();
-		super_update();
-		//console.log(self.x + " " + self.y)
+        self.updateFriction();
+
+        super_update();
+
 		if(self.pressingAttack){
 			self.shootBullet(self.mouseAngle);
 		}
-	}
+	};
 
 	self.shootBullet = function(angle){
 		var b = Bullet(self.id,angle);
 		b.x = self.x;
 		b.y = self.y;
-	}
+	};
 	
 	self.getInitPack = function(){
 		return {
@@ -70,7 +72,7 @@ var Player = function(id){
 			hpMax:self.hpMax,
 			score:self.score,
 		};		
-	}
+	};
 	
 	self.getUpdatePack = function(){
 		return {
@@ -81,13 +83,30 @@ var Player = function(id){
 			hp:self.hp,
 			score:self.score,
 		}	
-	}
+	};
 	
 	self.setGoalDest = function(destX,destY){
 		self.goalDest.x = destX;
 		self.goalDest.y = destY;
-	}
-	
+	};
+
+	self.updateFriction = function() {
+        // Check if the player is on the lava:
+        var line = Math.floor(self.x / TILE_WIDTH);
+        var column = Math.floor(self.y / TILE_HEIGHT);
+
+        var indexInMapArray = column*25 + line;
+        if (map_array[indexInMapArray] == LAVA) // player on lava
+        {
+            self.friction = 0.5;
+            self.health -= 0.5;
+        }
+        else
+        {
+            self.friction = 1;
+        }
+    };
+
 	self.updatePosition = function() {
 		if(Math.abs(self.x - self.goalDest.x) <= 8 && Math.abs(self.y - self.goalDest.y) <= 8 ) {
 			self.spdX=0;
@@ -147,19 +166,19 @@ var Player = function(id){
 		
 		self.rotation += self.angularVelocity/1000; // Why /1000 ?
 		
-	}
+	};
 	
 	Player.list[id] = self;
 	
 	initPack.player.push(self.getInitPack());
 	
 	return self;
-}
+};
 
 Player.list = {};
 
 Player.onConnect = function(socket){
-	console.log("Player connected.")
+	console.log("Player connected.");
 	
 	var player = Player(socket.id);
 	
@@ -187,7 +206,6 @@ Player.onConnect = function(socket){
 	socket.on('mouseClick',function(data){
         player.setGoalDest(data.x,data.y);
         player.currentSpeed = player.SPEED;
-		console.log("Click");
     });
 	
 	socket.emit('init',{
@@ -195,19 +213,19 @@ Player.onConnect = function(socket){
 		player:Player.getAllInitPack(),
 		bullet:Bullet.getAllInitPack()
 	})
-}
+};
 
 Player.getAllInitPack = function(){
 	var players = [];
 	for(var i in Player.list)
 		players.push(Player.list[i].getInitPack());
 	return players;
-}
+};
 
 Player.onDisconnect = function(socket){
 	delete Player.list[socket.id];
 	removePack.player.push(socket.id);
-}
+};
 
 Player.update = function(){
 	var pack = [];
@@ -217,4 +235,4 @@ Player.update = function(){
 		pack.push(player.getUpdatePack());		
 	}
 	return pack;
-}
+};
