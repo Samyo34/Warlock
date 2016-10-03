@@ -21,7 +21,7 @@ var Player = function(id){
     self.fullHealth = 200;
     self.health = 200;
 
-    self.SPEED = 10;
+    self.SPEED = 2;
 
     self.friction = 1;
     self.currentSpeed = 0;
@@ -47,7 +47,6 @@ var Player = function(id){
 	var super_update = self.update;
 	self.update = function(){
 		self.updatePosition();
-		self.updateSpd();
 		super_update();
 		//console.log(self.x + " " + self.y)
 		if(self.pressingAttack){
@@ -106,10 +105,10 @@ var Player = function(id){
 
 		// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
 		var error = angleDesired - self.rotation;
-		console.log("rotation: " + self.rotation)
-		console.log("angleDesired: " + angleDesired)
+		//console.log("rotation: " + self.rotation)
+		//console.log("angleDesired: " + angleDesired)
 		
-		console.log("error :" + error)
+		//console.log("error :" + error)
 
 		// If the error is small enough, we set the angular velocity to zero
 		if (Math.abs(error) <= 0.001) {
@@ -119,7 +118,7 @@ var Player = function(id){
 		else {
 			error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
 
-			self.angularVelocity = 500*error; // we multiply the error by a gain K in order to converge faster
+			self.angularVelocity = 150*error; // we multiply the error by a gain K in order to converge faster
 		}
 
 	/*
@@ -148,22 +147,6 @@ var Player = function(id){
 		
 		self.rotation += self.angularVelocity/1000; // Why /1000 ?
 		
-	}
-	
-	self.updateSpd = function(){
-		if(self.pressingRight)
-			self.spdX = self.maxSpd;
-		else if(self.pressingLeft)
-			self.spdX = -self.maxSpd;
-		else
-			self.spdX = 0;
-		
-		if(self.pressingUp)
-			self.spdY = -self.maxSpd;
-		else if(self.pressingDown)
-			self.spdY = self.maxSpd;
-		else
-			self.spdY = 0;		
 	}
 	
 	Player.list[id] = self;
