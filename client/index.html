@@ -11,6 +11,7 @@
 </div>
 
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script src="./client/js/HealthBar.standalone.js"></script>
 <script src="./client/js/jquery.js"></script>
 <script>
 
@@ -66,6 +67,11 @@
 		self.x = initPack.x;
 		self.y = initPack.y;
 		self.rotation = initPack.rotation;
+        self.hp = initPack.hp;
+        self.hpMax = initPack.hpMax;
+        self.hp = initPack.hp;
+
+        //this.healthBar = new HealthBar(game, {x: x, y: y-25, width: 40, height : 5});
 		
 		self.draw = function(){
             var x = self.x;
@@ -85,6 +91,16 @@
                 ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);
             }
             ctx.restore();
+
+            // Draw healthbar:
+            if(self.id === selfId) {
+                ctx.fillStyle = "#34C924";
+            }
+            else {
+                ctx.fillStyle="#FF0000";
+            }
+            ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
+            
 		};
 		
 		Player.list[self.id] = self;
@@ -92,7 +108,6 @@
 	};
 
 	Player.list = {};
-
 		
 	var Bullet = function(initPack){
 		var self = {};
@@ -158,6 +173,7 @@
 	setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         drawMap();
+
         for(var i in Player.list) {
 			ctx.save();
 			ctx.translate(Player.list[i].x,Player.list[i].y);
@@ -172,8 +188,7 @@
 			ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
 		}
 	},40);
-	
-	
+
 	document.onkeydown = function(event){
 		if(event.keyCode === 68)	//d
 			socket.emit('keyPress',{inputId:'right',state:true});
@@ -208,8 +223,3 @@
 	})
 
 </script>
-
-
-
-
-

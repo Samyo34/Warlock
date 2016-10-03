@@ -18,8 +18,8 @@ var Player = function(id){
 
     self.isDead = false;
 
-    self.fullHealth = 200;
-    self.health = 200;
+    self.hpMax = 200;
+    self.hp = 200;
 
     self.SPEED = 2;
 
@@ -36,8 +36,6 @@ var Player = function(id){
     self.actionTime = 0;
     self.ratioSpeed = 1;
     self.actionDuration = 0;
-
-	//  this.healthBar = new HealthBar(game, {x: x, y: y-25, width: 40, height : 5});
 
     self.Spell = [];
    //this.Spell.push(new Spell.FireBall(game, xSpellIndic, ySpellIndic));
@@ -81,6 +79,7 @@ var Player = function(id){
 			y:self.y,
 			rotation:self.rotation,
 			hp:self.hp,
+            hpMax:self.hpMax,
 			score:self.score,
 		}	
 	};
