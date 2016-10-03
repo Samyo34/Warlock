@@ -18,10 +18,10 @@ var Player = function(id){
 
     self.isDead = false;
 
-    self.fullHealth = 200;
-    self.health = 200;
+    self.hpMax = 200;
+    self.hp = 200;
 
-    self.SPEED = 10;
+    self.SPEED = 2;
 
     self.friction = 1;
     self.currentSpeed = 0;
@@ -37,8 +37,6 @@ var Player = function(id){
     self.ratioSpeed = 1;
     self.actionDuration = 0;
 
-	//  this.healthBar = new HealthBar(game, {x: x, y: y-25, width: 40, height : 5});
-
     self.Spell = [];
    //this.Spell.push(new Spell.FireBall(game, xSpellIndic, ySpellIndic));
    
@@ -46,20 +44,21 @@ var Player = function(id){
 	
 	var super_update = self.update;
 	self.update = function(){
-		self.updatePosition();
-		self.updateSpd();
-		super_update();
-		//console.log(self.x + " " + self.y)
+        self.updateFriction();
+	    self.updatePosition();
+
+        super_update();
+
 		if(self.pressingAttack){
 			self.shootBullet(self.mouseAngle);
 		}
-	}
+	};
 
 	self.shootBullet = function(angle){
 		var b = Bullet(self.id,angle);
 		b.x = self.x;
 		b.y = self.y;
-	}
+	};
 	
 	self.getInitPack = function(){
 		return {
@@ -71,7 +70,7 @@ var Player = function(id){
 			hpMax:self.hpMax,
 			score:self.score,
 		};		
-	}
+	};
 	
 	self.getUpdatePack = function(){
 		return {
@@ -80,15 +79,33 @@ var Player = function(id){
 			y:self.y,
 			rotation:self.rotation,
 			hp:self.hp,
+            hpMax:self.hpMax,
 			score:self.score,
 		}	
-	}
+	};
 	
-	self.setGoalDest = function(destX,destY){
+	self.setGoalDest = function(destX, destY){
 		self.goalDest.x = destX;
 		self.goalDest.y = destY;
-	}
-	
+	};
+
+	self.updateFriction = function() {
+        // Check if the player is on the lava:
+        var line = Math.floor(self.x / TILE_WIDTH);
+        var column = Math.floor(self.y / TILE_HEIGHT);
+
+        var indexInMapArray = column*25 + line;
+        if (map_array[indexInMapArray] == LAVA) // player on lava
+        {
+            self.friction = 0.5;
+            self.health -= 0.5;
+        }
+        else
+        {
+            self.friction = 1;
+        }
+    };
+
 	self.updatePosition = function() {
 		if(Math.abs(self.x - self.goalDest.x) <= 8 && Math.abs(self.y - self.goalDest.y) <= 8 ) {
 			self.spdX=0;
@@ -106,10 +123,10 @@ var Player = function(id){
 
 		// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
 		var error = angleDesired - self.rotation;
-		console.log("rotation: " + self.rotation)
-		console.log("angleDesired: " + angleDesired)
+		//console.log("rotation: " + self.rotation)
+		//console.log("angleDesired: " + angleDesired)
 		
-		console.log("error :" + error)
+		//console.log("error :" + error)
 
 		// If the error is small enough, we set the angular velocity to zero
 		if (Math.abs(error) <= 0.001) {
@@ -119,7 +136,7 @@ var Player = function(id){
 		else {
 			error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
 
-			self.angularVelocity = 500*error; // we multiply the error by a gain K in order to converge faster
+			self.angularVelocity = 150*error; // we multiply the error by a gain K in order to converge faster
 		}
 
 	/*
@@ -148,35 +165,19 @@ var Player = function(id){
 		
 		self.rotation += self.angularVelocity/1000; // Why /1000 ?
 		
-	}
-	
-	self.updateSpd = function(){
-		if(self.pressingRight)
-			self.spdX = self.maxSpd;
-		else if(self.pressingLeft)
-			self.spdX = -self.maxSpd;
-		else
-			self.spdX = 0;
-		
-		if(self.pressingUp)
-			self.spdY = -self.maxSpd;
-		else if(self.pressingDown)
-			self.spdY = self.maxSpd;
-		else
-			self.spdY = 0;		
-	}
+	};
 	
 	Player.list[id] = self;
 	
 	initPack.player.push(self.getInitPack());
 	
 	return self;
-}
+};
 
 Player.list = {};
 
 Player.onConnect = function(socket){
-	console.log("Player connected.")
+	console.log("Player connected.");
 	
 	var player = Player(socket.id);
 	
@@ -204,7 +205,6 @@ Player.onConnect = function(socket){
 	socket.on('mouseClick',function(data){
         player.setGoalDest(data.x,data.y);
         player.currentSpeed = player.SPEED;
-		console.log("Click");
     });
 	
 	socket.emit('init',{
@@ -212,19 +212,19 @@ Player.onConnect = function(socket){
 		player:Player.getAllInitPack(),
 		bullet:Bullet.getAllInitPack()
 	})
-}
+};
 
 Player.getAllInitPack = function(){
 	var players = [];
 	for(var i in Player.list)
 		players.push(Player.list[i].getInitPack());
 	return players;
-}
+};
 
 Player.onDisconnect = function(socket){
 	delete Player.list[socket.id];
 	removePack.player.push(socket.id);
-}
+};
 
 Player.update = function(){
 	var pack = [];
@@ -234,4 +234,4 @@ Player.update = function(){
 		pack.push(player.getUpdatePack());		
 	}
 	return pack;
-}
+};

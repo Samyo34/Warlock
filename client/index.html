@@ -1,12 +1,12 @@
 <div id="gameDiv">
-	<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+	<canvas id="ctx" width="800" height="800" style="border:1px solid #000000;"></canvas>
 
 	<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
 		<div>Hello!</div>
 	</div>
 
 	<form id="chat-form">
-		<input id="chat-input" type="text" style="width:500px"></input>
+		<input id="chat-input" type="text" style="width:800px"></input>
 	</form>
 </div>
 
@@ -14,8 +14,8 @@
 <script src="./client/js/jquery.js"></script>
 <script>
 
-	var WIDTH = 500;
-	var HEIGHT = 500;
+	var WIDTH = 800;
+	var HEIGHT = 800;
 	
 	var socket = io();
 	
@@ -41,14 +41,20 @@
 		else
 			socket.emit('sendMsgToServer',chatInput.value);
 		chatInput.value = '';		
-	}
+	};
 	
 	//game
 	var Img = {};
 	Img.player = new Image();
 	Img.player.src = '/client/img/sorcier.png';
     Img.enemy = new Image();
-    Img.enemy.src = '/client/img/enemy.png';
+    Img.enemy.src = '/client/img/enemy.png'
+    Img.map = new Image();
+    Img.map.src = '/client/img/map_lave_v1.1.png';
+
+    var drawMap = function () {
+        ctx.drawImage(Img.map, 0, 0);
+    };
 	
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
@@ -60,45 +66,45 @@
 		self.x = initPack.x;
 		self.y = initPack.y;
 		self.rotation = initPack.rotation;
-		
+        self.hp = initPack.hp;
+        self.hpMax = initPack.hpMax;
+        self.hp = initPack.hp;
+
 		self.draw = function(){
             var x = self.x;
             var y = self.y;
 
-            if(self.id === selfId) {
-                var width = Img.player.width*2;
-                var height = Img.player.height*2;
+            var width = Img.player.width;
+            var height = Img.player.height;
 
-                ctx.save(); // save current state
-                ctx.translate(x,y);
-                //ctx.rotate(Player.list[i].rotation*Math.PI/180);
-                ctx.rotate(self.rotation); // rotate
-                ctx.drawImage(Img.player,
-                        0,0,Img.player.width,Img.player.height,
-                        -width/2,-height/2,width,height);
-                ctx.restore();
+            ctx.save(); // save current state
+            ctx.translate(x,y);
+            ctx.rotate(self.rotation); // rotate
+
+            if(self.id === selfId) {
+                ctx.drawImage(Img.player, 0,0,width,height, -width/2,-height/2,width,height);
             }
             else {
-                var width = Img.enemy.width*2;
-                var height = Img.enemy.height*2;
-
-                ctx.save(); // save current state
-                ctx.translate(x,y);
-                //ctx.rotate(Player.list[i].rotation*Math.PI/180);
-                ctx.rotate(self.rotation); // rotate
-                ctx.drawImage(Img.enemy,
-                        0,0,Img.enemy.width,Img.enemy.height,
-                        -width/2,-height/2,width,height);
-                ctx.restore();
+                ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);
             }
+            ctx.restore();
 
-		}
+            // Draw healthbar:
+            if(self.id === selfId) {
+                ctx.fillStyle = "#34C924"; // green
+            }
+            else {
+                ctx.fillStyle="#FF0000"; // red
+            }
+            ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
+
+		};
 		
 		Player.list[self.id] = self;
 		return self;
-	}
-	Player.list = {};
+	};
 
+	Player.list = {};
 		
 	var Bullet = function(initPack){
 		var self = {};
@@ -107,7 +113,8 @@
 		self.y = initPack.y;
 		Bullet.list[self.id] = self;		
 		return self;
-	}
+	};
+
 	Bullet.list = {};
 	
 	var selfId = null;
@@ -159,78 +166,58 @@
 			delete Bullet.list[data.bullet[i]];
 		}
 	});
-	
-	setInterval(function(){
+
+    document.onkeydown = function(event){
+        if(event.keyCode === 68)	//d
+            socket.emit('keyPress',{inputId:'right',state:true});
+        else if(event.keyCode === 83)	//s
+            socket.emit('keyPress',{inputId:'down',state:true});
+        else if(event.keyCode === 65) //a
+            socket.emit('keyPress',{inputId:'left',state:true});
+        else if(event.keyCode === 87) // w
+            socket.emit('keyPress',{inputId:'up',state:true});
+
+    }
+    document.onkeyup = function(event){
+        if(event.keyCode === 68)	//d
+            socket.emit('keyPress',{inputId:'right',state:false});
+        else if(event.keyCode === 83)	//s
+            socket.emit('keyPress',{inputId:'down',state:false});
+        else if(event.keyCode === 65) //a
+            socket.emit('keyPress',{inputId:'left',state:false});
+        else if(event.keyCode === 87) // w
+            socket.emit('keyPress',{inputId:'up',state:false});
+    }
+
+    //jQuery
+    $('#ctx').on('mousedown',function(e){
+        clicX = e.pageX - $(this).offset().left;
+        clicY = e.pageY - $(this).offset().top;
+        console.log("click client");
+        socket.emit('mouseClick',{
+            x:clicX,
+            y:clicY
+        });
+    })
+
+
+    setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
-		for(var i in Player.list) {
-			/*ctx.save();
+        drawMap();
+
+        for(var i in Player.list) {
+			ctx.save();
 			ctx.translate(Player.list[i].x,Player.list[i].y);
 			ctx.rotate(Player.list[i].rotation*Math.PI/180);
 			ctx.fillRect(-10 ,-10, 20, 20);
 			ctx.fillStyle = 'green';
 			ctx.lineWidth = 5;
-			ctx.restore();*/
+			ctx.restore();
 			Player.list[i].draw()
 		}
 		for(var i in Bullet.list) {
-			//ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
+			ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
 		}
 	},40);
-	
-	
-	document.onkeydown = function(event){
-		if(event.keyCode === 68)	//d
-			socket.emit('keyPress',{inputId:'right',state:true});
-		else if(event.keyCode === 83)	//s
-			socket.emit('keyPress',{inputId:'down',state:true});
-		else if(event.keyCode === 65) //a
-			socket.emit('keyPress',{inputId:'left',state:true});
-		else if(event.keyCode === 87) // w
-			socket.emit('keyPress',{inputId:'up',state:true});
-			
-	}
-	document.onkeyup = function(event){
-		if(event.keyCode === 68)	//d
-			socket.emit('keyPress',{inputId:'right',state:false});
-		else if(event.keyCode === 83)	//s
-			socket.emit('keyPress',{inputId:'down',state:false});
-		else if(event.keyCode === 65) //a
-			socket.emit('keyPress',{inputId:'left',state:false});
-		else if(event.keyCode === 87) // w
-			socket.emit('keyPress',{inputId:'up',state:false});
-	}
-	
-	//jQuery
-	$('#ctx').on('mousedown',function(e){
-		clicX = e.pageX - $(this).offset().left;
-		clicY = e.pageY - $(this).offset().top;
-		console.log("click client");
-		socket.emit('mouseClick',{
-			x:clicX,
-			y:clicY
-		});
-	})
-		
-	/*document.onmousedown = function(event){
-		socket.emit('keyPress',{inputId:'',state:true});
-	}
-	document.onmouseup = function(event){
-		socket.emit('keyPress',{inputId:'attack',state:false});
-	}
-	
-	document.onmousemove = function(event){
-		var x = -250 + event.clientX - 8;
-		var y = -250 + event.clientY - 8;
-		var angle = Math.atan2(y,x) / Math.PI * 180;
-		socket.emit('keyPress',{inputId:'mouseAngle',state:angle});
-	}*/
-	
-	
-	
-	
+
 </script>
-
-
-
-
-
