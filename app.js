@@ -100,13 +100,3 @@ setInterval(function(){
 	removePack.bullet = [];
 	
 },1000/25);
-
-
-
-
-
-
-
-
-
-

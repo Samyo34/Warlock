@@ -37,11 +37,13 @@ var Player = function(id){
     self.ratioSpeed = 1;
     self.actionDuration = 0;
 
+	self.targetVisible = false;
+	self.targetType = '';
     self.Spell = [];
    //this.Spell.push(new Spell.FireBall(game, xSpellIndic, ySpellIndic));
    
 	self.mouseAngle = 0;
-	
+
 	var super_update = self.update;
 	self.update = function(){
         self.updateFriction();
@@ -69,6 +71,8 @@ var Player = function(id){
 			hp:self.hp,
 			hpMax:self.hpMax,
 			score:self.score,
+			targetVisible:self.targetVisible,
+			targetType:self.targetType,
 		};		
 	};
 	
@@ -81,6 +85,8 @@ var Player = function(id){
 			hp:self.hp,
             hpMax:self.hpMax,
 			score:self.score,
+			targetVisible:self.targetVisible,
+			targetType:self.targetType,
 		}	
 	};
 	
@@ -182,24 +188,29 @@ Player.onConnect = function(socket){
 	var player = Player(socket.id);
 	
 	socket.on('keyPress',function(data){
-		if(data.inputId === 'left') {
-			player.pressingLeft = data.state;
-			console.log("left")
+		if(data.inputId === 'A') {
+			player.targetVisible = data.state;
+			player.targetType = 'A';
+			console.log("A")
 		}
-		else if(data.inputId === 'right') {
-			player.pressingRight = data.state;
-			console.log("right")
+		else if(data.inputId === 'Z') {
+			player.targetVisible = data.state;
+			player.targetType = 'Z';
+			console.log("Z")
 		}
-		else if(data.inputId === 'up') {
-			player.pressingUp = data.state;
-			console.log("up")
+		else if(data.inputId === 'E') {
+			player.targetVisible = data.state;
+			player.targetType = 'E';
+			console.log("E")
 		}
-		else if(data.inputId === 'down')
-			player.pressingDown = data.state;
-		else if(data.inputId === 'attack')
-			player.pressingAttack = data.state;
-		else if(data.inputId === 'mouseAngle')
+		else if(data.inputId === 'R') {
+			player.targetVisible = data.state;
+			player.targetType = 'R';
+			console.log("R")
+		}
+		else if(data.inputId === 'mouseAngle') {
 			player.mouseAngle = data.state;
+		}
 	});
 	
 	socket.on('mouseRightClick',function(data){
@@ -241,3 +252,20 @@ Player.update = function(){
 	}
 	return pack;
 };
+
+/*if(game.input.mouse.button === Phaser.Mouse.RIGHT_BUTTON)
+{
+	console.log("Right click")
+	goalDestination = new Phaser.Point(game.input.x, game.input.y);
+	wizard[0].goalDest = goalDestination;
+	wizard[0].currentSpeed = wizard[0].SPEED;
+}
+
+if(target.visible && game.input.mouse.button === Phaser.Mouse.LEFT_BUTTON)
+{
+	console.log("Left click")
+	wizard[0].isShooting = true;
+	wizard[0].aimGoalPoint = new Phaser.Point(game.input.x, game.input.y);
+	wizard[0].prepareSpell("blink", wizard[0].x, wizard[0].y, game.input.x, game.input.y);
+	target.visible = false;
+}*/

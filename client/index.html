@@ -13,14 +13,16 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src="./client/js/jquery.js"></script>
 <script>
-
 	var WIDTH = 800;
 	var HEIGHT = 800;
 	
 	var socket = io();
 	
-	var clicY=0;
-	var clicX=0;
+	var click_Y = 0;
+	var click_X = 0;
+
+	var mouse_X = 0;
+	var mouse_Y = 0;
 	
 	//chat
 	var chatText = document.getElementById('chat-text');
@@ -51,6 +53,8 @@
     Img.enemy.src = '/client/img/enemy.png'
     Img.map = new Image();
     Img.map.src = '/client/img/map_lave_v1.1.png';
+	Img.fireball_target = new Image();
+	Img.fireball_target.src = '/client/img/spellarea.png';
 
     var drawMap = function () {
         ctx.drawImage(Img.map, 0, 0);
@@ -69,34 +73,51 @@
         self.hp = initPack.hp;
         self.hpMax = initPack.hpMax;
         self.hp = initPack.hp;
+		self.targetVisible = initPack.targetVisible;
+		self.targetType = initPack.targetType;
 
 		self.draw = function(){
-            var x = self.x;
-            var y = self.y;
+			var x = self.x;
+			var y = self.y;
 
-            var width = Img.player.width;
-            var height = Img.player.height;
+			var width = Img.player.width;
+			var height = Img.player.height;
 
-            ctx.save(); // save current state
-            ctx.translate(x,y);
-            ctx.rotate(self.rotation); // rotate
+			ctx.save(); // save current state
+			ctx.translate(x,y);
+			ctx.rotate(self.rotation); // rotate
 
-            if(self.id === selfId) {
-                ctx.drawImage(Img.player, 0,0,width,height, -width/2,-height/2,width,height);
-            }
-            else {
-                ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);
-            }
-            ctx.restore();
+			if(self.id === selfId) {
+				ctx.drawImage(Img.player, 0,0,width,height, -width/2,-height/2,width,height);
+			}
+			else {
+				ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);
+			}
+			ctx.restore();
 
-            // Draw healthbar:
-            if(self.id === selfId) {
-                ctx.fillStyle = "#34C924"; // green
-            }
-            else {
-                ctx.fillStyle="#FF0000"; // red
-            }
-            ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
+			// Draw healthbar:
+			if(self.id === selfId) {
+				ctx.fillStyle = "#34C924"; // green
+			}
+			else {
+				ctx.fillStyle="#FF0000"; // red
+			}
+			ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
+
+		};
+
+		self.drawTarget = function(){
+			if(self.id === selfId) {
+				if (self.targetVisible === false || self.targetType === "") {
+					return
+				}
+				else if (self.targetType === "A") {
+					var width = Img.fireball_target.width;
+					var height = Img.fireball_target.height;
+					ctx.drawImage(Img.fireball_target, mouse_X - (width / 2), mouse_Y - (height / 2));
+				}
+			}
+
 
 		};
 		
@@ -143,6 +164,10 @@
 					p.y = pack.y;
 				if(pack.rotation !== undefined)
 					p.rotation = pack.rotation;
+				if(pack.targetVisible !== undefined)
+					p.targetVisible = pack.targetVisible;
+				if(pack.targetType !== undefined)
+					p.targetType = pack.targetType;
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
@@ -167,41 +192,70 @@
 		}
 	});
 
-    document.onkeydown = function(event){
-        if(event.keyCode === 68)	//d
-            socket.emit('keyPress',{inputId:'right',state:true});
-        else if(event.keyCode === 83)	//s
-            socket.emit('keyPress',{inputId:'down',state:true});
-        else if(event.keyCode === 65) //a
-            socket.emit('keyPress',{inputId:'left',state:true});
-        else if(event.keyCode === 87) // w
-            socket.emit('keyPress',{inputId:'up',state:true});
+	/*// Check the keycode on this website:
+	// http://www.west-wind.com/westwindwebtoolkit/samples/ajax/html5andcss3/keycodechecker.aspx
+	// Be careful, the keycode are not the same if we detect with keyup and down or keypress
+	$(document).keypress(function(e) {
+		var code = e.keyCode || e.which;
+		if(code == 97) { // key a
+			socket.emit('keyPress', {inputId: 'a', state: true});
+			console.log("a pressed")
+		}
+		else if(code === 122) { // key z
+			socket.emit('keyPress', {inputId: 'z', state: true});
+			console.log("z pressed")
+		}
+		else if(code === 101) { // key e
+			socket.emit('keyPress',{inputId:'e',state:true});
+			console.log("e pressed")
+		}
+		else if(code === 114) { // key r
+			socket.emit('keyPress', {inputId: 'r', state: true});
+			console.log("r pressed")
+		}
+	});*/
 
-    }
-    document.onkeyup = function(event){
-        if(event.keyCode === 68)	//d
-            socket.emit('keyPress',{inputId:'right',state:false});
-        else if(event.keyCode === 83)	//s
-            socket.emit('keyPress',{inputId:'down',state:false});
-        else if(event.keyCode === 65) //a
-            socket.emit('keyPress',{inputId:'left',state:false});
-        else if(event.keyCode === 87) // w
-            socket.emit('keyPress',{inputId:'up',state:false});
-    }
-
+	document.onkeydown = function(event){
+		if(event.keyCode === 65) { // key A
+			socket.emit('keyPress', {inputId: 'A', state: true});
+		}
+		else if(event.keyCode === 90) { // key Z
+			socket.emit('keyPress', {inputId: 'Z', state: true});
+		}
+		else if(event.keyCode === 69) { // key E
+			socket.emit('keyPress',{inputId:'E',state:true});
+		}
+		else if(event.keyCode === 82) { // key R
+			socket.emit('keyPress', {inputId: 'R', state: true});
+		}
+	};
+	document.onkeyup = function(event){
+		if(event.keyCode === 65) { // key A
+			socket.emit('keyPress', {inputId: 'A', state: false});
+		}
+		else if(event.keyCode === 90) { // key Z
+			socket.emit('keyPress', {inputId: 'Z', state: false});
+		}
+		else if(event.keyCode === 69) { // key E
+			socket.emit('keyPress',{inputId:'E',state:false});
+		}
+		else if(event.keyCode === 82) { // key R
+			socket.emit('keyPress', {inputId: 'R', state: false});
+		}
+	};
 
 	// jQuery:
 
 	// Mouse click handler
 	$('#ctx').mousedown(function(event) {
-		clicX = event.pageX - $(this).offset().left;
-		clicY = event.pageY - $(this).offset().top;
+		click_X = event.pageX - $(this).offset().left;
+		click_Y = event.pageY - $(this).offset().top;
 		switch (event.which) {
 			case 1:
 				console.log('Left click');
 				socket.emit('mouseLeftClick',{
-					x:clicX,
-					y:clicY
+					x:click_X,
+					y:click_Y
 				});
 				break;
 			case 2:
@@ -210,8 +264,8 @@
 			case 3:
 				console.log('Right click');
 				socket.emit('mouseRightClick',{
-					x:clicX,
-					y:clicY
+					x:click_X,
+					y:click_Y
 				});
 				break;
 			default:
@@ -221,6 +275,11 @@
 
 	// Disable the popup triggered by the right click
 	$('body').on('contextmenu', '#ctx', function(e){ return false; });
+
+	$( "#ctx" ).mousemove(function( event ) {
+		mouse_X = event.pageX;
+		mouse_Y = event.pageY;
+	});
 
     setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
@@ -235,10 +294,12 @@
 			ctx.lineWidth = 5;
 			ctx.restore();
 			Player.list[i].draw()
+			Player.list[i].drawTarget()
 		}
 		for(var i in Bullet.list) {
 			ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
 		}
 	},40);
+
 
 </script>
