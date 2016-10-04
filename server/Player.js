@@ -202,10 +202,16 @@ Player.onConnect = function(socket){
 			player.mouseAngle = data.state;
 	});
 	
-	socket.on('mouseClick',function(data){
+	socket.on('mouseRightClick',function(data){
         player.setGoalDest(data.x,data.y);
         player.currentSpeed = player.SPEED;
-    });
+		console.log("Right Click");
+	});
+	socket.on('mouseLeftClick',function(data){
+		//player.setGoalDest(data.x,data.y);
+		//player.currentSpeed = player.SPEED;
+		console.log("Left Click");
+	});
 	
 	socket.emit('init',{
 		selfId:socket.id,

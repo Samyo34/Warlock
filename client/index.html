@@ -189,17 +189,38 @@
             socket.emit('keyPress',{inputId:'up',state:false});
     }
 
-    //jQuery
-    $('#ctx').on('mousedown',function(e){
-        clicX = e.pageX - $(this).offset().left;
-        clicY = e.pageY - $(this).offset().top;
-        console.log("click client");
-        socket.emit('mouseClick',{
-            x:clicX,
-            y:clicY
-        });
-    })
 
+	// jQuery:
+
+	// Mouse click handler
+	$('#ctx').mousedown(function(event) {
+		clicX = event.pageX - $(this).offset().left;
+		clicY = event.pageY - $(this).offset().top;
+		switch (event.which) {
+			case 1:
+				console.log('Left click');
+				socket.emit('mouseLeftClick',{
+					x:clicX,
+					y:clicY
+				});
+				break;
+			case 2:
+				console.log('Middle click');
+				break;
+			case 3:
+				console.log('Right click');
+				socket.emit('mouseRightClick',{
+					x:clicX,
+					y:clicY
+				});
+				break;
+			default:
+				console.log("Unkown click")
+		}
+	});
+
+	// Disable the popup triggered by the right click
+	$('body').on('contextmenu', '#ctx', function(e){ return false; });
 
     setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
