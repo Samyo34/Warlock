@@ -9,7 +9,7 @@ var Player = function(id){
 	
 	self.rotation = 0;
 	self.angularVelocity = 0;
-    self.isOrientationGood = true;
+    self.isOrientationGood = false;
 	
 	self.goalDest = {
         x:self.x,
@@ -40,8 +40,12 @@ var Player = function(id){
 	self.targetVisible = false;
 	self.targetType = '';
     self.Spell = [];
-   //this.Spell.push(new Spell.FireBall(game, xSpellIndic, ySpellIndic));
-   
+	self.isShooting = false;
+	self.aimGoalPoint = {
+		x:self.x,
+		y:self.y
+	};
+
 	self.mouseAngle = 0;
 
 	var super_update = self.update;
@@ -90,9 +94,42 @@ var Player = function(id){
 		}	
 	};
 	
+	self.setAimGoal = function(destX, destY){
+		self.aimGoalPoint.x = destX;
+		self.aimGoalPoint.y = destY;
+	};
+
 	self.setGoalDest = function(destX, destY){
 		self.goalDest.x = destX;
 		self.goalDest.y = destY;
+	};
+
+	self.prepareSpell = function(name, aimGoalPoint) {
+		var spellDescriptor;
+
+		if(name == "fireball")
+		{
+			spellDescriptor = {spellName:"fireball", spellType:"bullet", x: aimGoalPoint.x, y: aimGoalPoint.y};
+			self.spellsToCast.push(spellDescriptor);
+		}
+		else if(name == "blink")
+		{
+			spellDescriptor = {spellName:"blink", spellType:"noBullet", xx: xx, yy: yy, x:x, y:y};
+			self.spellsToCast.push(spellDescriptor);
+		}
+	};
+
+	// then, when the wizard have the right orientation we cast it
+	self.castSpell = function() {
+		if(self.spellsToCast.length > 0)
+		{
+			var s = Spell(self, self.spellsToCast[0]);
+			self.spellsToCast.shift();
+		}
+		else
+		{
+			self.isShooting = false;
+		}
 	};
 
 	self.updateFriction = function() {
@@ -113,63 +150,79 @@ var Player = function(id){
     };
 
 	self.updatePosition = function() {
-		if(Math.abs(self.x - self.goalDest.x) <= 8 && Math.abs(self.y - self.goalDest.y) <= 8 ) {
-			self.spdX=0;
-			self.spdY=0;
-			self.currentSpeed =0;
+		if (self.isShooting) // we turn the wizard toward the aimGoalPoint
+		{
+			//this.body.velocity.setTo(0, 0);
+			self.spdX = 0;
+			self.spdY = 0;
+			self.currentSpeed = 0;
+
+			if(self.isOrientationGood)
+			{
+				self.castSpell();
+			}
+
+			//================ Update rotation ================
+			// we compute the desiredAngle towards the clicked point (in radians)
+			self.angleDesired = Math.atan2(self.aimGoalPoint.y - self.y, self.aimGoalPoint.x - self.x);
+
+			// we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
+			var error = self.angleDesired - self.rotation;
+
+			// If the error is small enough, we set the angular velocity to zero
+			console.log("error : " +  Math.abs(error))
+			if (Math.abs(error)%3.14 <= 0.1)
+			{
+				self.angularVelocity = 0;
+				self.isOrientationGood = true;
+			}
+			else
+			{
+				error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
+				self.angularVelocity = 150 * error; // we multiply the error by a gain K in order to converge faster
+				self.rotation += self.angularVelocity/1000; // Why /1000 ?
+			}
 		}
 		else {
-			//console.log("currentSpeed: " + self.currentSpeed)
-			self.spdX = self.friction * self.currentSpeed * Math.cos(self.rotation) + self.enemySpellActionVelocity.x;
-			self.spdY = self.friction * self.currentSpeed * Math.sin(self.rotation) + self.enemySpellActionVelocity.y;
+			if(Math.abs(self.x - self.goalDest.x) <= 8 && Math.abs(self.y - self.goalDest.y) <= 8 ) {
+				self.spdX = 0;
+				self.spdY = 0;
+				self.currentSpeed = 0;
+			}
+			else {
+				//console.log("currentSpeed: " + self.currentSpeed)
+				self.spdX = self.friction * self.currentSpeed * Math.cos(self.rotation) + self.enemySpellActionVelocity.x;
+				self.spdY = self.friction * self.currentSpeed * Math.sin(self.rotation) + self.enemySpellActionVelocity.y;
+			}
+
+			if(self.isOrientationGood != true) {
+				angleDesired = Math.atan2(self.goalDest.y - self.y, self.goalDest.x - self.x);
+				//console.log("AngleDesired: " + angleDesired);
+
+				// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
+				var error = angleDesired - self.rotation;
+				//console.log("rotation: " + self.rotation)
+				//console.log("angleDesired: " + angleDesired)
+
+				//console.log("error :" + error)
+
+				// If the error is small enough, we set the angular velocity to zero
+				if (Math.abs(error) <= 0.001) {
+					self.angularVelocity = 0;
+					self.isOrientationGood = true;
+				}
+				else {
+					error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
+
+					self.angularVelocity = 150 * error; // we multiply the error by a gain K in order to converge faster
+				}
+			}
+
+			self.x += self.spdX;
+			self.y += self.spdY;
+
+			self.rotation += self.angularVelocity/1000; // Why /1000 ?
 		}
-
-		angleDesired = Math.atan2(self.goalDest.y - self.y, self.goalDest.x - self.x);
-		//console.log("AngleDesired: " + angleDesired);
-
-		// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
-		var error = angleDesired - self.rotation;
-		//console.log("rotation: " + self.rotation)
-		//console.log("angleDesired: " + angleDesired)
-		
-		//console.log("error :" + error)
-
-		// If the error is small enough, we set the angular velocity to zero
-		if (Math.abs(error) <= 0.001) {
-			self.angularVelocity = 0;
-			self.isOrientationGood = true;
-		}
-		else {
-			error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
-
-			self.angularVelocity = 150*error; // we multiply the error by a gain K in order to converge faster
-		}
-
-	/*
-		angleDesired = Math.atan2(self.goalDest.y - self.y, self.goalDest.x - self.x);
-
-		// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
-		var error = angleDesired - self.rotation;
-
-		// If the error is small enough, we set the angular velocity to zero
-		if (Math.abs(error) <= 0.001)
-		{
-			self.body.angularVelocity = 0;
-			self.isOrientationGood = true;
-		}
-		else
-		{
-			error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
-			self.body.angularVelocity = K * error; // we multiply the error by a gain K in order to converge faster
-		}*/
-
-		self.x += self.spdX;
-		self.y += self.spdY;
-		//console.log("x: " + self.x + " y: " + self.y)
-	   // self.rotation = self.rotation;
-		
-		
-		self.rotation += self.angularVelocity/1000; // Why /1000 ?
 		
 	};
 	
@@ -214,13 +267,21 @@ Player.onConnect = function(socket){
 	});
 	
 	socket.on('mouseRightClick',function(data){
+		player.isOrientationGood = false;
         player.setGoalDest(data.x,data.y);
         player.currentSpeed = player.SPEED;
 		console.log("Right Click");
 	});
+
 	socket.on('mouseLeftClick',function(data){
-		//player.setGoalDest(data.x,data.y);
-		//player.currentSpeed = player.SPEED;
+		player.isOrientationGood = false;
+		if(player.targetVisible === true)
+		{
+			player.isShooting = true;
+			player.setAimGoal(data.x,data.y);
+			player.prepareSpell("fireball", player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
+			player.targetVisible = false;
+		}
 		console.log("Left Click");
 	});
 	
@@ -248,7 +309,7 @@ Player.update = function(){
 	for(var i in Player.list){
 		var player = Player.list[i];
 		player.update();
-		pack.push(player.getUpdatePack());		
+		pack.push(player.getUpdatePack());
 	}
 	return pack;
 };

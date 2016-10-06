@@ -192,10 +192,10 @@
 		}
 	});
 
-	/*// Check the keycode on this website:
+	// Check the keycode on this website:
 	// http://www.west-wind.com/westwindwebtoolkit/samples/ajax/html5andcss3/keycodechecker.aspx
 	// Be careful, the keycode are not the same if we detect with keyup and down or keypress
-	$(document).keypress(function(e) {
+	/*$(document).keypress(function(e) {
 		var code = e.keyCode || e.which;
 		if(code == 97) { // key a
 			socket.emit('keyPress', {inputId: 'a', state: true});
@@ -216,6 +216,7 @@
 	});*/
 
 	document.onkeydown = function(event){
+		console.log(event.keyCode)
 		if(event.keyCode === 65) { // key A
 			socket.emit('keyPress', {inputId: 'A', state: true});
 		}
@@ -223,12 +224,13 @@
 			socket.emit('keyPress', {inputId: 'Z', state: true});
 		}
 		else if(event.keyCode === 69) { // key E
-			socket.emit('keyPress',{inputId:'E',state:true});
+			socket.emit('keyPress',{inputId: 'E',state:true});
 		}
 		else if(event.keyCode === 82) { // key R
 			socket.emit('keyPress', {inputId: 'R', state: true});
 		}
 	};
+
 	document.onkeyup = function(event){
 		if(event.keyCode === 65) { // key A
 			socket.emit('keyPress', {inputId: 'A', state: false});
@@ -245,11 +247,11 @@
 	};
 
 	// jQuery:
-
 	// Mouse click handler
 	$('#ctx').mousedown(function(event) {
 		click_X = event.pageX - $(this).offset().left;
 		click_Y = event.pageY - $(this).offset().top;
+		console.log(event.which);
 		switch (event.which) {
 			case 1:
 				console.log('Left click');
@@ -276,7 +278,7 @@
 	// Disable the popup triggered by the right click
 	$('body').on('contextmenu', '#ctx', function(e){ return false; });
 
-	$( "#ctx" ).mousemove(function( event ) {
+	$("#ctx").mousemove(function( event ) {
 		mouse_X = event.pageX;
 		mouse_Y = event.pageY;
 	});
@@ -289,9 +291,6 @@
 			ctx.save();
 			ctx.translate(Player.list[i].x,Player.list[i].y);
 			ctx.rotate(Player.list[i].rotation*Math.PI/180);
-			ctx.fillRect(-10 ,-10, 20, 20);
-			ctx.fillStyle = 'green';
-			ctx.lineWidth = 5;
 			ctx.restore();
 			Player.list[i].draw()
 			Player.list[i].drawTarget()
@@ -300,6 +299,5 @@
 			ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
 		}
 	},40);
-
 
 </script>
