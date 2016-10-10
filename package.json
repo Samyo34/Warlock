@@ -16,12 +16,22 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Samyo34/Warlock.git"
   },
+  "keywords": [
+    "node",
+    "heroku",
+    "express",
+    "fs",
+    "jQuery",
+    "node-uuid",
+    "socket.io"    
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
