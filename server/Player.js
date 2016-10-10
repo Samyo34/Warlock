@@ -1,12 +1,16 @@
 /**
  * Created by sambr on 24/09/2016.
  */
- 
+
+
+
 var Player = function(id){
 	var self = Entity();
 	self.id = id;
 	self.number = "" + Math.floor(10 * Math.random());
-	
+
+    self.time =0;
+
 	self.rotation = 0;
 	self.angularVelocity = 0;
     self.isOrientationGood = false;
@@ -33,9 +37,9 @@ var Player = function(id){
         y:0
     };
 
-    self.actionTime = 0;
+    self.actionTime = 0;// time when the spell action is over
     self.ratioSpeed = 1;
-    self.actionDuration = 0;
+    self.actionDuration = 0;// duration of the spell action
 
 	self.targetVisible = false;
 	self.targetType = '';
@@ -189,11 +193,27 @@ var Player = function(id){
 				self.spdY = 0;
 				self.currentSpeed = 0;
 			}
-			else {
-				//console.log("currentSpeed: " + self.currentSpeed)
+			//else {
+            var d = new Date();
+			if(d.getTime() < self.actionTime)
+			{
+
+				var cd = self.actionTime - d.getTime();
+				//console.log('spell action : '+cd + ' '+ self.actionTime + ' '+self.time.getTime());
+				//console.log('action time '+self.actionTime + ' '+time.getTime());
+				var ratioSpeed =  (((100*cd)/self.actionDuration) /100);
+				self.enemySpellActionVelocity.x = self.enemySpellActionVelocity.x*ratioSpeed;
+				self.enemySpellActionVelocity.y = self.enemySpellActionVelocity.y*ratioSpeed;
+			}
+			else
+			{
+				self.enemySpellActionVelocity.x = 0;
+				self.enemySpellActionVelocity.y = 0;
+			}
+				//console.log(self.id+" : currentSpeed: " + self.currentSpeed + ' '+ self.enemySpellActionVelocity.x);
 				self.spdX = self.friction * self.currentSpeed * Math.cos(self.rotation) + self.enemySpellActionVelocity.x;
 				self.spdY = self.friction * self.currentSpeed * Math.sin(self.rotation) + self.enemySpellActionVelocity.y;
-			}
+			//}
 
 			if(self.isOrientationGood != true) {
 				angleDesired = Math.atan2(self.goalDest.y - self.y, self.goalDest.x - self.x);

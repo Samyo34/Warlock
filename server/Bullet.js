@@ -15,6 +15,9 @@ var Bullet = function(parent, name, aimGoalPoint){
 	self.timer = 0;
 	self.toRemove = false;
 
+    self.action = 2;
+    self.actionTime = 50000;
+
 	var super_update = self.update;
 	self.update = function(){
 		if(self.timer++ > 100)
@@ -26,6 +29,14 @@ var Bullet = function(parent, name, aimGoalPoint){
 			if(self.getDistance(p) < 32 && self.parent.id !== p.id) {
 				//handle collision. ex: hp--;
 				self.toRemove = true;
+                var direction = Math.atan2(self.y - p.y,self.x - p.x);
+                p.enemySpellActionVelocity.x = self.action * Math.cos(direction);
+                p.enemySpellActionVelocity.x = self.action * Math.sin(direction);
+                p.actionDuration = self.actionTime;
+                var d = new Date();
+                p.time = d.getTime();
+                p.actionTime =p.time + self.actionTime;
+                console.log('collision '+ self.action);
 			}
 		}
 	};
