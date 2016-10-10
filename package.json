@@ -1,6 +1,9 @@
 {
   "name": "warlock",
   "version": "1.0.0",
+  "engines":{
+    "node": "^6.4.0"
+  },
   "description": "multi player game",
   "main": "app.js",
   "dependencies": {
