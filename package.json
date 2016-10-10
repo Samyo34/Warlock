@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
+"engines":{
+"node":6.4.0
+},
   "dependencies": {
 "express":4.14.0,
 "http":4.1.2
