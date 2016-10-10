@@ -82,6 +82,7 @@ var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
 
 
+
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
