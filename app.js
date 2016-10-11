@@ -18,7 +18,7 @@ app.get( '/*' , function( req, res, next ) {
 
 //app.use('/client',express.static(__dirname + '/client'));
 
-serv.listen(80);
+serv.listen(5000);
 console.log("Server started.");
 
 var SOCKET_LIST = {};
