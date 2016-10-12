@@ -113,7 +113,7 @@ var Player = function(id){
 
 		if(name == "fireball")
 		{
-			spellDescriptor = {spellName:"fireball", spellType:"bullet", x: aimGoalPoint.x, y: aimGoalPoint.y};
+			spellDescriptor = {spellName:"fireball", spellType:"bullet", x: aimGoalPoint.x, y: aimGoalPoint.y, damages: 10};
 			self.spellsToCast.push(spellDescriptor);
 		}
 		else if(name == "blink")

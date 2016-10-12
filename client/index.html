@@ -55,7 +55,7 @@
     Img.map = new Image();
     Img.map.src = '/client/img/map_lave_v1.1.png';
 	Img.fireball_target = new Image();
-	Img.fireball_target.src = '/client/img/spellarea.png';
+	Img.fireball_target.src = '/client/img/spellarea_2.png';
 
     var drawMap = function () {
         ctx.drawImage(Img.map, 0, 0);
@@ -98,6 +98,8 @@
 			ctx.restore();
 
 			// Draw healthbar:
+			ctx.fillStyle = "#000000"; // green
+			ctx.strokeRect(self.x-(width/2)-4, self.y-(height/2) - 13, 38+2, 5+2);
 			if(self.id === selfId) {
 				ctx.fillStyle = "#34C924"; // green
 			}
@@ -116,11 +118,9 @@
 				else if (self.targetType === "A") {
 					var width = Img.fireball_target.width;
 					var height = Img.fireball_target.height;
-					ctx.drawImage(Img.fireball_target, mouse_X - (width / 2), mouse_Y - (height / 2));
+					ctx.drawImage(Img.fireball_target, mouse_X - (width/2), mouse_Y - (height/2));
 				}
 			}
-
-
 		};
 		
 		Player.list[self.id] = self;
@@ -170,6 +170,8 @@
 					p.targetVisible = pack.targetVisible;
 				if(pack.targetType !== undefined)
 					p.targetType = pack.targetType;
+				if(pack.hp !== undefined)
+					p.hp = pack.hp;
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
@@ -303,8 +305,10 @@
 	$('body').on('contextmenu', '#ctx', function(e){ return false; });
 
 	$("#ctx").mousemove(function( event ) {
-		mouse_X = event.pageX;
-		mouse_Y = event.pageY;
+		var parentOffset = $(this).parent().offset();
+		//or $(this).offset(); if you really just want the current element's offset
+		mouse_X = event.pageX - parentOffset.left;
+		mouse_Y = event.pageY - parentOffset.top;
 	});
 
     setInterval(function(){
