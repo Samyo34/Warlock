@@ -216,36 +216,57 @@
 			console.log("r pressed")
 		}
 	});*/
-
+	var isPressedA = false;
+	var isPressedZ = false;
+	var isPressedE = false;
+	var isPressedR = false;
 
 	document.onkeydown = function(event){
 		console.log(event.keyCode)
 		if(event.keyCode === 65) { // key A
-			socket.emit('keyPress', {inputId: 'A', state: true});
+			if(isPressedA === false)
+			{
+				socket.emit('keyPress', {inputId: 'A', state: true});
+				isPressedA = true;
+			}
 		}
 		else if(event.keyCode === 90) { // key Z
-			socket.emit('keyPress', {inputId: 'Z', state: true});
+			if(isPressedZ === false)
+			{
+				socket.emit('keyPress', {inputId: 'Z', state: true});
+				isPressedZ = true;
+			}
 		}
 		else if(event.keyCode === 69) { // key E
-			socket.emit('keyPress',{inputId: 'E',state:true});
+			if (isPressedE === false) {
+				socket.emit('keyPress', {inputId: 'E', state: true});
+				isPressedE = true;
+			}
 		}
 		else if(event.keyCode === 82) { // key R
-			socket.emit('keyPress', {inputId: 'R', state: true});
+			if (isPressedR === false) {
+				socket.emit('keyPress', {inputId: 'R', state: true});
+				isPressedR = true;
+			}
 		}
 	};
 
 	document.onkeyup = function(event){
 		if(event.keyCode === 65) { // key A
 			socket.emit('keyPress', {inputId: 'A', state: false});
+			isPressedA = false;
 		}
 		else if(event.keyCode === 90) { // key Z
 			socket.emit('keyPress', {inputId: 'Z', state: false});
+			isPressedZ = false;
 		}
 		else if(event.keyCode === 69) { // key E
 			socket.emit('keyPress',{inputId:'E',state:false});
+			isPressedE = false;
 		}
 		else if(event.keyCode === 82) { // key R
 			socket.emit('keyPress', {inputId: 'R', state: false});
+			isPressedR = false;
 		}
 	};
 
