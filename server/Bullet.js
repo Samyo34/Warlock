@@ -1,4 +1,4 @@
-var Bullet = function(parent, name, aimGoalPoint){
+var Bullet = function(parent, name, aimGoalPoint, damages){
 	console.log("New bullet")
 
 	var self = Entity();
@@ -11,6 +11,8 @@ var Bullet = function(parent, name, aimGoalPoint){
 	self.angle =  Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x);
 	self.spdX = Math.cos(self.angle) * 10;
 	self.spdY = Math.sin(self.angle) * 10;
+
+	self.damages = damages;
 
 	self.timer = 0;
 	self.toRemove = false;
@@ -25,6 +27,7 @@ var Bullet = function(parent, name, aimGoalPoint){
 			var p = Player.list[i];
 			if(self.getDistance(p) < 32 && self.parent.id !== p.id) {
 				//handle collision. ex: hp--;
+				p.hp -= self.damages;
 				self.toRemove = true;
 			}
 		}
@@ -108,7 +111,8 @@ var Spell = function (parent, spellDescriptor) {
 	var aimGoalPoint = {x: spellDescriptor.x, y: spellDescriptor.y}
 
 	if(type === "bullet") {
-		var self = Bullet(parent, name, aimGoalPoint);
+		var damages = spellDescriptor.damages;
+		var self = Bullet(parent, name, aimGoalPoint, damages);
 	}
 	else if (type === "noBullet") {
 

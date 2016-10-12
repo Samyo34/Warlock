@@ -96,6 +96,8 @@
 			ctx.restore();
 
 			// Draw healthbar:
+			ctx.fillStyle = "#000000"; // green
+			ctx.strokeRect(self.x-(width/2)-4, self.y-(height/2) - 13, 38+2, 5+2);
 			if(self.id === selfId) {
 				ctx.fillStyle = "#34C924"; // green
 			}
@@ -117,8 +119,6 @@
 					ctx.drawImage(Img.fireball_target, mouse_X - (width/2), mouse_Y - (height/2));
 				}
 			}
-
-
 		};
 		
 		Player.list[self.id] = self;
@@ -168,6 +168,8 @@
 					p.targetVisible = pack.targetVisible;
 				if(pack.targetType !== undefined)
 					p.targetType = pack.targetType;
+				if(pack.hp !== undefined)
+					p.hp = pack.hp;
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
@@ -283,9 +285,6 @@
 		//or $(this).offset(); if you really just want the current element's offset
 		mouse_X = event.pageX - parentOffset.left;
 		mouse_Y = event.pageY - parentOffset.top;
-
-		//mouse_X = event.pageX;
-		//mouse_Y = event.pageY;
 	});
 
     setInterval(function(){
