@@ -29,12 +29,12 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 		for(var i in Player.list){
 			var p = Player.list[i];
 			if(self.getDistance(p) < 32 && self.parent.id !== p.id) {
-				//handle collision. ex: hp--;
+				// bullet self touches player p: handle collision. ex: hp--;
 				p.hp -= self.damages;
 				self.toRemove = true;
                 var direction = Math.atan2(self.y - p.y,self.x - p.x);
-                p.enemySpellActionVelocity.x = self.action * Math.cos(direction);
-                p.enemySpellActionVelocity.x = self.action * Math.sin(direction);
+                p.enemySpellActionVelocity.x = -self.action * Math.cos(direction);
+                p.enemySpellActionVelocity.y = -self.action * Math.sin(direction);
                 p.actionDuration = self.actionTime;
                 var d = new Date();
                 p.time = d.getTime();
