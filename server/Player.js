@@ -62,6 +62,12 @@ var Player = function(id){
 		if(self.pressingAttack){
 			self.shootBullet(self.mouseAngle);
 		}
+
+		// Check if player is dead
+		if(self.hp <= 0)
+		{
+			self.isDead = true;
+		}
 	};
 
 	self.shootBullet = function(angle){
@@ -81,6 +87,7 @@ var Player = function(id){
 			score:self.score,
 			targetVisible:self.targetVisible,
 			targetType:self.targetType,
+			isDead:self.isDead,
 		};		
 	};
 	
@@ -95,6 +102,7 @@ var Player = function(id){
 			score:self.score,
 			targetVisible:self.targetVisible,
 			targetType:self.targetType,
+			isDead:self.isDead,
 		}	
 	};
 	

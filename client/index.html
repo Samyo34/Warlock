@@ -77,37 +77,40 @@
         self.hp = initPack.hp;
 		self.targetVisible = initPack.targetVisible;
 		self.targetType = initPack.targetType;
+		self.isDead = initPack.isDead;
 
 		self.draw = function(){
-			var x = self.x;
-			var y = self.y;
+			if(!self.isDead)
+			{
+				var x = self.x;
+				var y = self.y;
 
-			var width = Img.player.width;
-			var height = Img.player.height;
+				var width = Img.player.width;
+				var height = Img.player.height;
 
-			ctx.save(); // save current state
-			ctx.translate(x,y);
-			ctx.rotate(self.rotation); // rotate
+				ctx.save(); // save current state
+				ctx.translate(x,y);
+				ctx.rotate(self.rotation); // rotate
 
-			if(self.id === selfId) {
-				ctx.drawImage(Img.player, 0,0,width,height, -width/2,-height/2,width,height);
+				if(self.id === selfId) {
+					ctx.drawImage(Img.player, 0,0,width,height, -width/2,-height/2,width,height);
+				}
+				else {
+					ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);
+				}
+				ctx.restore();
+
+				// Draw healthbar:
+				ctx.fillStyle = "#000000"; // green
+				ctx.strokeRect(self.x-(width/2)-4, self.y-(height/2) - 13, 38+2, 5+2);
+				if(self.id === selfId) {
+					ctx.fillStyle = "#34C924"; // green
+				}
+				else {
+					ctx.fillStyle="#FF0000"; // red
+				}
+				ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
 			}
-			else {
-				ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);
-			}
-			ctx.restore();
-
-			// Draw healthbar:
-			ctx.fillStyle = "#000000"; // green
-			ctx.strokeRect(self.x-(width/2)-4, self.y-(height/2) - 13, 38+2, 5+2);
-			if(self.id === selfId) {
-				ctx.fillStyle = "#34C924"; // green
-			}
-			else {
-				ctx.fillStyle="#FF0000"; // red
-			}
-			ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
-
 		};
 
 		self.drawTarget = function(){
@@ -172,6 +175,8 @@
 					p.targetType = pack.targetType;
 				if(pack.hp !== undefined)
 					p.hp = pack.hp;
+				if(pack.isDead !== undefined)
+					p.isDead = pack.isDead;
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
