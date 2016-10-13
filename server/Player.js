@@ -145,7 +145,7 @@ var Player = function(id){
         if (map_array[indexInMapArray] == LAVA) // player on lava
         {
             self.friction = 0.5;
-            self.health -= 0.5;
+            self.hp -= 2;
         }
         else
         {
