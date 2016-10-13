@@ -56,6 +56,8 @@
     Img.map.src = '/client/img/map_lave_v1.1.png';
 	Img.fireball_target = new Image();
 	Img.fireball_target.src = '/client/img/spellarea_2.png';
+    Img.fireball = new Image();
+    Img.fireball.src = '/client/img/fireball2.png';
 
     var drawMap = function () {
         ctx.drawImage(Img.map, 0, 0);
@@ -134,7 +136,27 @@
 		self.id = initPack.id;
 		self.x = initPack.x;
 		self.y = initPack.y;
-		Bullet.list[self.id] = self;		
+        self.orientation = initPack.orientation;
+		Bullet.list[self.id] = self;
+
+		self.draw = function()
+        {
+            var x = self.x;
+            var y = self.y;
+
+            var width = Img.fireball.width;
+            var height = Img.fireball.height;
+
+            ctx.save(); // save current state
+            ctx.translate(x,y);
+            ctx.rotate(self.orientation); // rotate
+
+            //if(self.id === selfId) {
+                ctx.drawImage(Img.fireball, 0,0,width,height, -width/2,-height/2,width,height);
+            //}
+            ctx.restore();
+
+        }
 		return self;
 	};
 
@@ -324,7 +346,12 @@
 			Player.list[i].drawTarget()
 		}
 		for(var i in Bullet.list) {
-			ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
+		    ctx.save();
+            ctx.translate(Bullet.list[i].x,Bullet.list[i].y);
+            ctx.rotate(Bullet.list[i].orientation*Math.PI/180);
+            ctx.restore();
+            Bullet.list[i].draw();
+			//ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
 		}
 	},40);
 
