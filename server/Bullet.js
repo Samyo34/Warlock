@@ -49,7 +49,8 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 			id:self.id,
 			type:self.type,
 			x:self.x,
-			y:self.y,		
+			y:self.y,
+			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
 		};
 	};
 
@@ -58,7 +59,8 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 			id:self.id,
 			name:self.name,
 			x:self.x,
-			y:self.y,		
+			y:self.y,
+			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
 		};
 	};
 
