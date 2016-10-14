@@ -41,6 +41,11 @@ var Player = function(id){
     self.ratioSpeed = 1;
     self.actionDuration = 0;// duration of the spell action
 
+	self.spellCooldowns = {
+		fireball: {total: 100, current:0},
+		blink: {total: 100, current:0},
+	};
+
 	self.targetVisible = false;
 	self.targetType = '';
     self.Spell = [];
@@ -59,8 +64,14 @@ var Player = function(id){
 
         super_update();
 
-		if(self.pressingAttack){
-			self.shootBullet(self.mouseAngle);
+		for (var spell in self.spellCooldowns) {
+			var currentTimer = self.spellCooldowns[spell].current;
+			currentTimer -= 1;
+
+			if(currentTimer <= 0) // cooldown is finished
+				currentTimer = 0;
+
+			self.spellCooldowns[spell].current = currentTimer;
 		}
 
 		// Check if player is dead
@@ -119,9 +130,14 @@ var Player = function(id){
 	self.prepareSpell = function(name, aimGoalPoint) {
 		var spellDescriptor;
 
+		if(self.spellCooldowns[name]["current"] != 0)
+		{
+			return;
+		}
+
 		if(name == "fireball")
 		{
-			spellDescriptor = {spellName:"fireball", spellType:"bullet", x: aimGoalPoint.x, y: aimGoalPoint.y, damages: 10};
+			spellDescriptor = {spellName:"fireball", spellType:"bullet", x: aimGoalPoint.x, y: aimGoalPoint.y, damages: 10, cooldown:5000};
 			self.spellsToCast.push(spellDescriptor);
 		}
 		else if(name == "blink")
@@ -136,6 +152,7 @@ var Player = function(id){
 		if(self.spellsToCast.length > 0)
 		{
 			var s = Spell(self, self.spellsToCast[0]);
+			self.spellCooldowns[self.spellsToCast[0].spellName].current = self.spellCooldowns[self.spellsToCast[0].spellName].total;
 			self.spellsToCast.shift();
 		}
 		else
@@ -303,7 +320,9 @@ Player.onConnect = function(socket){
 
 	socket.on('mouseLeftClick',function(data){
 		player.isOrientationGood = false;
-		if(player.targetVisible === true)
+
+		// TBD make it for every spells:
+		if(player.targetVisible === true && player.spellCooldowns["fireball"].current === 0)
 		{
 			player.isShooting = true;
 			player.setAimGoal(data.x,data.y);

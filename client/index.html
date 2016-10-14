@@ -51,7 +51,7 @@
 	Img.player = new Image();
 	Img.player.src = '/client/img/sorcier.png';
     Img.enemy = new Image();
-    Img.enemy.src = '/client/img/enemy.png'
+    Img.enemy.src = '/client/img/enemy.png';
     Img.map = new Image();
     Img.map.src = '/client/img/map_lave_v1.1.png';
 	Img.fireball_target = new Image();
@@ -118,7 +118,7 @@
 		self.drawTarget = function(){
 			if(self.id === selfId) {
 				if (self.targetVisible === false || self.targetType === "") {
-					return
+					return;
 				}
 				else if (self.targetType === "A") {
 					var width = Img.fireball_target.width;
@@ -159,7 +159,7 @@
             //}
             ctx.restore();
 
-        }
+        };
 		return self;
 	};
 
@@ -251,7 +251,7 @@
 	var isPressedR = false;
 
 	document.onkeydown = function(event){
-		console.log(event.keyCode)
+		console.log(event.keyCode);
 		if(event.keyCode === 65) { // key A
 			if(isPressedA === false)
 			{
