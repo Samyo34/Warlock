@@ -1,3 +1,26 @@
+/* Spells' parameters in JSON*/
+var SpellsParam = function(){
+
+    this.fireball = {
+        damage:10,
+        spellType:'bullet',
+        range:50,
+        action:2,
+        actionTime:50000,
+        cd:5
+    }
+
+    this.blink = {
+        spellType:'noBullet',
+        range:100,
+        cd:10
+    }
+    return this;
+};
+
+
+
+
 var Bullet = function(parent, name, aimGoalPoint, damages){
 	console.log("New bullet")
 
@@ -8,7 +31,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 	self.x = parent.x + 16*Math.cos(parent.rotation);
 	self.y = parent.y + 16*Math.sin(parent.rotation);
 
-	self.angle =  Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x);
+	self.angle = Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x);
 	self.spdX = Math.cos(self.angle) * 10;
 	self.spdY = Math.sin(self.angle) * 10;
 
@@ -17,12 +40,14 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 	self.timer = 0;
 	self.toRemove = false;
 
+    self.range = 50;
+
     self.action = 2;
     self.actionTime = 50000;
 
 	var super_update = self.update;
 	self.update = function(){
-		if(self.timer++ > 100)
+		if(self.timer++ > self.range)
 			self.toRemove = true;
 		super_update();
 		
@@ -38,7 +63,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
                 p.actionDuration = self.actionTime;
                 var d = new Date();
                 p.time = d.getTime();
-                p.actionTime =p.time + self.actionTime;
+                p.actionTime = p.time + self.actionTime;
                 console.log('collision '+ self.action);
 			}
 		}
@@ -128,7 +153,23 @@ var Spell = function (parent, spellDescriptor) {
 		var self = Bullet(parent, name, aimGoalPoint, damages);
 	}
 	else if (type === "noBullet") {
+        if(name === "blink")
+        {
+            var params = SpellsParam();
+            if(Math.sqrt(((aimGoalPoint.x-parent.x)*(aimGoalPoint.x-parent.x))+((aimGoalPoint.y-parent.y)*(aimGoalPoint.y-parent.y))) > params.blink.range)
+            {
+                console.log("trop loin");
+                parent.setGoalDest(aimGoalPoint.x,aimGoalPoint.y);
+                parent.currentSpeed = parent.SPEED;
+            }
+            else
+            {
+                console.log("good");
+                parent.x = aimGoalPoint.x;
+                parent.y = aimGoalPoint.y;
+            }
 
+        }
 	}
 
 	return self;

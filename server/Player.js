@@ -118,7 +118,7 @@ var Player = function(id){
 		}
 		else if(name == "blink")
 		{
-			spellDescriptor = {spellName:"blink", spellType:"noBullet", xx: xx, yy: yy, x:x, y:y};
+			spellDescriptor = {spellName:"blink", spellType:"noBullet",x: aimGoalPoint.x, y: aimGoalPoint.y};
 			self.spellsToCast.push(spellDescriptor);
 		}
 	};
@@ -299,7 +299,15 @@ Player.onConnect = function(socket){
 		{
 			player.isShooting = true;
 			player.setAimGoal(data.x,data.y);
-			player.prepareSpell("fireball", player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
+			if(player.targetType === 'A')
+			{
+				player.prepareSpell("fireball", player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
+			}
+			if(player.targetType === 'Z')
+			{
+			    console.log('blink');
+				player.prepareSpell("blink", player.aimGoalPoint);
+			}
 			player.targetVisible = false;
 		}
 		console.log("Left Click");
