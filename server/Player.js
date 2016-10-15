@@ -42,8 +42,8 @@ var Player = function(id){
     self.actionDuration = 0;// duration of the spell action
 
 	self.spellCooldowns = {
-		fireball: {total: 100, current:0},
-		blink: {total: 100, current:0},
+		fireball: {total: 100, current:0, progress: 0},
+		blink: {total: 100, current:0, progress: 0},
 	};
 
 	self.targetVisible = false;
@@ -64,14 +64,18 @@ var Player = function(id){
 
         super_update();
 
-		for (var spell in self.spellCooldowns) {
-			var currentTimer = self.spellCooldowns[spell].current;
-			currentTimer -= 1;
+		for (var i in self.spellCooldowns) {
+			var spell = self.spellCooldowns[i];
+			spell.current -= 1;
 
-			if(currentTimer <= 0) // cooldown is finished
-				currentTimer = 0;
+			if(spell.current <= 0) {// cooldown is finished
+				spell.current = 0;
+				spell.progress = 0;
+			}
+			else {
+				spell.progress = spell.current/spell.total;
+			}
 
-			self.spellCooldowns[spell].current = currentTimer;
 		}
 
 		// Check if player is dead
@@ -101,20 +105,28 @@ var Player = function(id){
 			isDead:self.isDead,
 		};		
 	};
+
+	self.getCooldownsPack = function(){
+		return {
+			fireball: self.spellCooldowns["fireball"].progress,
+			blink: self.spellCooldowns["blink"].progress
+		}
+	};
 	
 	self.getUpdatePack = function(){
 		return {
-			id:self.id,
-			x:self.x,
-			y:self.y,
-			rotation:self.rotation,
-			hp:self.hp,
-            hpMax:self.hpMax,
-			score:self.score,
-			targetVisible:self.targetVisible,
-			targetType:self.targetType,
-			isDead:self.isDead,
-		}	
+			id: self.id,
+			x: self.x,
+			y: self.y,
+			rotation: self.rotation,
+			hp: self.hp,
+			hpMax: self.hpMax,
+			score: self.score,
+			targetVisible: self.targetVisible,
+			targetType: self.targetType,
+			isDead: self.isDead,
+			spellCooldowns: self.getCooldownsPack()
+		}
 	};
 	
 	self.setAimGoal = function(destX, destY){

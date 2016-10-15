@@ -1,6 +1,10 @@
 <div id="gameDiv">
 	<canvas id="ctx" width="800" height="800" style="border:1px solid #000000;"></canvas>
 
+	<div id="ctxSpellIndic2" style="width:800px;height:100px;border:1px solid #000000;">
+		<canvas id="ctxSpellIndic" width="75" height="75" style="border:1px solid #000000;"></canvas>
+	</div>
+
 	<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
 		<div>Hello!</div>
 	</div>
@@ -10,12 +14,13 @@
 	</form>
 </div>
 
+
+
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src="./client/js/jquery.js"></script>
 <script>
 	var WIDTH = 800;
 	var HEIGHT = 800;
-
 	
 	var socket = io();
 	
@@ -58,6 +63,8 @@
 	Img.fireball_target.src = '/client/img/spellarea_2.png';
     Img.fireball = new Image();
     Img.fireball.src = '/client/img/fireball2.png';
+	Img.fireball_indic = new Image();
+	Img.fireball_indic.src = '/client/img/fireball_indic.png';
 
     var drawMap = function () {
         ctx.drawImage(Img.map, 0, 0);
@@ -66,6 +73,7 @@
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 
+	var ctxSpellIndic = document.getElementById("ctxSpellIndic").getContext("2d");
 
     var Player = function(initPack){
 		var self = {};
@@ -80,6 +88,11 @@
 		self.targetVisible = initPack.targetVisible;
 		self.targetType = initPack.targetType;
 		self.isDead = initPack.isDead;
+
+		self.spellCooldowns = {
+			fireball: 0,
+			blink: 0,
+		};
 
 		self.draw = function(){
 			if(!self.isDead)
@@ -112,6 +125,11 @@
 					ctx.fillStyle="#FF0000"; // red
 				}
 				ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
+
+				console.log(1-self.spellCooldowns["fireball"])
+				var progress = 1-self.spellCooldowns["fireball"];
+				draw_coolddown_Pie(ctxSpellIndic, progress)
+
 			}
 		};
 
@@ -199,6 +217,8 @@
 					p.hp = pack.hp;
 				if(pack.isDead !== undefined)
 					p.isDead = pack.isDead;
+				if(pack.spellCooldowns !== undefined)
+					p.spellCooldowns = pack.spellCooldowns;
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
@@ -338,6 +358,33 @@
 		mouse_Y = event.pageY - parentOffset.top;
 	});
 
+	function draw_coolddown_Pie(ctx, progress) {
+		var width = ctx.canvas.clientWidth;
+		var height = ctx.canvas.clientHeight;
+
+		var x = width/2;
+		var y = height/2;
+		var r = (height/2)*Math.sqrt(2);
+
+		ctx.drawImage(Img.fireball_indic, 0,0,width,height);
+
+		if(progress < 1) {
+			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+			ctx.beginPath();
+			ctx.arc(x, y, r,  - Math.PI/2, (Math.PI * 2) * progress -  Math.PI/2, true); // we draw the arc
+			ctx.lineTo(x, y); // we add the center point in order to have a pie
+			ctx.fill();
+
+			ctx.globalCompositeOperation = 'destination-in'
+			var squareSide = (2*r) / Math.sqrt(2);
+			ctx.fillStyle = "rgba(0, 0, 0, 1)";
+			ctx.fillRect(x - squareSide/2, y - squareSide/2, squareSide, squareSide);
+		}
+
+
+		ctx.globalCompositeOperation = 'source-over';
+	}
+
     setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         drawMap();
@@ -356,8 +403,9 @@
             ctx.rotate(Bullet.list[i].orientation*Math.PI/180);
             ctx.restore();
             Bullet.list[i].draw();
-			//ctx.fillRect(Bullet.list[i].x-5,Bullet.list[i].y-5,10,10);
 		}
+
+
 	},40);
 
 </script>

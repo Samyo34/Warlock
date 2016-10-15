@@ -121,6 +121,7 @@ Bullet.getAllInitPack = function(){
 var Spell = function (parent, spellDescriptor) {
 	var type = spellDescriptor.spellType;
 	var name = spellDescriptor.spellName;
+	var cooldown = spellDescriptor.cooldown;
 	var aimGoalPoint = {x: spellDescriptor.x, y: spellDescriptor.y}
 
 	if(type === "bullet") {
