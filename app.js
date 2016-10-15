@@ -86,8 +86,6 @@ io.sockets.on('connection', function(socket){
 var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
 
-
-
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
