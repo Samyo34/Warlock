@@ -552,6 +552,11 @@
 				y3 += (Math.random() * width) - (width / 2);
 			}
 
+			ctx.shadowOffsetX = 2;
+			ctx.shadowOffsetY = 2;
+			ctx.shadowBlur    = 4;
+			ctx.shadowColor   = "blue";
+
 			// Draw line
 			ctx.strokeStyle = color1;
 			ctx.lineWidth = 1 ;
@@ -583,6 +588,8 @@
 			ctx.beginPath();
 			ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
 			ctx.fill();
+
+			ctx.shadowColor = "transparent";
 
 			prevX = x3;
 			prevY = y3;
