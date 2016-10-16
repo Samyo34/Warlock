@@ -73,7 +73,7 @@ var Player = function(id){
 				spell.progress = 0;
 			}
 			else {
-				spell.progress = spell.current/spell.total;
+				spell.progress = 1 - spell.current/spell.total;
 			}
 
 		}

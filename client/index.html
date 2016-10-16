@@ -1,8 +1,11 @@
 <div id="gameDiv">
 	<canvas id="ctx" width="800" height="800" style="border:1px solid #000000;"></canvas>
 
-	<div id="ctxSpellIndic2" style="width:800px;height:100px;border:1px solid #000000;">
-		<canvas id="ctxSpellIndic" width="75" height="75" style="border:1px solid #000000;"></canvas>
+	<div id="spellIndicatorsArea" style="width:800px;height:100px;border:1px solid #000000;">
+		<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
+		<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
+		<canvas id="ctxSpell_2" width="75" height="75" style="border:1px solid #000000;"></canvas>
+		<canvas id="ctxSpell_3" width="75" height="75" style="border:1px solid #000000;"></canvas>
 	</div>
 
 	<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
@@ -65,6 +68,17 @@
     Img.fireball.src = '/client/img/fireball2.png';
 	Img.fireball_indic = new Image();
 	Img.fireball_indic.src = '/client/img/fireball_indic.png';
+	Img.blink_indic = new Image();
+	Img.blink_indic.src = '/client/img/blink_indic.png';
+
+	var ImgSpellIndicators = {
+		fireball: {	name: "fireball",
+					img: Img.fireball_indic,
+					keyboardKey: "A"},
+		blink: { 	name: "blink",
+					img: Img.blink_indic,
+					keyboardKey: "Z"},
+	};
 
     var drawMap = function () {
         ctx.drawImage(Img.map, 0, 0);
@@ -72,8 +86,6 @@
 
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
-
-	var ctxSpellIndic = document.getElementById("ctxSpellIndic").getContext("2d");
 
     var Player = function(initPack){
 		var self = {};
@@ -126,11 +138,23 @@
 				}
 				ctx.fillRect(self.x-(width/2)-3, self.y-(height/2) - 12,(self.hp*38)/self.hpMax,5);
 
-				console.log(1-self.spellCooldowns["fireball"])
-				var progress = 1-self.spellCooldowns["fireball"];
-				draw_coolddown_Pie(ctxSpellIndic, progress)
-
+				self.drawSpellIndicators();
 			}
+		};
+
+		self.drawSpellIndicators = function () {
+			var n = 0;
+			for (var i in ImgSpellIndicators) {
+				var spell = ImgSpellIndicators[i];
+
+				var contextName = "ctxSpell_" + n;
+				var ctxSpellIndic = document.getElementById(contextName).getContext("2d");
+
+				var progress = self.spellCooldowns[spell.name];
+				draw_spell_indicator(ctxSpellIndic, progress, spell.img, spell.keyboardKey);
+				n += 1;
+			}
+
 		};
 
 		self.drawTarget = function(){
@@ -358,7 +382,7 @@
 		mouse_Y = event.pageY - parentOffset.top;
 	});
 
-	function draw_coolddown_Pie(ctx, progress) {
+	function draw_spell_indicator(ctx, progress, img, keyboardKey) {
 		var width = ctx.canvas.clientWidth;
 		var height = ctx.canvas.clientHeight;
 
@@ -366,8 +390,17 @@
 		var y = height/2;
 		var r = (height/2)*Math.sqrt(2);
 
-		ctx.drawImage(Img.fireball_indic, 0,0,width,height);
+		// Draw spell img:
+		ctx.drawImage(img, 0,0,width,height);
 
+		// Draw shortkey:
+		ctx.font = '20pt Calibri';
+		ctx.fillStyle = 'white';
+		var xx = 7.5*width/10;
+		var yy = 9.5*(height/10);
+		ctx.fillText(keyboardKey, xx, yy);
+
+		// Draw cooldown pie:
 		if(progress < 1) {
 			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
 			ctx.beginPath();
