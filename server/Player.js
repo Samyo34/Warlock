@@ -3,7 +3,6 @@
  */
 
 
-
 var Player = function(id){
 	var self = Entity();
 	self.id = id;
@@ -44,6 +43,13 @@ var Player = function(id){
 	self.spellCooldowns = {
 		fireball: {total: 100, current:0, progress: 0},
 		blink: {total: 100, current:0, progress: 0},
+		lightning: {total: 100, current:0, progress: 0},
+	};
+
+	self.spellBinding = {
+		A: "fireball",
+		Z: "blink",
+		E: "lightning",
 	};
 
 	self.targetVisible = false;
@@ -61,22 +67,9 @@ var Player = function(id){
 	self.update = function(){
         self.updateFriction();
 	    self.updatePosition();
+		self.updateCooldowns();
 
         super_update();
-
-		for (var i in self.spellCooldowns) {
-			var spell = self.spellCooldowns[i];
-			spell.current -= 1;
-
-			if(spell.current <= 0) {// cooldown is finished
-				spell.current = 0;
-				spell.progress = 0;
-			}
-			else {
-				spell.progress = 1 - spell.current/spell.total;
-			}
-
-		}
 
 		// Check if player is dead
 		if(self.hp <= 0)
@@ -109,7 +102,8 @@ var Player = function(id){
 	self.getCooldownsPack = function(){
 		return {
 			fireball: self.spellCooldowns["fireball"].progress,
-			blink: self.spellCooldowns["blink"].progress
+			blink: self.spellCooldowns["blink"].progress,
+			lightning: self.spellCooldowns["lightning"].progress
 		}
 	};
 	
@@ -149,14 +143,37 @@ var Player = function(id){
 
 		if(name == "fireball")
 		{
-			spellDescriptor = {spellName:"fireball", spellType:"bullet", x: aimGoalPoint.x, y: aimGoalPoint.y, damages: 10, cooldown:5000};
-			self.spellsToCast.push(spellDescriptor);
+			spellDescriptor = {	spellName:"fireball",
+								spellType:"bullet",
+								x: aimGoalPoint.x,
+								y: aimGoalPoint.y,
+								damages: 10,
+								speed: 10,
+								lifeTime: 100,
+								cooldown:5000};
 		}
 		else if(name == "blink")
 		{
-			spellDescriptor = {spellName:"blink", spellType:"noBullet", xx: xx, yy: yy, x:x, y:y};
-			self.spellsToCast.push(spellDescriptor);
+			spellDescriptor = {	spellName:"blink",
+								spellType:"noBullet",
+								xx: xx,
+								yy: yy,
+								x:x,
+								y:y};
 		}
+		else if(name == "lightning")
+		{
+			spellDescriptor = { spellName:"lightning",
+								spellType:"bullet",
+								x: aimGoalPoint.x,
+								y: aimGoalPoint.y,
+								damages: 10,
+								speed: 30,
+								lifeTime: 5,
+								cooldown:5000};
+		}
+
+		self.spellsToCast.push(spellDescriptor);
 	};
 
 	// then, when the wizard have the right orientation we cast it
@@ -164,7 +181,8 @@ var Player = function(id){
 		if(self.spellsToCast.length > 0)
 		{
 			var s = Spell(self, self.spellsToCast[0]);
-			self.spellCooldowns[self.spellsToCast[0].spellName].current = self.spellCooldowns[self.spellsToCast[0].spellName].total;
+			var name = self.spellsToCast[0].spellName;
+			self.spellCooldowns[name].current = self.spellCooldowns[name].total;
 			self.spellsToCast.shift();
 		}
 		else
@@ -282,6 +300,22 @@ var Player = function(id){
 		}
 		
 	};
+
+	self.updateCooldowns = function() {
+		for (var i in self.spellCooldowns) {
+			var spell = self.spellCooldowns[i];
+			spell.current -= 1;
+
+			if(spell.current <= 0) {// cooldown is finished
+				spell.current = 0;
+				spell.progress = 0;
+			}
+			else {
+				spell.progress = 1 - spell.current/spell.total;
+			}
+
+		}
+	};
 	
 	Player.list[id] = self;
 	
@@ -334,12 +368,16 @@ Player.onConnect = function(socket){
 		player.isOrientationGood = false;
 
 		// TBD make it for every spells:
-		if(player.targetVisible === true && player.spellCooldowns["fireball"].current === 0)
+		if(player.targetVisible === true)
 		{
-			player.isShooting = true;
-			player.setAimGoal(data.x,data.y);
-			player.prepareSpell("fireball", player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
-			player.targetVisible = false;
+			var spell = player.spellBinding[player.targetType]; // spell = "fireball" for instance
+			if (player.spellCooldowns[spell].current === 0) {
+				player.isShooting = true;
+				player.setAimGoal(data.x,data.y);
+				player.prepareSpell(spell, player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
+				player.targetVisible = false;
+			}
+
 		}
 		console.log("Left Click");
 	});
@@ -372,20 +410,3 @@ Player.update = function(){
 	}
 	return pack;
 };
-
-/*if(game.input.mouse.button === Phaser.Mouse.RIGHT_BUTTON)
-{
-	console.log("Right click")
-	goalDestination = new Phaser.Point(game.input.x, game.input.y);
-	wizard[0].goalDest = goalDestination;
-	wizard[0].currentSpeed = wizard[0].SPEED;
-}
-
-if(target.visible && game.input.mouse.button === Phaser.Mouse.LEFT_BUTTON)
-{
-	console.log("Left click")
-	wizard[0].isShooting = true;
-	wizard[0].aimGoalPoint = new Phaser.Point(game.input.x, game.input.y);
-	wizard[0].prepareSpell("blink", wizard[0].x, wizard[0].y, game.input.x, game.input.y);
-	target.visible = false;
-}*/

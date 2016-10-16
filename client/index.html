@@ -62,22 +62,29 @@
     Img.enemy.src = '/client/img/enemy.png';
     Img.map = new Image();
     Img.map.src = '/client/img/map_lave_v1.1.png';
-	Img.fireball_target = new Image();
-	Img.fireball_target.src = '/client/img/spellarea_2.png';
+	Img.spell_target = new Image();
+	Img.spell_target.src = '/client/img/spellarea_2.png';
     Img.fireball = new Image();
     Img.fireball.src = '/client/img/fireball2.png';
+
 	Img.fireball_indic = new Image();
 	Img.fireball_indic.src = '/client/img/fireball_indic.png';
 	Img.blink_indic = new Image();
 	Img.blink_indic.src = '/client/img/blink_indic.png';
+	Img.lightning_indic = new Image();
+	Img.lightning_indic.src = '/client/img/lightning_indic.png';
 
-	var ImgSpellIndicators = {
+
+	var spellIndicators = {
 		fireball: {	name: "fireball",
 					img: Img.fireball_indic,
 					keyboardKey: "A"},
 		blink: { 	name: "blink",
 					img: Img.blink_indic,
 					keyboardKey: "Z"},
+		lightning: { name: "lightning",
+					 img: Img.lightning_indic,
+					 keyboardKey: "E"},
 	};
 
     var drawMap = function () {
@@ -144,8 +151,8 @@
 
 		self.drawSpellIndicators = function () {
 			var n = 0;
-			for (var i in ImgSpellIndicators) {
-				var spell = ImgSpellIndicators[i];
+			for (var i in spellIndicators) {
+				var spell = spellIndicators[i];
 
 				var contextName = "ctxSpell_" + n;
 				var ctxSpellIndic = document.getElementById(contextName).getContext("2d");
@@ -162,10 +169,10 @@
 				if (self.targetVisible === false || self.targetType === "") {
 					return;
 				}
-				else if (self.targetType === "A") {
-					var width = Img.fireball_target.width;
-					var height = Img.fireball_target.height;
-					ctx.drawImage(Img.fireball_target, mouse_X - (width/2), mouse_Y - (height/2));
+				else if (self.targetType === spellIndicators["fireball"].keyboardKey || self.targetType === spellIndicators["lightning"].keyboardKey) {
+					var width = Img.spell_target.width;
+					var height = Img.spell_target.height;
+					ctx.drawImage(Img.spell_target, mouse_X - (width/2), mouse_Y - (height/2));
 				}
 			}
 		};
@@ -179,6 +186,8 @@
 	var Bullet = function(initPack){
 		var self = {};
 		self.id = initPack.id;
+		self.spellName = initPack.spellName;
+		self.parentID = initPack.parentID;
 		self.x = initPack.x;
 		self.y = initPack.y;
         self.orientation = initPack.orientation;
@@ -192,14 +201,20 @@
             var width = Img.fireball.width;
             var height = Img.fireball.height;
 
-            ctx.save(); // save current state
-            ctx.translate(x,y);
-            ctx.rotate(self.orientation); // rotate
-
-            //if(self.id === selfId) {
+            if(self.spellName === "fireball") {
+				ctx.save(); // save current state
+				ctx.translate(x,y);
+				ctx.rotate(self.orientation); // rotate
                 ctx.drawImage(Img.fireball, 0,0,width,height, -width/2,-height/2,width,height);
-            //}
-            ctx.restore();
+				ctx.restore();
+            }
+            else if (self.spellName === "lightning") {
+            	var parent = Player.list[self.parentID];
+				var x_start = parent.x+16*Math.cos(parent.rotation);
+				var y_start = parent.y+16*Math.sin(parent.rotation);
+				drawLightningSpell(x_start, y_start, x, y);
+			}
+
 
         };
 		return self;
@@ -253,6 +268,8 @@
 					b.x = pack.x;
 				if(pack.y !== undefined)
 					b.y = pack.y;
+				if(pack.parentID !== undefined)
+					b.parentID = pack.parentID;
 			}
 		}
 	});
@@ -417,27 +434,214 @@
 		ctx.globalCompositeOperation = 'source-over';
 	}
 
+	/*var Lightning = function(ctx) {
+		var self = this;
+
+		// (x1, y1) starting point
+		// (x2, y2) ending point
+		self.strike = function(x1, y1, x2, y2, color1, color2, drawOrbs) {
+			var x = x2 - x1;
+			var y = y2 - y1;
+			var segments = 10;
+			var distance = Math.sqrt(x * x + y * y);
+			var width = distance / segments;
+			var prevX = x1;
+			var prevY = y1;
+
+			if(drawOrbs) {
+				// Draw point
+				ctx.strokeStyle = color1;
+				ctx.fillStyle = color1;
+				ctx.lineWidth = 2;
+				ctx.beginPath();
+				ctx.arc(x1, y1, 3 + (Math.random() * 4), 0, 2 * Math.PI, false);
+				ctx.fill();
+			}
+
+			for(var i = 0; i <= segments; i++) {
+				var magnitude = (width * i) / distance;
+
+				var x3 = magnitude * x2 + (1 - magnitude) * x1;
+				var y3 = magnitude * y2 + (1 - magnitude) * y1;
+
+				if(i !== 0 && i !== segments) {
+					x3 += (Math.random() * width) - (width / 2);
+					y3 += (Math.random() * width) - (width / 2);
+				}
+
+				// Draw line
+				ctx.strokeStyle = color1;
+				ctx.lineWidth = 1 ;
+				ctx.beginPath();
+				ctx.moveTo(prevX, prevY);
+				ctx.lineTo(x3, y3);
+				ctx.closePath();
+				ctx.stroke();
+
+				// Draw point
+				ctx.strokeStyle = color1;
+				ctx.fillStyle = color1;
+				ctx.beginPath();
+				ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
+				ctx.fill();
+
+				// Draw line
+				ctx.strokeStyle = color2;
+				ctx.lineWidth = 1;
+				ctx.beginPath();
+				ctx.moveTo(prevX, prevY);
+				ctx.lineTo(x3, y3);
+				ctx.closePath();
+				ctx.stroke();
+
+				// Draw point
+				ctx.strokeStyle = color2;
+				ctx.fillStyle = color2;
+				ctx.beginPath();
+				ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
+				ctx.fill();
+
+				prevX = x3;
+				prevY = y3;
+			}
+
+			if(drawOrbs) {
+				// Draw point
+				ctx.strokeStyle = color2;
+				ctx.fillStyle = color2;
+				ctx.lineWidth = 1;
+				ctx.beginPath();
+				ctx.arc(x1, y1, 1 + (Math.random() * 4), 0, 2 * Math.PI, false);
+				ctx.fill();
+			}
+		};
+	};
+	var lightning = new Lightning(ctx);*/
+
+	function drawLightningSpell(x_start, y_start, x_aimPoint, y_aimPoint) {
+		drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, "#cfefff", "#ffffff");
+		drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, "#557788", "#7799aa", true);
+	}
+	function drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, color1, color2, drawOrbs) {
+		var x = x_start - x_aimPoint;
+		var y = y_start - y_aimPoint;
+		var segments = 10;
+		var distance = Math.sqrt(x * x + y * y);
+		var width = distance / segments;
+		var prevX = x_aimPoint;
+		var prevY = y_aimPoint;
+
+		if(drawOrbs) {
+			// Draw point
+			ctx.strokeStyle = color1;
+			ctx.fillStyle = color1;
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.arc(x_aimPoint, y_aimPoint, 3 + (Math.random() * 4), 0, 2 * Math.PI, false);
+			ctx.fill();
+		}
+
+		for(var i = 0; i <= segments; i++) {
+			var magnitude = (width * i) / distance;
+
+			var x3 = magnitude * x_start + (1 - magnitude) * x_aimPoint;
+			var y3 = magnitude * y_start + (1 - magnitude) * y_aimPoint;
+
+			if(i !== 0 && i !== segments) {
+				x3 += (Math.random() * width) - (width / 2);
+				y3 += (Math.random() * width) - (width / 2);
+			}
+
+			// Draw line
+			ctx.strokeStyle = color1;
+			ctx.lineWidth = 1 ;
+			ctx.beginPath();
+			ctx.moveTo(prevX, prevY);
+			ctx.lineTo(x3, y3);
+			ctx.closePath();
+			ctx.stroke();
+
+			// Draw point
+			ctx.strokeStyle = color1;
+			ctx.fillStyle = color1;
+			ctx.beginPath();
+			ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
+			ctx.fill();
+
+			// Draw line
+			ctx.strokeStyle = color2;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(prevX, prevY);
+			ctx.lineTo(x3, y3);
+			ctx.closePath();
+			ctx.stroke();
+
+			// Draw point
+			ctx.strokeStyle = color2;
+			ctx.fillStyle = color2;
+			ctx.beginPath();
+			ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
+			ctx.fill();
+
+			prevX = x3;
+			prevY = y3;
+		}
+
+		if(drawOrbs) {
+			// Draw point
+			ctx.strokeStyle = color2;
+			ctx.fillStyle = color2;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.arc(x_aimPoint, y_aimPoint, 1 + (Math.random() * 4), 0, 2 * Math.PI, false);
+			ctx.fill();
+		}
+	};
+
     setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         drawMap();
 
         for(var i in Player.list) {
-			ctx.save();
+			/*ctx.save();
 			ctx.translate(Player.list[i].x,Player.list[i].y);
 			ctx.rotate(Player.list[i].rotation*Math.PI/180);
-			ctx.restore();
+			ctx.restore();*/
 			Player.list[i].draw()
 			Player.list[i].drawTarget()
 		}
 		for(var i in Bullet.list) {
-		    ctx.save();
+		   /* ctx.save();
             ctx.translate(Bullet.list[i].x,Bullet.list[i].y);
             ctx.rotate(Bullet.list[i].orientation*Math.PI/180);
-            ctx.restore();
+            ctx.restore();*/
             Bullet.list[i].draw();
 		}
 
 
+
+		//lightning.strike(50, 90, 540, 420, "#cfefff", "#ffffff", true);
+		/*dx += 50
+		dy += 50
+		if (dx >= 750)
+		{
+
+		}
+		else if (dx >= 200){
+			lightning.strike(450, 250, 250+16, 250,  "#cfefff", "#ffffff");//"#557788", "#7799aa", true);
+			lightning.strike(450, 250, 250+16, 250, "#557788", "#7799aa", true);
+		}
+		else
+		{
+			lightning.strike(250+16+dx, 250, 250+16, 250,  "#cfefff", "#ffffff");//"#557788", "#7799aa", true);
+			lightning.strike(250+16+dx, 250, 250+16, 250, "#557788", "#7799aa", true);
+		}*/
+
+		/*lightning.strike(450, 250, 250+16, 250,  "#cfefff", "#ffffff");//"#557788", "#7799aa", true);
+		lightning.strike( 450, 250, 250+16, 250, "#557788", "#7799aa", true);*/
 	},40);
+
+
 
 </script>

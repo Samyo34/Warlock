@@ -1,28 +1,32 @@
-var Bullet = function(parent, name, aimGoalPoint, damages){
+var Bullet = function(parent, name, aimGoalPoint, damages, speed, lifeTime){
 	console.log("New bullet")
 
 	var self = Entity();
 	self.id = Math.random();
+	self.spellName = name;
 	self.parent = parent;
 
 	self.x = parent.x + 16*Math.cos(parent.rotation);
 	self.y = parent.y + 16*Math.sin(parent.rotation);
 
 	self.angle =  Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x);
-	self.spdX = Math.cos(self.angle) * 10;
-	self.spdY = Math.sin(self.angle) * 10;
+	self.spdX = Math.cos(self.angle) * speed;
+	self.spdY = Math.sin(self.angle) * speed;
 
 	self.damages = damages;
 
 	self.timer = 0;
+	self.lifeTime = lifeTime;
 	self.toRemove = false;
 
     self.action = 2;
     self.actionTime = 50000;
 
+	console.log("LOl")
+	console.log(lifeTime)
 	var super_update = self.update;
 	self.update = function(){
-		if(self.timer++ > 100)
+		if(self.timer++ > self.lifeTime)
 			self.toRemove = true;
 		super_update();
 		
@@ -47,7 +51,9 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 	self.getInitPack = function(){
 		return {
 			id:self.id,
+			spellName:self.spellName,
 			type:self.type,
+			parentID:self.parent["id"],
 			x:self.x,
 			y:self.y,
 			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
@@ -57,7 +63,6 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 	self.getUpdatePack = function(){
 		return {
 			id:self.id,
-			name:self.name,
 			x:self.x,
 			y:self.y,
 			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
@@ -94,39 +99,18 @@ Bullet.getAllInitPack = function(){
 	return bullets;
 };
 
-//======================================================================================================================
-//  Our core Spell class
-//  child class of Bullet class
-//var Spell = [];
-
-/*Spell.FireBall = function (x, y, parent) {
-
-	var self = new Bullet(parent, "fireball")
-	//this.indic = new SpellIndicator(game, 'fireball_spell_indicator', x, y);
-
-	self.nextFire = 0;
-	self.damage = 100;
-	self.bulletSpeed = 300;
-	self.fireRate = 2500;
-	self.cooldown;
-	self.actionRatio = 200;
-	self.actionTime = 50000;
-	self.nextFire = this.game.time.time + this.fireRate;
-
-	//this.actionRatio = 200;
-
-	return self;
-};*/
-
 var Spell = function (parent, spellDescriptor) {
 	var type = spellDescriptor.spellType;
 	var name = spellDescriptor.spellName;
-	var cooldown = spellDescriptor.cooldown;
+	//var cooldown = spellDescriptor.cooldown;
 	var aimGoalPoint = {x: spellDescriptor.x, y: spellDescriptor.y}
 
 	if(type === "bullet") {
 		var damages = spellDescriptor.damages;
-		var self = Bullet(parent, name, aimGoalPoint, damages);
+		var speed = spellDescriptor.speed;
+		var lifeTime = spellDescriptor.lifeTime;
+		console.log(parent.id)
+		var self = Bullet(parent, name, aimGoalPoint, damages, speed, lifeTime);
 	}
 	else if (type === "noBullet") {
 
