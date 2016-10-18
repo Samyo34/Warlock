@@ -1,43 +1,65 @@
+
 /* Spells' parameters in JSON*/
 var SpellsParam = function(){
 
-    this.fireball = {
+    this.spellArray = [];
+
+    this.spellArray.push(
+        {
+        name:'fireball',
         damage:10,
         spellType:'bullet',
         range:50,
         action:2,
         actionTime:50000,
         cd:5
-    }
+    });
 
-    this.blink = {
+    this.spellArray.push(
+        {
+        name:'blink',
         spellType:'noBullet',
         range:100,
         cd:10
-    }
+        }
+    );
+
+    this.getParams = function(name)
+    {
+        for(var i in this.spellArray)
+        {
+            if(this.spellArray[i].name === name)
+            {
+                return this.spellArray[i];
+            }
+        }
+    };
+
     return this;
 };
 
 
 
-
-var Bullet = function(parent, name, aimGoalPoint, damages){
+var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 	console.log("New bullet")
 
 	var self = Entity();
 	self.id = Math.random();
+	self.spellName = name;
 	self.parent = parent;
 
 	self.x = parent.x + 16*Math.cos(parent.rotation);
 	self.y = parent.y + 16*Math.sin(parent.rotation);
 
+
 	self.angle = Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x);
-	self.spdX = Math.cos(self.angle) * 10;
-	self.spdY = Math.sin(self.angle) * 10;
+	self.spdX = Math.cos(self.angle) * speed;
+	self.spdY = Math.sin(self.angle) * speed;
 
 	self.damages = damages;
 
 	self.timer = 0;
+	self.lifeTime = lifeTime;
 	self.toRemove = false;
 
     self.range = 50;
@@ -45,9 +67,12 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
     self.action = 2;
     self.actionTime = 50000;
 
+	console.log("LOl")
+	console.log(lifeTime)
 	var super_update = self.update;
 	self.update = function(){
 		if(self.timer++ > self.range)
+		if(self.timer++ > self.lifeTime)
 			self.toRemove = true;
 		super_update();
 		
@@ -72,7 +97,9 @@ var Bullet = function(parent, name, aimGoalPoint, damages){
 	self.getInitPack = function(){
 		return {
 			id:self.id,
+			spellName:self.spellName,
 			type:self.type,
+			parentID:self.parent["id"],
 			x:self.x,
 			y:self.y,
 			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
@@ -119,30 +146,6 @@ Bullet.getAllInitPack = function(){
 	return bullets;
 };
 
-//======================================================================================================================
-//  Our core Spell class
-//  child class of Bullet class
-//var Spell = [];
-
-/*Spell.FireBall = function (x, y, parent) {
-
-	var self = new Bullet(parent, "fireball")
-	//this.indic = new SpellIndicator(game, 'fireball_spell_indicator', x, y);
-
-	self.nextFire = 0;
-	self.damage = 100;
-	self.bulletSpeed = 300;
-	self.fireRate = 2500;
-	self.cooldown;
-	self.actionRatio = 200;
-	self.actionTime = 50000;
-	self.nextFire = this.game.time.time + this.fireRate;
-
-	//this.actionRatio = 200;
-
-	return self;
-};*/
-
 var Spell = function (parent, spellDescriptor) {
 	var type = spellDescriptor.spellType;
 	var name = spellDescriptor.spellName;
@@ -151,24 +154,16 @@ var Spell = function (parent, spellDescriptor) {
 
 	if(type === "bullet") {
 		var damages = spellDescriptor.damages;
-		var self = Bullet(parent, name, aimGoalPoint, damages);
+		var speed = spellDescriptor.speed;
+		var lifeTime = spellDescriptor.lifeTime;
+		console.log(parent.id)
+		var self = Bullet(parent, name, aimGoalPoint, damages, speed, lifeTime);
 	}
 	else if (type === "noBullet") {
         if(name === "blink")
         {
-            var params = SpellsParam();
-            if(Math.sqrt(((aimGoalPoint.x-parent.x)*(aimGoalPoint.x-parent.x))+((aimGoalPoint.y-parent.y)*(aimGoalPoint.y-parent.y))) > params.blink.range)
-            {
-                console.log("trop loin");
-                parent.setGoalDest(aimGoalPoint.x,aimGoalPoint.y);
-                parent.currentSpeed = parent.SPEED;
-            }
-            else
-            {
-                console.log("good");
-                parent.x = aimGoalPoint.x;
-                parent.y = aimGoalPoint.y;
-            }
+            parent.x = aimGoalPoint.x;
+            parent.y = aimGoalPoint.y;
 
         }
 	}
