@@ -7,6 +7,7 @@ var Player = function(id){
 	var self = Entity();
 	self.id = id;
 	self.number = "" + Math.floor(10 * Math.random());
+    self.size = 32;// car le sprite des wizard fait 32x32 pix
 
     self.time =0;
 
@@ -46,12 +47,14 @@ var Player = function(id){
 		fireball: {total: 100, current:0, progress: 0},
 		blink: {total: 100, current:0, progress: 0},
         lightning: {total : 100,current:0,progress:0},
+		scurge: {total:100,current:0,progress:0}
 	};
 
     self.spellBinding = {
         A: "fireball",
         Z: "blink",
         E: "lightning",
+		R: "scurge",
     };
 
 	self.targetVisible = false;
@@ -119,7 +122,8 @@ var Player = function(id){
 		return {
 			fireball: self.spellCooldowns["fireball"].progress,
 			blink: self.spellCooldowns["blink"].progress,
-			lightning: self.spellCooldowns["lightning"].progress
+			lightning: self.spellCooldowns["lightning"].progress,
+            scurge:self.spellCooldowns["scurge"].progress
 		}
 	};
 	
@@ -151,7 +155,7 @@ var Player = function(id){
 
 	self.prepareSpell = function(name, aimGoalPoint) {
 		var spellDescriptor;
-
+        console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
 		if(self.spellCooldowns[name]["current"] != 0)
 		{
 			return;
@@ -166,7 +170,8 @@ var Player = function(id){
 								damages: 10,
 								speed: 10,
 								lifeTime: 100,
-								cooldown:5000};
+								cooldown:5000,
+                                range: 32};
 		}
 		else if(name == "blink")
 		{
@@ -188,8 +193,21 @@ var Player = function(id){
 								damages: 10,
 								speed: 30,
 								lifeTime: 5,
-								cooldown:5000};
+								cooldown:5000,
+                                range:32};
 		}
+		else if (name == "scurge")
+        {
+            console.log("scurge");
+            spellDescriptor = { spellName:"scurge",
+                                spellType:"bullet",
+                                x:self.x,
+                                y:self.y,
+                                damages:10,
+                                lifeTime:10,
+                                cooldown:5000,
+                                range: self.size*2};
+        }
 
 		self.spellsToCast.push(spellDescriptor);
 	};
@@ -403,6 +421,8 @@ Player.onConnect = function(socket){
 		else if(data.inputId === 'R') {
 			player.targetVisible = data.state;
 			player.targetType = 'R';
+            player.prepareSpell("scurge", player.aimGoalPoint);
+            player.castSpell();
 			console.log("R")
 		}
 		else if(data.inputId === 'mouseAngle') {

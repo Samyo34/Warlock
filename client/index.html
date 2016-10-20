@@ -66,6 +66,8 @@
 	Img.spell_target.src = '/client/img/spellarea_2.png';
     Img.fireball = new Image();
     Img.fireball.src = '/client/img/fireball2.png';
+    Img.scurge = new Image();
+    Img.scurge.src = '/client/img/explosion.png';
 
 	Img.fireball_indic = new Image();
 	Img.fireball_indic.src = '/client/img/fireball_indic.png';
@@ -73,6 +75,8 @@
 	Img.blink_indic.src = '/client/img/blink_indic.png';
 	Img.lightning_indic = new Image();
 	Img.lightning_indic.src = '/client/img/lightning_indic.png';
+    Img.scurge_indic = new Image();
+    Img.scurge_indic.src = '/client/img/spellsIcons.jpg';
 
 
 	var spellIndicators = {
@@ -85,6 +89,9 @@
 		lightning: { name: "lightning",
 					 img: Img.lightning_indic,
 					 keyboardKey: "E"},
+        scurge: {   name: "scurge",
+                    img : Img.scurge_indic,
+                    keyboardKey:"R"},
 	};
 
     var drawMap = function () {
@@ -125,7 +132,6 @@
 				ctx.save(); // save current state
 				ctx.translate(x,y);
 				ctx.rotate(self.rotation); // rotate
-
 				if(self.id === selfId) {
 					ctx.drawImage(Img.player, 0,0,width,height, -width/2,-height/2,width,height);
 				}
@@ -158,7 +164,7 @@
 				var ctxSpellIndic = document.getElementById(contextName).getContext("2d");
 
 				var progress = self.spellCooldowns[spell.name];
-				draw_spell_indicator(ctxSpellIndic, progress, spell.img, spell.keyboardKey);
+				draw_spell_indicator(ctxSpellIndic, progress, spell, spell.keyboardKey);
 				n += 1;
 			}
 
@@ -214,7 +220,19 @@
 				var y_start = parent.y+16*Math.sin(parent.rotation);
 				drawLightningSpell(x_start, y_start, x, y);
 			}
+            else if(self.spellName === "scurge")
+            {
+                var parent = Player.list[self.parentID];
+                var startX = parent.x;
+                var startY = parent.y;
 
+                ctx.save();
+                ctx.translate(startX,startY);
+                console.log("draw image : " + startX+":"+startY);
+                ctx.drawImage(Img.scurge,185,93,89,89,-32,-32,64,64);
+                ctx.restore();
+
+            }
 
         };
 		return self;
@@ -222,7 +240,7 @@
 
 	Bullet.list = {};
 	
-	var selfId = null;
+	var selfId ;
 
 	socket.on('init',function(data){
 	    if(data.selfId)
@@ -406,9 +424,16 @@
 		var x = width/2;
 		var y = height/2;
 		var r = (height/2)*Math.sqrt(2);
+        if(img.name === "scurge")
+        {
+            ctx.drawImage(img.img,41,235,85,83,0,0,width,height);
+        }else
+        {
+            // Draw spell img:
+            ctx.drawImage(img.img, 0,0,width,height);
+        }
 
-		// Draw spell img:
-		ctx.drawImage(img, 0,0,width,height);
+
 
 		// Draw shortkey:
 		ctx.font = '20pt Calibri';

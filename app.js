@@ -4,8 +4,8 @@ var serv = require('http').Server(app);
 
 var fs = require('fs');
 
-eval(fs.readFileSync('./server/Player.js')+'');
-eval(fs.readFileSync('./server/Bullet.js')+'');
+eval(fs.readFileSync('./Server/Player.js')+'');
+eval(fs.readFileSync('./Server/Bullet.js')+'');
 
 
 app.set('port', (process.env.PORT || 5000));
@@ -60,9 +60,9 @@ var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
 	socket.id = Math.random();
 	SOCKET_LIST[socket.id] = socket;
-	
+
 	Player.onConnect(socket);
-	
+
 	socket.on('disconnect',function(){
 		delete SOCKET_LIST[socket.id];
 		Player.onDisconnect(socket);
@@ -94,9 +94,10 @@ setInterval(function(){
 	
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
-		socket.emit('init',initPack);
+        socket.emit('init',initPack);
 		socket.emit('update',pack);
-		socket.emit('remove',removePack);
+        socket.emit('remove',removePack);
+
 	}
 	initPack.player = [];
 	initPack.bullet = [];

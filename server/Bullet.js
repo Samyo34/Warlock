@@ -9,7 +9,7 @@ var SpellsParam = function(){
         name:'fireball',
         damage:10,
         spellType:'bullet',
-        range:50,
+        range:32,
         action:2,
         actionTime:50000,
         cd:5
@@ -62,7 +62,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 	self.lifeTime = lifeTime;
 	self.toRemove = false;
 
-    self.range = 50;
+    self.range = 32;
 
     self.action = 2;
     self.actionTime = 50000;
@@ -71,14 +71,14 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 	console.log(lifeTime)
 	var super_update = self.update;
 	self.update = function(){
-		if(self.timer++ > self.range)
+		//if(self.timer++ > self.range)
 		if(self.timer++ > self.lifeTime)
 			self.toRemove = true;
 		super_update();
 		
 		for(var i in Player.list){
 			var p = Player.list[i];
-			if(self.getDistance(p) < 32 && self.parent.id !== p.id) {
+			if(self.getDistance(p) < ((self.range/2) + (p.size/2))  && self.parent.id !== p.id) {
 				// bullet self touches player p: handle collision. ex: hp--;
 				p.hp -= self.damages;
 				self.toRemove = true;
