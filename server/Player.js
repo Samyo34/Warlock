@@ -38,7 +38,7 @@ var Player = function(id){
         x:0,
         y:0
     };
-
+    self.linkedSpells = [];
     self.actionTime = 0;// time when the spell action is over
     self.ratioSpeed = 1;
     self.actionDuration = 0;// duration of the spell action
@@ -97,11 +97,11 @@ var Player = function(id){
 		}
 	};
 
-	self.shootBullet = function(angle){
+/*	self.shootBullet = function(angle){
 		var b = Bullet(self.id,angle);
 		b.x = self.x;
 		b.y = self.y;
-	};
+	};*/
 	
 	self.getInitPack = function(){
 		return {
@@ -207,6 +207,7 @@ var Player = function(id){
                                 lifeTime:10,
                                 cooldown:5000,
                                 range: self.size*2};
+            self.linkedSpells.push(spellDescriptor);
         }
 
 		self.spellsToCast.push(spellDescriptor);
@@ -220,6 +221,10 @@ var Player = function(id){
 			var name = self.spellsToCast[0].spellName;
 			self.spellCooldowns[name].current = self.spellCooldowns[name].total;
 			self.spellsToCast.shift();
+            /*if(self.linkedSpells[0])
+            {
+               self.linkedSpells.shift();
+            }*/
 		}
 		else
 		{
@@ -245,9 +250,14 @@ var Player = function(id){
     };
 
 	self.updatePosition = function() {
+	    if(self.linkedSpells[0])
+        {
+            self.linkedSpells[0].x = self.x;
+            self.linkedSpells[0].y = self.y;
+        }
 	    if(self.spellsToCast[0])
         {
-            console.log('spell to cast : '+self.spellsToCast[0].name);
+            console.log('spell to cast : '+self.spellsToCast[0].spellName);
             if(self.spellsToCast[0].spellType === "noBullet")
             {
 
@@ -421,8 +431,14 @@ Player.onConnect = function(socket){
 		else if(data.inputId === 'R') {
 			player.targetVisible = data.state;
 			player.targetType = 'R';
-            player.prepareSpell("scurge", player.aimGoalPoint);
-            player.castSpell();
+            //player.prepareSpell("scurge", player.aimGoalPoint);
+            var spell = player.spellBinding[player.targetType]; // spell = "fireball" for instance
+            if (player.spellCooldowns[spell].current === 0) {
+                player.isShooting = true;
+                player.setAimGoal(player.x,player.y);
+                player.prepareSpell(spell, player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
+               // player.targetVisible = false;
+            }
 			console.log("R")
 		}
 		else if(data.inputId === 'mouseAngle') {
@@ -442,7 +458,7 @@ Player.onConnect = function(socket){
 		// TBD make it for every spells:
 		if(player.targetVisible === true /*&& player.spellCooldowns["fireball"].current === 0*/)
 		{
-			player.isShooting = true;
+/*			player.isShooting = true;
 			player.setAimGoal(data.x,data.y);
 			if(player.targetType === 'A')
 			{
@@ -453,7 +469,7 @@ Player.onConnect = function(socket){
 			    console.log('blink');
 				player.prepareSpell("blink", player.aimGoalPoint);
 			}
-			player.targetVisible = false;
+			player.targetVisible = false;*/
 			var spell = player.spellBinding[player.targetType]; // spell = "fireball" for instance
 			if (player.spellCooldowns[spell].current === 0) {
 				player.isShooting = true;

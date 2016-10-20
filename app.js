@@ -49,6 +49,7 @@ var Entity = function(){
 		self.y += self.spdY;
 	};
 	self.getDistance = function(pt){
+	    console.log('getDist : '+self.x+':'+self.y +' | ' + pt.x+':'+pt.y);
 		return Math.sqrt(Math.pow(self.x-pt.x,2) + Math.pow(self.y-pt.y,2));
 	};
 	return self;

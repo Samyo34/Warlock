@@ -223,12 +223,11 @@
             else if(self.spellName === "scurge")
             {
                 var parent = Player.list[self.parentID];
-                var startX = parent.x;
-                var startY = parent.y;
-
+                var x_start = parent.x;
+                var y_start = parent.y;
                 ctx.save();
-                ctx.translate(startX,startY);
-                console.log("draw image : " + startX+":"+startY);
+                ctx.translate(x_start,y_start);
+                console.log("draw image : " + x+":"+y);
                 ctx.drawImage(Img.scurge,185,93,89,89,-32,-32,64,64);
                 ctx.restore();
 
