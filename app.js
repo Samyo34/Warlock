@@ -49,7 +49,7 @@ var Entity = function(){
 		self.y += self.spdY;
 	};
 	self.getDistance = function(pt){
-	    console.log('getDist : '+self.x+':'+self.y +' | ' + pt.x+':'+pt.y);
+	    //console.log('getDist : '+self.x+':'+self.y +' | ' + pt.x+':'+pt.y);
 		return Math.sqrt(Math.pow(self.x-pt.x,2) + Math.pow(self.y-pt.y,2));
 	};
 	return self;
@@ -95,9 +95,15 @@ setInterval(function(){
 	
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
-        socket.emit('init',initPack);
-		socket.emit('update',pack);
-        socket.emit('remove',removePack);
+       // socket.emit('init',initPack);
+        //console.log('app99 : removepack :'+removePack.bullet.length);
+        socket.emit('update',pack);
+
+        if(removePack.bullet.length>0 || removePack.player.length>0)
+        {
+            console.log('app104 : remove');
+            socket.emit('remove',removePack);
+        }
 
 	}
 	initPack.player = [];

@@ -41,7 +41,7 @@ var SpellsParam = function(){
 
 
 var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
-	console.log("New bullet")
+	console.log("New bullet "+parent.x+':'+parent.y+' '+parent.rotation );
 
 	var self = Entity();
 	self.id = Math.random();
@@ -51,10 +51,18 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 	self.x = parent.x + 16*Math.cos(parent.rotation);
 	self.y = parent.y + 16*Math.sin(parent.rotation);
 
-
 	self.angle = Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x);
-	self.spdX = Math.cos(self.angle) * speed;
-	self.spdY = Math.sin(self.angle) * speed;
+    if(self.angle === 0)
+    {
+        self.spdX = 0;
+        self.spdY = 0;
+    }
+    else
+    {
+        self.spdX = Math.cos(self.angle) * speed;
+        self.spdY = Math.sin(self.angle) * speed;
+    }
+    console.log(self.spdX+':'+self.spdY+' '+self.angle);
 
 	self.damages = damages;
 
@@ -71,16 +79,23 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 	console.log(lifeTime)
 	var super_update = self.update;
 	self.update = function(){
+
 		//if(self.timer++ > self.range)
 		if(self.timer++ > self.lifeTime)
 			self.toRemove = true;
 		super_update();
-		
 		for(var i in Player.list){
 			var p = Player.list[i];
 			if(self.getDistance(p) < ((self.range/2) + (p.size/2))  && self.parent.id !== p.id) {
 				// bullet self touches player p: handle collision. ex: hp--;
-				p.hp -= self.damages;
+                if((p.hp - self.damages)>0)
+                {
+                    p.hp -= self.damages;
+                }
+                else
+                {
+                    p.hp = 0;
+                }
 				self.toRemove = true;
                 var direction = Math.atan2(self.y - p.y,self.x - p.x);
                 p.enemySpellActionVelocity.x = -self.action * Math.cos(direction);
@@ -107,9 +122,12 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 	};
 
 	self.getUpdatePack = function(){
+	    console.log('bullet : '+ self.x+':'+self.y+' | '+self.parent.x+':'+self.parent.y);
 		return {
 			id:self.id,
-			name:self.name,
+			spellName:self.spellName,
+            type:self.type,
+            parentID:self.parent["id"],
 			x:self.x,
 			y:self.y,
 			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
@@ -156,8 +174,19 @@ var Spell = function (parent, spellDescriptor) {
 		var damages = spellDescriptor.damages;
 		var speed = spellDescriptor.speed;
 		var lifeTime = spellDescriptor.lifeTime;
-		console.log(parent.id)
 		var self = Bullet(parent, name, aimGoalPoint, damages, speed, lifeTime);
+
+        if(spellDescriptor.spellName === 'scurge')
+        {
+            self.x = parent.x;
+            self.y = parent.y;
+            console.log('spell -> '+spellDescriptor.spellName+' : '+parent.x+':'+parent.y);
+        }
+        if(spellDescriptor.range)
+        {
+            self.range = spellDescriptor.range;
+
+        }
 	}
 	else if (type === "noBullet") {
         if(name === "blink")
