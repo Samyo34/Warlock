@@ -26,7 +26,7 @@ var Player = function(id){
     self.hpMax = 200;
     self.hp = 200;
 
-    self.SPEED = 2;
+    self.SPEED = 4;
 
     self.friction = 1;
     self.currentSpeed = 0;
@@ -68,13 +68,13 @@ var Player = function(id){
 
 	self.mouseAngle = 0;
 
-	var super_update = self.update;
+	//var super_update = self.update;
 	self.update = function(){
         self.updateFriction();
 	    self.updatePosition();
 		self.updateCooldowns();
 
-        super_update();
+        //super_update();
 
 		for (var i in self.spellCooldowns) {
 			var spell = self.spellCooldowns[i];
@@ -155,7 +155,7 @@ var Player = function(id){
 
 	self.prepareSpell = function(name, aimGoalPoint) {
 		var spellDescriptor;
-        console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
+        //console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
 		if(self.spellCooldowns[name]["current"] != 0)
 		{
 			return;
@@ -198,7 +198,7 @@ var Player = function(id){
 		}
 		else if (name == "scurge")
         {
-            console.log("scurge");
+            //console.log("scurge");
             spellDescriptor = { spellName:"scurge",
                                 spellType:"bullet",
                                 x:self.x,
@@ -257,7 +257,7 @@ var Player = function(id){
         }
 	    if(self.spellsToCast[0])
         {
-            console.log('spell to cast : '+self.spellsToCast[0].spellName);
+            //console.log('spell to cast : '+self.spellsToCast[0].spellName);
             if(self.spellsToCast[0].spellType === "noBullet")
             {
 
@@ -309,7 +309,7 @@ var Player = function(id){
 			var error = self.angleDesired - self.rotation;
 
 			// If the error is small enough, we set the angular velocity to zero
-			console.log("error : " +  Math.abs(error))
+			//console.log("error : " +  Math.abs(error))
 			if (Math.abs(error)%3.14 <= 0.1)
 			{
 				self.angularVelocity = 0;
@@ -318,7 +318,7 @@ var Player = function(id){
 			else
 			{
 				error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
-				self.angularVelocity = 150 * error; // we multiply the error by a gain K in order to converge faster
+				self.angularVelocity = 250 * error; // we multiply the error by a gain K in order to converge faster
 				self.rotation += self.angularVelocity/1000; // Why /1000 ?
 			}
 		}
@@ -327,6 +327,8 @@ var Player = function(id){
 				self.spdX = 0;
 				self.spdY = 0;
 				self.currentSpeed = 0;
+              /*  self.angularVelocity = 0;
+                self.isOrientationGood = true;*/
 			}
 			//else {
             var d = new Date();
@@ -345,9 +347,20 @@ var Player = function(id){
 				self.enemySpellActionVelocity.x = 0;
 				self.enemySpellActionVelocity.y = 0;
 			}
-				//console.log(self.id+" : currentSpeed: " + self.currentSpeed + ' '+ self.enemySpellActionVelocity.x);
-				self.spdX = self.friction * self.currentSpeed * Math.cos(self.rotation) + self.enemySpellActionVelocity.x;
-				self.spdY = self.friction * self.currentSpeed * Math.sin(self.rotation) + self.enemySpellActionVelocity.y;
+			angleDesired = Math.atan2(self.goalDest.y - self.y, self.goalDest.x - self.x);
+			//console.log("AngleDesired: " + angleDesired);
+
+			// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
+			var error = angleDesired - self.rotation;
+			var tempRot = self.rotation;
+			if((error*180/Math.PI)>90)
+			{
+				tempRot = angleDesired;
+			}
+
+			console.log(self.id+" : currentSpeed: " + Math.cos(self.rotation) + ' '+ Math.sin(self.rotation));
+			self.spdX = self.friction * self.currentSpeed * Math.cos(tempRot) + self.enemySpellActionVelocity.x;
+			self.spdY = self.friction * self.currentSpeed * Math.sin(tempRot) + self.enemySpellActionVelocity.y;
 			//}
 
 			if(self.isOrientationGood != true) {
@@ -369,7 +382,7 @@ var Player = function(id){
 				else {
 					error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
 
-					self.angularVelocity = 150 * error; // we multiply the error by a gain K in order to converge faster
+					self.angularVelocity = 250 * error; // we multiply the error by a gain K in order to converge faster
 				}
 			}
 
@@ -408,7 +421,7 @@ var Player = function(id){
 Player.list = {};
 
 Player.onConnect = function(socket){
-	console.log("Player connected.");
+	//console.log("Player connected.");
 	
 	var player = Player(socket.id);
 	

@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
 
+var profiler = require('v8-profiler');
 var fs = require('fs');
 
 eval(fs.readFileSync('./Server/Player.js')+'');
@@ -101,7 +102,7 @@ setInterval(function(){
 
         if(removePack.bullet.length>0 || removePack.player.length>0)
         {
-            console.log('app104 : remove');
+            //console.log('app104 : remove');
             socket.emit('remove',removePack);
         }
 
@@ -112,3 +113,18 @@ setInterval(function(){
 	removePack.bullet = [];
 	
 },1000/25);
+
+var startProfiling = function(time)
+{
+    profiler.startProfiling('1',true);
+    setTimeout(function() {
+        var profile1 = profiler.stopProfiling('1');
+        profile1.export(function (error, result) {
+            fs.writeFile('./profilev2.cpuprofile', result);
+            profile1.delete();
+            console.log('profile saved');
+        });
+
+    },time);
+}
+startProfiling(10000);

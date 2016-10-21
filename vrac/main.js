@@ -32,17 +32,17 @@ function preload() {
     //  The final one tells Phaser the foramt of the map data, in this case it's a JSON file exported from the Tiled map editor.
     //  This could be Phaser.Tilemap.CSV too.
 
-    game.load.tilemap('map', 'map_lave_v1.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.tilemap('map', '../client/img/map_lave_v1.1.json', null, Phaser.Tilemap.TILED_JSON);
 
     //  Next we load the tileset. This is just an image, loaded in via the normal way we load images:
 
-    game.load.image('tiles', 'terrain_atlas.png');
+    game.load.image('tiles', '../client/img/map_lave_v1.1.png');
 
-    game.load.image('sorcier', 'sorcier.png');
-    game.load.image('i_fireball', 'fireball.png');
-    game.load.image('target', 'spellarea.png');
-    game.load.image('fireball_spell_indicator', 'fireball-red-3.png');
-    game.load.image('spell_border', 'spell_border.png');
+    game.load.image('sorcier', '../client/img/sorcier.png');
+    game.load.image('i_fireball', '../client/img/fireball2.png');
+    game.load.image('target', '../client/img/spellarea.png');
+    game.load.image('fireball_spell_indicator', '../client/img/fireball_indic.png');
+    game.load.image('spell_border', '../client/img/spell_border.png');
 }
 
 var map;
@@ -58,17 +58,17 @@ function create() {
 
     //  The first parameter is the tileset name, as specified in the Tiled map editor (and in the tilemap json file)
     //  The second parameter maps this name to the Phaser.Cache key 'tiles'
-    map.addTilesetImage('terrain_atlas', 'tiles');
+   // map.addTilesetImage('terrain_atlas', 'tiles');
 
     //  Creates a layer from the MyMap layer in the map data.
     //  A Layer is effectively like a Phaser.Sprite, so is added to the display list.
-    layer = map.createLayer('background');
+   // layer = map.createLayer('background');
 
     // we set up the clicked point at the same position than the circle
     goalDestination = new Phaser.Point(GlobalPosi.x, GlobalPosi.y);
 
     //  This resizes the game world to match the layer dimensions
-    layer.resizeWorld();
+   // layer.resizeWorld();
 
     // for capturing left and right mouse clicks:
     game.input.mouse.capture = true;

@@ -122,7 +122,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 	};
 
 	self.getUpdatePack = function(){
-	    console.log('bullet : '+ self.x+':'+self.y+' | '+self.parent.x+':'+self.parent.y);
+	    //console.log('bullet : '+ self.x+':'+self.y+' | '+self.parent.x+':'+self.parent.y);
 		return {
 			id:self.id,
 			spellName:self.spellName,
@@ -180,7 +180,7 @@ var Spell = function (parent, spellDescriptor) {
         {
             self.x = parent.x;
             self.y = parent.y;
-            console.log('spell -> '+spellDescriptor.spellName+' : '+parent.x+':'+parent.y);
+            //console.log('spell -> '+spellDescriptor.spellName+' : '+parent.x+':'+parent.y);
         }
         if(spellDescriptor.range)
         {

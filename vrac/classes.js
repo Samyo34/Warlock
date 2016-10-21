@@ -186,7 +186,7 @@ Wizard = function (game, x, y, xSpellIndic, ySpellIndic) {
 
     this.autoShoot = false;
 
-    this.healthBar = new HealthBar(game, {x: x, y: y-25, width: 40, height : 5});
+   // this.healthBar = new HealthBar(game, {x: x, y: y-25, width: 40, height : 5});
 
     this.Spell = [];
     this.Spell.push(new Spell.FireBall(game, xSpellIndic, ySpellIndic));
@@ -201,7 +201,7 @@ Wizard.prototype.update = function() {
     {
         this.health = 0;
         this.isDead = true;
-        this.healthBar.kill();
+        //this.healthBar.kill();
         this.visible = false;
     }
     else if(this.isActive)
@@ -280,7 +280,7 @@ Wizard.prototype.update = function() {
             else  // else we set up the velocity
             {
                 //console.log(this.currentSpeed);
-                this.body.velocity.setTo(this.friction * this.currentSpeed * Math.cos(this.rotation*Math.PI/180)+this.spellActionVelocity.x, this.friction * this.currentSpeed * Math.sin(this.rotation*Math.PI/180)+this.spellActionVelocity.y);
+                this.body.velocity.setTo(this.friction * this.currentSpeed * Math.cos(this.rotation)+this.spellActionVelocity.x, this.friction * this.currentSpeed * Math.sin(this.rotation)+this.spellActionVelocity.y);
             }
             //================ Update rotation ================
             // we compute the desiredAngle towards the clicked point (in radians)
@@ -304,8 +304,8 @@ Wizard.prototype.update = function() {
     }
 
     // Update the position and the progress of the healthBar:
-    this.healthBar.setPosition(this.x, this.y - 25);
-    this.healthBar.setPercent((100 * this.health) / this.fullHealth);
+    //this.healthBar.setPosition(this.x, this.y - 25);
+    //this.healthBar.setPercent((100 * this.health) / this.fullHealth);
 
 };
 
