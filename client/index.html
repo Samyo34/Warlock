@@ -175,7 +175,9 @@
 				if (self.targetVisible === false || self.targetType === "") {
 					return;
 				}
-				else if (self.targetType === spellIndicators["fireball"].keyboardKey || self.targetType === spellIndicators["lightning"].keyboardKey) {
+				else if (self.targetType === spellIndicators["fireball"].keyboardKey ||
+                        self.targetType === spellIndicators["lightning"].keyboardKey||
+                        self.targetType === spellIndicators["blink"].keyboardKey) {
 					var width = Img.spell_target.width;
 					var height = Img.spell_target.height;
 					ctx.drawImage(Img.spell_target, mouse_X - (width/2), mouse_Y - (height/2));
@@ -197,6 +199,12 @@
 		self.x = initPack.x;
 		self.y = initPack.y;
         self.orientation = initPack.orientation;
+        self.range =0;
+        if(initPack.range !== undefined)
+        {
+            self.range = initPack.range;
+        }
+
 		Bullet.list[self.id] = self;
 
 		self.draw = function()
@@ -228,7 +236,7 @@
                 ctx.save();
                 ctx.translate(x_start,y_start);
                 console.log("draw image : " + x+":"+y);
-                ctx.drawImage(Img.scurge,185,93,89,89,-32,-32,64,64);
+                ctx.drawImage(Img.scurge,186,94,87,87,-self.range/2,-self.range/2,self.range,self.range);
                 ctx.restore();
 
             }

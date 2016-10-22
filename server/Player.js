@@ -206,7 +206,7 @@ var Player = function(id){
                                 damages:10,
                                 lifeTime:10,
                                 cooldown:5000,
-                                range: self.size*2};
+                                range: self.size*4};
             self.linkedSpells.push(spellDescriptor);
         }
 
@@ -353,12 +353,13 @@ var Player = function(id){
 			// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
 			var error = angleDesired - self.rotation;
 			var tempRot = self.rotation;
-			if((error*180/Math.PI)>90)
+           // console.log('angle : '+(error*180/Math.PI));
+			if(Math.abs((error*180/Math.PI))>10)
 			{
 				tempRot = angleDesired;
 			}
 
-			console.log(self.id+" : currentSpeed: " + Math.cos(self.rotation) + ' '+ Math.sin(self.rotation));
+			//console.log(self.id+" : currentSpeed: " + Math.cos(self.rotation) + ' '+ Math.sin(self.rotation));
 			self.spdX = self.friction * self.currentSpeed * Math.cos(tempRot) + self.enemySpellActionVelocity.x;
 			self.spdY = self.friction * self.currentSpeed * Math.sin(tempRot) + self.enemySpellActionVelocity.y;
 			//}

@@ -118,6 +118,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 			x:self.x,
 			y:self.y,
 			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
+            range:self.range
 		};
 	};
 
@@ -131,6 +132,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 			x:self.x,
 			y:self.y,
 			orientation:Math.atan2(aimGoalPoint.y - self.parent.y, aimGoalPoint.x - self.parent.x),
+			range:self.range,
 		};
 	};
 
@@ -168,13 +170,17 @@ var Spell = function (parent, spellDescriptor) {
 	var type = spellDescriptor.spellType;
 	var name = spellDescriptor.spellName;
 	var cooldown = spellDescriptor.cooldown;
-	var aimGoalPoint = {x: spellDescriptor.x, y: spellDescriptor.y}
+	var aimGoalPoint = {x: spellDescriptor.x, y: spellDescriptor.y};
 
 	if(type === "bullet") {
 		var damages = spellDescriptor.damages;
 		var speed = spellDescriptor.speed;
 		var lifeTime = spellDescriptor.lifeTime;
 		var self = Bullet(parent, name, aimGoalPoint, damages, speed, lifeTime);
+        if(spellDescriptor.range)
+        {
+            self.range = spellDescriptor.range;
+        }
 
         if(spellDescriptor.spellName === 'scurge')
         {
