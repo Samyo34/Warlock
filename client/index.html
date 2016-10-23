@@ -58,6 +58,8 @@
 	var Img = {};
 	Img.player = new Image();
 	Img.player.src = '/client/img/sorcier.png';
+	Img.playerSheet = new Image();
+	Img.playerSheet.src = '/client/img/spritesheet_Wizard.png';
     Img.enemy = new Image();
     Img.enemy.src = '/client/img/enemy.png';
     Img.map = new Image();
@@ -101,6 +103,12 @@
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 
+    var indexMove = 0;
+    var indexCast = 0;
+    var lastChangeTransiTime = 0;
+    var lastX = 0;
+    var lastY = 0;
+
     var Player = function(initPack){
 		var self = {};
 		self.id = initPack.id;
@@ -114,6 +122,14 @@
 		self.targetVisible = initPack.targetVisible;
 		self.targetType = initPack.targetType;
 		self.isDead = initPack.isDead;
+        self.isShooting = initPack.isShooting;
+
+
+        self.indexMoveX = [2,49,96,145,2,51,99];
+        self.indexMoveY = [148,148,148,148,196,196,196];
+        self.indexCastX = [1,51,102,152,197];
+        self.indexCastY = [292,292,292,292,292];
+
 
 		self.spellCooldowns = {
 			fireball: 0,
@@ -126,14 +142,58 @@
 				var x = self.x;
 				var y = self.y;
 
+                /*
 				var width = Img.player.width;
 				var height = Img.player.height;
+				*/
+                var width = 44;
+                var height = 44;
+
+                if(Date.now() > lastChangeTransiTime + 1000/25){
+                    indexMove++;
+                    //changement de transition
+                    if(indexMove >= self.indexMoveX.length){
+                        indexMove = 0;
+                    }
+
+                    lastChangeTransiTime = Date.now();
+                }
+
+                if(lastX === x || lastY === y)
+                {
+                    indexMove =0;
+                    lastChangeTransiTime = 0;
+                }
+                lastX = x;
+                lastY = y;
+
+                if(self.isShooting)
+                {
+                    if(Date.now() > lastChangeTransiTime +100){
+                        indexCast++;
+                        //changement de transition
+                        if(indexCast >= self.indexCastX.length){
+                            indexCast = 0;
+                        }
+
+                        lastChangeTransiTime = Date.now();
+                    }
+                }
 
 				ctx.save(); // save current state
 				ctx.translate(x,y);
-				ctx.rotate(self.rotation); // rotate
+                console.log(self.isShooting);
+				ctx.rotate(self.rotation+((-90*Math.PI)/180)); // rotate
 				if(self.id === selfId) {
-					ctx.drawImage(Img.player, 0,0,width,height, -width/2,-height/2,width,height);
+                    //console.log(self.indexMoveX[self.index]+':'+self.indexMoveY[self.index]);
+                    if(self.isShooting)
+                    {
+                        ctx.drawImage(Img.playerSheet, self.indexCastX[indexCast],self.indexCastY[indexCast],width,height, -width/2,-height/2,width,height);
+                    }
+					else
+                    {
+                        ctx.drawImage(Img.playerSheet, self.indexMoveX[indexMove],self.indexMoveY[indexMove],width,height, -width/2,-height/2,width,height);
+                    }
 				}
 				else {
 					ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);

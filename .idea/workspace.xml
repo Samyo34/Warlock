@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6c9c681f-5cdf-47f3-8962-3475afe2dd57" name="Default" comment="- upgrade of new displacement&#10;- change">
+    <list default="true" id="6c9c681f-5cdf-47f3-8962-3475afe2dd57" name="Default" comment="- upgrade of new displacement&#10;- add range propriety to the bullets ( = the size of the bullet)&#10;- the scurge is now well drawn">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/index.html" afterPath="$PROJECT_DIR$/client/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/Bullet.js" afterPath="$PROJECT_DIR$/server/Bullet.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/Player.js" afterPath="$PROJECT_DIR$/server/Player.js" />
     </list>
     <ignored path="Warlock.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,7 +29,7 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1025">
+            <state relative-caret-position="25">
               <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
               <folding />
             </state>
@@ -41,7 +39,7 @@
       <file leaf-file-name="Bullet.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/Bullet.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="100">
+            <state relative-caret-position="2950">
               <caret line="118" column="21" selection-start-line="118" selection-start-column="21" selection-end-line="118" selection-end-column="21" />
               <folding />
             </state>
@@ -51,20 +49,21 @@
       <file leaf-file-name="Player.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/Player.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="347">
-              <caret line="266" column="7" selection-start-line="266" selection-start-column="7" selection-end-line="266" selection-end-column="7" />
+            <state relative-caret-position="514">
+              <caret line="116" column="39" selection-start-line="116" selection-start-column="39" selection-end-line="116" selection-end-column="39" />
               <folding>
                 <element signature="e#1475#1945#0" expanded="false" />
-                <element signature="e#2090#2329#0" expanded="false" />
-                <element signature="e#2367#2605#0" expanded="false" />
-                <element signature="e#2641#2929#0" expanded="false" />
-                <element signature="e#2974#3040#0" expanded="false" />
-                <element signature="e#3085#3143#0" expanded="false" />
-                <element signature="e#5369#5788#0" expanded="false" />
-                <element signature="e#11268#11549#0" expanded="false" />
-                <element signature="e#14254#14366#0" expanded="false" />
-                <element signature="e#14407#14478#0" expanded="false" />
-                <element signature="e#14507#14658#0" expanded="false" />
+                <element signature="e#2398#2636#0" expanded="false" />
+                <element signature="e#3036#3102#0" expanded="false" />
+                <element signature="e#3147#3205#0" expanded="false" />
+                <element signature="e#3258#4903#0" expanded="false" />
+                <element signature="e#4999#5394#0" expanded="false" />
+                <element signature="e#5431#5850#0" expanded="false" />
+                <element signature="e#5887#11292#0" expanded="false" />
+                <element signature="e#11330#11611#0" expanded="false" />
+                <element signature="e#14316#14428#0" expanded="false" />
+                <element signature="e#14469#14540#0" expanded="false" />
+                <element signature="e#14569#14720#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -83,7 +82,7 @@
       <file leaf-file-name="classes.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/vrac/classes.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="637">
+            <state relative-caret-position="7425">
               <caret line="300" column="44" selection-start-line="300" selection-start-column="44" selection-end-line="300" selection-end-column="44" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
@@ -95,8 +94,8 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-325">
-              <caret line="179" column="66" selection-start-line="179" selection-start-column="66" selection-end-line="179" selection-end-column="66" />
+            <state relative-caret-position="500">
+              <caret line="188" column="39" selection-start-line="188" selection-start-column="39" selection-end-line="188" selection-end-column="39" />
               <folding>
                 <element signature="n#style#0;n#canvas#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -204,8 +203,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -254,6 +251,8 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -375,7 +374,8 @@
       <workItem from="1476368855122" duration="31800000" />
       <workItem from="1476800383696" duration="33186000" />
       <workItem from="1477065786939" duration="503000" />
-      <workItem from="1477066338210" duration="5630000" />
+      <workItem from="1477066338210" duration="5759000" />
+      <workItem from="1477241548466" duration="3712000" />
     </task>
     <task id="LOCAL-00001" summary="adapte phaser size to screen">
       <created>1470911100808</created>
@@ -594,20 +594,27 @@
       <option name="project" value="LOCAL" />
       <updated>1477067726500</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="- upgrade of new displacement&#10;- add range propriety to the bullets ( = the size of the bullet)&#10;- the scurge is now well drawn">
+      <created>1477159000503</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1477159000503</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="236684000" />
+    <option name="totallyTimeSpent" value="240525000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-11" y="-11" width="1942" height="1042" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15260416" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15260416" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17351598" sideWeight="0.765625" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17351598" sideWeight="0.234375" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17351598" sideWeight="0.76666665" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17351598" sideWeight="0.23333333" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -672,7 +679,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add collision detection" />
     <MESSAGE value="add action when bullet hit wizard (direction, change speed and control)" />
     <MESSAGE value="add autoshooting" />
     <MESSAGE value="Create Folder for server.&#10;init connection&#10;exemple of using" />
@@ -697,7 +703,8 @@
     <MESSAGE value="fix scurge" />
     <MESSAGE value="reduce number of packages send on sockets" />
     <MESSAGE value="- improve displacements system (like Warlock displacements)&#10;- add profiling system" />
-    <option name="LAST_COMMIT_MESSAGE" value="- improve displacements system (like Warlock displacements)&#10;- add profiling system" />
+    <MESSAGE value="- upgrade of new displacement&#10;- add range propriety to the bullets ( = the size of the bullet)&#10;- the scurge is now well drawn" />
+    <option name="LAST_COMMIT_MESSAGE" value="- upgrade of new displacement&#10;- add range propriety to the bullets ( = the size of the bullet)&#10;- the scurge is now well drawn" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -793,6 +800,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/vrac/classes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7425">
+          <caret line="300" column="44" selection-start-line="300" selection-start-column="44" selection-end-line="300" selection-end-column="44" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/Bullet.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2950">
+          <caret line="118" column="21" selection-start-line="118" selection-start-column="21" selection-end-line="118" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="25">
+          <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/vrac/main.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -801,56 +834,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vrac/classes.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="637">
-          <caret line="300" column="44" selection-start-line="300" selection-start-column="44" selection-end-line="300" selection-end-column="44" />
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1025">
-          <caret line="62" column="16" selection-start-line="62" selection-start-column="16" selection-end-line="62" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Server/Bullet.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="118" column="21" selection-start-line="118" selection-start-column="21" selection-end-line="118" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Server/Player.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
-          <caret line="266" column="7" selection-start-line="266" selection-start-column="7" selection-end-line="266" selection-end-column="7" />
+        <state relative-caret-position="514">
+          <caret line="116" column="39" selection-start-line="116" selection-start-column="39" selection-end-line="116" selection-end-column="39" />
           <folding>
             <element signature="e#1475#1945#0" expanded="false" />
-            <element signature="e#2090#2329#0" expanded="false" />
-            <element signature="e#2367#2605#0" expanded="false" />
-            <element signature="e#2641#2929#0" expanded="false" />
-            <element signature="e#2974#3040#0" expanded="false" />
-            <element signature="e#3085#3143#0" expanded="false" />
-            <element signature="e#5369#5788#0" expanded="false" />
-            <element signature="e#11268#11549#0" expanded="false" />
-            <element signature="e#14254#14366#0" expanded="false" />
-            <element signature="e#14407#14478#0" expanded="false" />
-            <element signature="e#14507#14658#0" expanded="false" />
+            <element signature="e#2398#2636#0" expanded="false" />
+            <element signature="e#3036#3102#0" expanded="false" />
+            <element signature="e#3147#3205#0" expanded="false" />
+            <element signature="e#3258#4903#0" expanded="false" />
+            <element signature="e#4999#5394#0" expanded="false" />
+            <element signature="e#5431#5850#0" expanded="false" />
+            <element signature="e#5887#11292#0" expanded="false" />
+            <element signature="e#11330#11611#0" expanded="false" />
+            <element signature="e#14316#14428#0" expanded="false" />
+            <element signature="e#14469#14540#0" expanded="false" />
+            <element signature="e#14569#14720#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-325">
-          <caret line="179" column="66" selection-start-line="179" selection-start-column="66" selection-end-line="179" selection-end-column="66" />
+        <state relative-caret-position="500">
+          <caret line="188" column="39" selection-start-line="188" selection-start-column="39" selection-end-line="188" selection-end-column="39" />
           <folding>
             <element signature="n#style#0;n#canvas#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
