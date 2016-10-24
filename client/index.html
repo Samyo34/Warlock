@@ -153,7 +153,8 @@
 				var width = Img.player.width;
 				var height = Img.player.height;
 				*/
-                var width = 44;
+                var
+                        width = 44;
                 var height = 44;
 
                 if(Date.now() > self.lastChangeTransiTime + 1000/25){
@@ -170,6 +171,7 @@
                 {
                     self.indexMove =0;
                     self.lastChangeTransiTime = 0;
+                    console.log('stop :'+x+':'+y);
                 }
                 self.lastX = x;
                 self.lastY = y;
@@ -187,60 +189,56 @@
                     }
                 }
 
-                if(camera.isOnViewPort(self)) {
-                    ctx.save(); // save current state
-                    ctx.translate(self.x, self.y);
-                    ctx.rotate(self.rotation + ((-90 * Math.PI) / 180)); // rotate
+                ctx.save(); // save current state
+                ctx.translate(self.x, self.y);
+                ctx.rotate(self.rotation + ((-90 * Math.PI) / 180)); // rotate
 
-                    if (self.id === selfId) {
+                if (self.id === selfId) {
 
-                        //console.log(self.indexMoveX[self.index]+':'+self.indexMoveY[self.index]);
-                        if (self.isShooting) {
-                            ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height,-(self.size/2),-(self.size/2),self.size, self.size);
-                        }
-                        else {
-                            ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
-                        }
+                    //console.log(self.indexMoveX[self.index]+':'+self.indexMoveY[self.index]);
+                    if (self.isShooting) {
+                        ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height,-(self.size/2),-(self.size/2),self.size, self.size);
+                    } else {
+                        ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
+                    }
+                }
+                else {
+                    if (self.isShooting) {
+                        ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
                     }
                     else {
-                        if (self.isShooting) {
-                            ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
-                        }
-                        else {
-                            ctx.drawImage(Img.playerSheet_enemy, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
-                        }
-
+                        ctx.drawImage(Img.playerSheet_enemy, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
                     }
-                    //ctx.translate(-transX,-transY);
-                    ctx.restore();
 
-                    ctx.save();
-                    //ctx.translate(self.x, self.y);
-                    // Draw healthbar:
-                    ctx.fillStyle = "#000000";
-                        // green
-                    ctx.strokeRect(self.x*-(self.size/2)-4, self.y-(self.size
-                            /2) - 13, 38+2, 5+ 2);
-                        if(self.id === selfId) {
+                } //ctx.translate(-transX,-transY);
+                ctx.restore();
+
+                ctx.save();
+                //ctx.translate(self.x, self.y);
+                // Draw healthbar:
+                ctx.fillStyle = "#000000";
+                    // green
+                ctx.strokeRect(self.x-(self.size/2)-4, self.y-(self.size
+                        /2
+                        ) - 13, 38+2, 5+ 2);
+                    if(self.id === selfId) {
                         ctx.fillStyle = "#34C924"
-                        ; // green
-                    }
-                    else {
-                        ctx.fillStyle="#FF0000"; // red
-                    }
-                    ctx.fillRect(self.x-(self.size/2)-3, self.y
-                            -
-                            (self.size/2) - 12, (self.hp* 38 )/self.hpMax,5);
+                    ; // green
+                }
+                else {
+                    ctx.fillStyle="#FF0000"; // red
+                }
+                ctx.fillRect(self.x-(self.size/2)-3, self.y
+                        -
+                        (self.size/2) - 12, (self.hp* 38 ) / self.hpMax, 5);
 
-                    //ctx.restore();
+                //ctx.restore();
 
-                    self.drawSpellIndicators();
-			    }
-			}
-		};
+                self.drawSpellIndicators();
+            }
+        };
 
-		self.drawSpellIndicators =
-                function () {
+		self.drawSpellIndicators = function () {
 			var n = 0;
 			for (var i in spellIndicators) {
 				var spell = spellIndicators[i];
@@ -299,7 +297,7 @@
 		self.spellName = initPack.spellName;
 		self.parentID = initPack.parentID;
 		self.x = initPack.x-camera.x;
-		self.y = initPack.x-camera.x;
+		self.y = initPack.y-camera.y;
         self.orientation = initPack.orientation;
         self.range =0;
         if(initPack.range !== undefined)
@@ -344,6 +342,21 @@
             }
 
         };
+
+        self.onUpdate = function(updatePack)
+        {
+            self.id = updatePack.id;
+            self.spellName = updatePack.spellName;
+            self.parentID = updatePack.parentID;
+            self.x = updatePack.x-camera.x;
+            self.y = updatePack.y-camera.y;
+            self.orientation = updatePack.orientation;
+            self.range =0;
+            if(updatePack.range !== undefined)
+            {
+                self.range = updatePack.range;
+            }
+        }
 		return self;
 	};
 
@@ -379,6 +392,7 @@
             {
                 if(data.player[i].id === selfId)
                 {
+                    //console.log('update : '+data.player[i].x+':'+data.player[i].y)
                     camera.moveTo(data.player[i].x,data.player[i].y);
                 }
                 //console.log('update');
@@ -396,11 +410,11 @@
         for(var i = 0 ; i < data.bullet.length; i++){
             if(bullets[data.bullet[i].id])
             {
-                bullets[data.bullet[i].id].onUpdate();
+                bullets[data.bullet[i].id].onUpdate(data.bullet[i]);
             }
             else
             {
-                bullets[data.bullet[i].id]=new Bullet(data.bullet[i]);
+                bullets[data.bullet[i].id] = new Bullet(data.bullet[i]);
             }
 
         }
@@ -427,7 +441,7 @@
 					p.spellCooldowns = pack.spellCooldowns;
 			}
 		}*/
-		for(var i = 0 ; i < data.bullet.length; i++){
+	/*	for(var i = 0 ; i < data.bullet.length; i++){
 			var pack = data.bullet[i];
 			var b = Bullet.list[data.bullet[i].id];
 			if(b){
@@ -438,7 +452,7 @@
 				if(pack.parentID !== undefined)
 					b.parentID = pack.parentID;
 			}
-		}
+		}*/
 	});
 	
 	socket.on('remove',function(data){
@@ -448,7 +462,7 @@
 			//delete Player.list[data.player[i]];
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
-			delete Bullet.list[data.bullet[i]];
+			delete bullets[data.bullet[i]];
 		}
 	});
 
@@ -531,8 +545,8 @@
 	// jQuery:
 	// Mouse click handler
 	$('#ctx').mousedown(function(event) {
-		click_X = camera.x+event.pageX - $(this).offset().left-camera.x;
-		click_Y = camera.y+event.pageY - $(this).offset().top-camera.y;
+		click_X = camera.x+event.pageX - $(this).offset().left;
+		click_Y = camera.y+event.pageY - $(this).offset().top;
 		console.log(event.which);
 		switch (event.which) {
 			case 1:
@@ -802,12 +816,12 @@
 			Player.list[i].draw()
 			Player.list[i].drawTarget()
 		}*/
-		for(var i in Bullet.list) {
+		for(var i in bullets) {
 		   /* ctx.save();
             ctx.translate(Bullet.list[i].x,Bullet.list[i].y);
             ctx.rotate(Bullet.list[i].orientation*Math.PI/180);
             ctx.restore();*/
-            Bullet.list[i].draw();
+            bullets[i].draw();
 		}
 
 

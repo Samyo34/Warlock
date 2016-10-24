@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6c9c681f-5cdf-47f3-8962-3475afe2dd57" name="Default" comment="camera now follow the player at the center of the canvas (TODO : adapte Bullet">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client/js/Camera.js" />
+    <list default="true" id="6c9c681f-5cdf-47f3-8962-3475afe2dd57" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/index.html" afterPath="$PROJECT_DIR$/client/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/js/Camera.js" afterPath="$PROJECT_DIR$/client/js/Camera.js" />
     </list>
     <ignored path="Warlock.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -50,8 +50,8 @@
       <file leaf-file-name="Player.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Server/Player.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="700">
-              <caret line="117" column="33" selection-start-line="117" selection-start-column="33" selection-end-line="117" selection-end-column="33" />
+            <state relative-caret-position="207">
+              <caret line="131" column="36" selection-start-line="131" selection-start-column="36" selection-end-line="131" selection-end-column="36" />
               <folding>
                 <element signature="e#1475#1945#0" expanded="false" />
                 <element signature="e#2432#2670#0" expanded="false" />
@@ -92,8 +92,8 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="250">
-              <caret line="402" column="16" selection-start-line="402" selection-start-column="16" selection-end-line="402" selection-end-column="16" />
+            <state relative-caret-position="575">
+              <caret line="211" column="0" selection-start-line="211" selection-start-column="0" selection-end-line="211" selection-end-column="0" />
               <folding>
                 <element signature="n#style#0;n#canvas#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -103,9 +103,9 @@
                 <element signature="n#style#0;n#canvas#3;n#div#0;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#1;n#div#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#input#0;n#form#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="e#3505#9961#0" expanded="false" />
-                <element signature="e#8322#8680#0" expanded="false" />
-                <element signature="e#10442#11645#0" expanded="false" />
+                <element signature="e#8170#8528#0" expanded="false" />
+                <element signature="e#8561#9102#0" expanded="false" />
+                <element signature="e#9866#12007#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -114,8 +114,8 @@
       <file leaf-file-name="Camera.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/js/Camera.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="265">
-              <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+            <state relative-caret-position="525">
+              <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
               <folding>
                 <element signature="e#0#42#0" expanded="false" />
               </folding>
@@ -407,7 +407,7 @@
       <workItem from="1476800383696" duration="33186000" />
       <workItem from="1477065786939" duration="503000" />
       <workItem from="1477066338210" duration="5759000" />
-      <workItem from="1477241548466" duration="27534000" />
+      <workItem from="1477241548466" duration="29897000" />
     </task>
     <task id="LOCAL-00001" summary="adapte phaser size to screen">
       <created>1470911100808</created>
@@ -661,11 +661,18 @@
       <option name="project" value="LOCAL" />
       <updated>1477307494514</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="camera now follow the player at the center of the canvas (TODO : adapte Bullet)">
+      <created>1477333308706</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1477333308706</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="264347000" />
+    <option name="totallyTimeSpent" value="266710000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-11" y="-11" width="1942" height="1042" extended-state="6" />
@@ -739,7 +746,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="movement is now calculated with rotation (server side)" />
     <MESSAGE value="update rotation on client" />
     <MESSAGE value="change ip connection" />
     <MESSAGE value="add spell action of fireball" />
@@ -764,11 +770,12 @@
     <MESSAGE value="add sprite sheet for wizards" />
     <MESSAGE value="size of sprites now take the value of the Player's" />
     <MESSAGE value="camera now follow the player at the center of the canvas" />
-    <option name="LAST_COMMIT_MESSAGE" value="camera now follow the player at the center of the canvas" />
+    <MESSAGE value="camera now follow the player at the center of the canvas (TODO : adapte Bullet)" />
+    <option name="LAST_COMMIT_MESSAGE" value="camera now follow the player at the center of the canvas (TODO : adapte Bullet)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="14" />
+      <option name="time" value="15" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -877,16 +884,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/js/Camera.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#42#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Server/Bullet.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-263">
@@ -905,8 +902,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Server/Player.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="700">
-          <caret line="117" column="33" selection-start-line="117" selection-start-column="33" selection-end-line="117" selection-end-column="33" />
+        <state relative-caret-position="207">
+          <caret line="131" column="36" selection-start-line="131" selection-start-column="36" selection-end-line="131" selection-end-column="36" />
           <folding>
             <element signature="e#1475#1945#0" expanded="false" />
             <element signature="e#2432#2670#0" expanded="false" />
@@ -921,10 +918,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/client/js/Camera.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#42#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/client/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="402" column="16" selection-start-line="402" selection-start-column="16" selection-end-line="402" selection-end-column="16" />
+        <state relative-caret-position="575">
+          <caret line="211" column="0" selection-start-line="211" selection-start-column="0" selection-end-line="211" selection-end-column="0" />
           <folding>
             <element signature="n#style#0;n#canvas#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#div#0;n#!!top" expanded="true" />
@@ -934,9 +941,9 @@
             <element signature="n#style#0;n#canvas#3;n#div#0;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#div#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#input#0;n#form#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="e#3505#9961#0" expanded="false" />
-            <element signature="e#8322#8680#0" expanded="false" />
-            <element signature="e#10442#11645#0" expanded="false" />
+            <element signature="e#8170#8528#0" expanded="false" />
+            <element signature="e#8561#9102#0" expanded="false" />
+            <element signature="e#9866#12007#0" expanded="false" />
           </folding>
         </state>
       </provider>

@@ -21,21 +21,3 @@ Camera.prototype.moveTo = function(x,y)
     //console.log('camera moved : '+this.x+':'+this.y+' || '+this.width+':'+this.width);
 };
 
-Camera.prototype.isOnViewPort = function(object)
-{
-    if((object.x >= this.x || object.y >= this.y) && (object.x <= this.x+this.width || object.y <= this.y+this.height))
-    {
-
-        return true;
-    }
-   /* else if((((object.x-object.width/2)>= this.x) ||((object.y-object.height/2)>= this.y)) &&
-        (((object.x-object.width/2)>= this.x+this.width) ||((object.y-object.height/2)>= this.y+this.height)))
-    {
-        return true;
-    }*/
-    else
-    {
-        return false;
-    }
-
-};
