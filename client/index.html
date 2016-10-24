@@ -32,6 +32,8 @@
 
 	var mouse_X = 0;
 	var mouse_Y = 0;
+
+    var players = {};
 	
 	//chat
 	var chatText = document.getElementById('chat-text');
@@ -60,6 +62,8 @@
 	Img.player.src = '/client/img/sorcier.png';
 	Img.playerSheet = new Image();
 	Img.playerSheet.src = '/client/img/spritesheet_Wizard.png';
+    Img.playerSheet_enemy = new Image();
+    Img.playerSheet_enemy.src = '/client/img/spritesheet_Wizard_enemy.png';
     Img.enemy = new Image();
     Img.enemy.src = '/client/img/enemy.png';
     Img.map = new Image();
@@ -103,11 +107,7 @@
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 
-    var indexMove = 0;
-    var indexCast = 0;
-    var lastChangeTransiTime = 0;
-    var lastX = 0;
-    var lastY = 0;
+
 
     var Player = function(initPack){
 		var self = {};
@@ -124,6 +124,12 @@
 		self.isDead = initPack.isDead;
         self.isShooting = initPack.isShooting;
 
+        self.indexMove = 0;
+        self.indexCast = 0;
+        self.lastChangeTransiTime = 0;
+        self.lastChangeTransiTimeC = 0;
+        self.lastX = 0;
+        self.lastY = 0;
 
         self.indexMoveX = [2,49,96,145,2,51,99];
         self.indexMoveY = [148,148,148,148,196,196,196];
@@ -149,54 +155,61 @@
                 var width = 44;
                 var height = 44;
 
-                if(Date.now() > lastChangeTransiTime + 1000/25){
-                    indexMove++;
+                if(Date.now() > self.lastChangeTransiTime + 1000/25){
+                    self.indexMove++;
                     //changement de transition
-                    if(indexMove >= self.indexMoveX.length){
-                        indexMove = 0;
+                    if(self.indexMove >= self.indexMoveX.length){
+                        self.indexMove = 0;
                     }
 
-                    lastChangeTransiTime = Date.now();
+                    self.lastChangeTransiTime = Date.now();
                 }
 
-                if(lastX === x || lastY === y)
+                if(self.lastX === x || self.lastY === y)
                 {
-                    indexMove =0;
-                    lastChangeTransiTime = 0;
+                    self.indexMove =0;
+                    self.lastChangeTransiTime = 0;
                 }
-                lastX = x;
-                lastY = y;
+                self.lastX = x;
+                self.lastY = y;
 
                 if(self.isShooting)
                 {
-                    if(Date.now() > lastChangeTransiTime +100){
-                        indexCast++;
+                    if(Date.now() > self.lastChangeTransiTimeC + 200){
+                        self.indexCast++;
                         //changement de transition
-                        if(indexCast >= self.indexCastX.length){
-                            indexCast = 0;
+                        if(self.indexCast >= self.indexCastX.length){
+                            self.indexCast = 0;
                         }
 
-                        lastChangeTransiTime = Date.now();
+                        self.lastChangeTransiTimeC = Date.now();
                     }
                 }
 
 				ctx.save(); // save current state
 				ctx.translate(x,y);
-                console.log(self.isShooting);
 				ctx.rotate(self.rotation+((-90*Math.PI)/180)); // rotate
 				if(self.id === selfId) {
                     //console.log(self.indexMoveX[self.index]+':'+self.indexMoveY[self.index]);
                     if(self.isShooting)
                     {
-                        ctx.drawImage(Img.playerSheet, self.indexCastX[indexCast],self.indexCastY[indexCast],width,height, -width/2,-height/2,width,height);
+                        ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast],self.indexCastY[self.indexCast],width,height, -width/2,-height/2,width,height);
                     }
 					else
                     {
-                        ctx.drawImage(Img.playerSheet, self.indexMoveX[indexMove],self.indexMoveY[indexMove],width,height, -width/2,-height/2,width,height);
+                        ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove],self.indexMoveY[self.indexMove],width,height, -width/2,-height/2,width,height);
                     }
 				}
 				else {
-					ctx.drawImage(Img.enemy, 0,0,Img.enemy.width,Img.enemy.height, -width/2,-height/2,width,height);
+                    if(self.isShooting)
+                    {
+                        ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast],self.indexCastY[self.indexCast],width,height, -width/2,-height/2,width,height);
+                    }
+                    else
+                    {
+                        ctx.drawImage(Img.playerSheet_enemy , self.indexMoveX[self.indexMove],self.indexMoveY[self.indexMove],width,height, -width/2,-height/2,width,height);
+                    }
+
 				}
 				ctx.restore();
 
@@ -244,6 +257,22 @@
 				}
 			}
 		};
+
+		self.onUpdate = function(updatePack)
+        {
+            self.id = updatePack.id;
+            self.number = updatePack.number;
+            self.x = updatePack.x;
+            self.y = updatePack.y;
+            self.rotation = updatePack.rotation;
+            self.hp = updatePack.hp;
+            self.hpMax = updatePack.hpMax;
+            self.hp = updatePack.hp;
+            self.targetVisible = updatePack.targetVisible;
+            self.targetType = updatePack.targetType;
+            self.isDead = updatePack.isDead;
+            self.isShooting = updatePack.isShooting;
+        };
 		
 		Player.list[self.id] = self;
 		return self;
@@ -307,14 +336,15 @@
 
 	Bullet.list = {};
 	
-	var selfId ;
+	var selfId;
 
 	socket.on('init',function(data){
 	    if(data.selfId)
 	        selfId = data.selfId;
 		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
 		for(var i = 0 ; i < data.player.length; i++){
-			new Player(data.player[i]);
+            players[data.player[i].id] = new Player(data.player[i]);
+			//Player.list[data.player[i]]= new Player(data.player[i]);
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
 			new Bullet(data.bullet[i]);
@@ -322,17 +352,31 @@
 	});
 	
 	socket.on('update',function(data){
-        if(data.selfId)
-            selfId = data.selfId;
+        //if(data.selfId)
+            //selfId = data.selfId;
         //{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
         for(var i = 0 ; i < data.player.length; i++){
-            new Player(data.player[i]);
+            //new Player(data.player[i]);
+            //console.log('update player : '+data.player[i].id);
+            if(players[data.player[i].id])
+            {
+                console.log('update');
+                players[data.player[i].id].onUpdate(data.player[i]);
+                //Player.list[data.player[i].id].onUpdate(data.player[i]);
+            }
+            else
+            {
+                console.log('addNew');
+                players[data.player[i].id] = new Player(data.player[i]);
+                //Player.list[data.player[i].id] = new Player(data.player[i]);
+            }
+
         }
         for(var i = 0 ; i < data.bullet.length; i++){
             new Bullet(data.bullet[i]);
         }
 		//{ player : [{id:123,x:0,y:0},{id:1,x:0,y:0}], bullet: []}
-		for(var i = 0 ; i < data.player.length; i++){
+		/*for(var i = 0 ; i < data.player.length; i++){
 			var pack = data.player[i];
 			var p = Player.list[pack.id];
 			if(p){
@@ -353,7 +397,7 @@
 				if(pack.spellCooldowns !== undefined)
 					p.spellCooldowns = pack.spellCooldowns;
 			}
-		}
+		}*/
 		for(var i = 0 ; i < data.bullet.length; i++){
 			var pack = data.bullet[i];
 			var b = Bullet.list[data.bullet[i].id];
@@ -371,7 +415,8 @@
 	socket.on('remove',function(data){
 		//{player:[12323],bullet:[12323,123123]}
 		for(var i = 0 ; i < data.player.length; i++){
-			delete Player.list[data.player[i]];
+            delete players[data.player[i].id];
+			//delete Player.list[data.player[i]];
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
 			delete Bullet.list[data.bullet[i]];
@@ -710,15 +755,21 @@
     setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         drawMap();
-
-        for(var i in Player.list) {
-			/*ctx.save();
+        //console.log('setInterval');
+        for(var i in players)
+        {
+            //console.log(i);
+            players[i].draw();
+            players[i].drawTarget();
+        }
+ /*       for(var i in Player.list) {
+			/!*ctx.save();
 			ctx.translate(Player.list[i].x,Player.list[i].y);
 			ctx.rotate(Player.list[i].rotation*Math.PI/180);
-			ctx.restore();*/
+			ctx.restore();*!/
 			Player.list[i].draw()
 			Player.list[i].drawTarget()
-		}
+		}*/
 		for(var i in Bullet.list) {
 		   /* ctx.save();
             ctx.translate(Bullet.list[i].x,Bullet.list[i].y);

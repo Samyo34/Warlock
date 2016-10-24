@@ -102,7 +102,7 @@ setInterval(function(){
 
         if(removePack.bullet.length>0 || removePack.player.length>0)
         {
-            //console.log('app104 : remove');
+            console.log('app105 : remove');
             socket.emit('remove',removePack);
         }
 
