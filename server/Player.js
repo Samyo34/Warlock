@@ -115,6 +115,7 @@ var Player = function(id){
 			targetVisible:self.targetVisible,
 			targetType:self.targetType,
 			isShooting:self.isShooting,
+            sizePlayer:self.size,
 			isDead:self.isDead,
 		};		
 	};
@@ -141,6 +142,7 @@ var Player = function(id){
 			targetType: self.targetType,
 			isDead: self.isDead,
 			isShooting:self.isShooting,
+            sizePlayer:self.size,
 			spellCooldowns: self.getCooldownsPack()
 		}
 	};

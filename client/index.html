@@ -123,6 +123,7 @@
 		self.targetType = initPack.targetType;
 		self.isDead = initPack.isDead;
         self.isShooting = initPack.isShooting;
+        self.size = initPack.sizePlayer;
 
         self.indexMove = 0;
         self.indexCast = 0;
@@ -193,21 +194,21 @@
                     //console.log(self.indexMoveX[self.index]+':'+self.indexMoveY[self.index]);
                     if(self.isShooting)
                     {
-                        ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast],self.indexCastY[self.indexCast],width,height, -width/2,-height/2,width,height);
+                        ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast],self.indexCastY[self.indexCast],width,height, -self.size/2,-self.size/2,self.size,self.size);
                     }
 					else
                     {
-                        ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove],self.indexMoveY[self.indexMove],width,height, -width/2,-height/2,width,height);
+                        ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove],self.indexMoveY[self.indexMove],width,height, -self.size/2,-self.size/2,self.size,self.size);
                     }
 				}
 				else {
                     if(self.isShooting)
                     {
-                        ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast],self.indexCastY[self.indexCast],width,height, -width/2,-height/2,width,height);
+                        ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast],self.indexCastY[self.indexCast],width,height, -self.size/2,-self.size/2,self.size,self.size);
                     }
                     else
                     {
-                        ctx.drawImage(Img.playerSheet_enemy , self.indexMoveX[self.indexMove],self.indexMoveY[self.indexMove],width,height, -width/2,-height/2,width,height);
+                        ctx.drawImage(Img.playerSheet_enemy , self.indexMoveX[self.indexMove],self.indexMoveY[self.indexMove],width,height, -self.size/2,-self.size/2,self.size,self.size);
                     }
 
 				}
@@ -271,6 +272,7 @@
             self.targetVisible = updatePack.targetVisible;
             self.targetType = updatePack.targetType;
             self.isDead = updatePack.isDead;
+            self.size = updatePack.sizePlayer;
             self.isShooting = updatePack.isShooting;
         };
 		
