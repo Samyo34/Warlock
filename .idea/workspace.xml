@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6c9c681f-5cdf-47f3-8962-3475afe2dd57" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client/img/spritesheet_Wizard.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/client/img/spritesheet_Wizard_enemy.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app.js" afterPath="$PROJECT_DIR$/app.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/index.html" afterPath="$PROJECT_DIR$/client/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/Player.js" afterPath="$PROJECT_DIR$/server/Player.js" />
     </list>
     <ignored path="Warlock.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -250,6 +249,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Warlock" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Warlock" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="img" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -376,7 +393,7 @@
       <workItem from="1476800383696" duration="33186000" />
       <workItem from="1477065786939" duration="503000" />
       <workItem from="1477066338210" duration="5759000" />
-      <workItem from="1477241548466" duration="10886000" />
+      <workItem from="1477241548466" duration="11045000" />
     </task>
     <task id="LOCAL-00001" summary="adapte phaser size to screen">
       <created>1470911100808</created>
@@ -609,17 +626,24 @@
       <option name="project" value="LOCAL" />
       <updated>1477245296583</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="- new system of connection on client side (TODO : check delete on reload)&#10;- animation for enemy">
+      <created>1477304588287</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1477304588287</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="247699000" />
+    <option name="totallyTimeSpent" value="247858000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-11" y="-11" width="1942" height="1042" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15260416" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15260416" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17351598" sideWeight="0.76666665" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17351598" sideWeight="0.23333333" order="7" side_tool="false" content_ui="tabs" />
@@ -687,7 +711,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add autoshooting" />
     <MESSAGE value="Create Folder for server.&#10;init connection&#10;exemple of using" />
     <MESSAGE value="Organisation in differents files&#10;create Player.js" />
     <MESSAGE value="add displacement when click on the canvas" />
@@ -712,7 +735,8 @@
     <MESSAGE value="- improve displacements system (like Warlock displacements)&#10;- add profiling system" />
     <MESSAGE value="- upgrade of new displacement&#10;- add range propriety to the bullets ( = the size of the bullet)&#10;- the scurge is now well drawn" />
     <MESSAGE value="use spritesheet animation for self wizard" />
-    <option name="LAST_COMMIT_MESSAGE" value="use spritesheet animation for self wizard" />
+    <MESSAGE value="- new system of connection on client side (TODO : check delete on reload)&#10;- animation for enemy" />
+    <option name="LAST_COMMIT_MESSAGE" value="- new system of connection on client side (TODO : check delete on reload)&#10;- animation for enemy" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
