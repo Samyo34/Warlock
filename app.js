@@ -64,22 +64,32 @@ io.sockets.on('connection', function(socket){
 	SOCKET_LIST[socket.id] = socket;
 
 	Player.onConnect(socket);
-
-	socket.on('disconnect',function(){
-		delete SOCKET_LIST[socket.id];
-		Player.onDisconnect(socket);
-		
-		for(var i in SOCKET_LIST)
+	for(var i in SOCKET_LIST)
+	{
+		if(SOCKET_LIST[i].id  !== socket.id)
 		{
-			if(SOCKET_LIST[i].id !== id)
-			{
 				var socket = SOCKET_LIST[i];
 				socket.emit('init',{
 					player:Player.getAllInitPack(),
 					bullet:Bullet.getAllInitPack()});
-			}
 		}
+
+	}
+
+	socket.on('disconnect',function(){
+		console.log('disconnect : '+socket.id);
+		Player.onDisconnect(socket);
+		delete SOCKET_LIST[socket.id];
+		
+/*		for(var i in SOCKET_LIST)
+		{
+			var socket = SOCKET_LIST[i];
+			socket.emit('init',{
+				player:Player.getAllInitPack(),
+				bullet:Bullet.getAllInitPack()});
+		}*/
 	});
+
 	socket.on('sendMsgToServer',function(data){
 		var playerName = ("" + socket.id).slice(2,7);
 		for(var i in SOCKET_LIST){
@@ -94,16 +104,7 @@ io.sockets.on('connection', function(socket){
 		socket.emit('evalAnswer',res);		
 	});
 
-	for(var i in SOCKET_LIST)
-	{
-		if(SOCKET_LIST[i].id !== id)
-		{
-			var socket = SOCKET_LIST[i];
-			socket.emit('init',{
-				player:Player.getAllInitPack(),
-				bullet:Bullet.getAllInitPack()});
-		}
-	}
+
 	
 });
 
@@ -115,13 +116,13 @@ setInterval(function(){
 		player:Player.update(),
 		bullet:Bullet.update(),
 	};
-	
+	var nbPlayer = 0;
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
        // socket.emit('init',initPack);
         //console.log('app99 : removepack :'+removePack.bullet.length);
         socket.emit('update',pack);
-
+        nbPlayer++;
         if(removePack.bullet.length>0 || removePack.player.length>0)
         {
             console.log('app105 : remove');
@@ -129,6 +130,7 @@ setInterval(function(){
         }
 
 	}
+	console.log('nb players : '+nbPlayer);
 	initPack.player = [];
 	initPack.bullet = [];
 	removePack.player = [];
