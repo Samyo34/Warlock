@@ -110,7 +110,8 @@
 
     var camera = new Camera(ctx);
 
-
+    var lastCX = 0;
+    var lastCY = 0;
     var Player = function(initPack){
 		var self = {};
 		self.id = initPack.id;
@@ -153,8 +154,7 @@
 				var width = Img.player.width;
 				var height = Img.player.height;
 				*/
-                var
-                        width = 44;
+                var width = 44;
                 var height = 44;
 
                 if(Date.now() > self.lastChangeTransiTime + 1000/25){
@@ -167,14 +167,29 @@
                     self.lastChangeTransiTime = Date.now();
                 }
 
-                if(self.lastX === x || self.lastY === y)
+               // console.log(camera.x+':'+camera.y+' || '+lastCX+':'+lastCY);
+                if (self.id === selfId)
                 {
-                    self.indexMove =0;
-                    self.lastChangeTransiTime = 0;
-                    console.log('stop :'+x+':'+y);
+                    if(camera.x === lastCX || camera.y === lastCY)
+                    {
+                        self.indexMove =0;
+                        self.lastChangeTransiTime = 0;
+                    }
+                }
+                else
+                {
+                     if(self.lastX === self.x || self.lastY === self.y)
+                     {
+                        self.indexMove =0;
+                        self.lastChangeTransiTime = 0;
+                     //console.log(self.id +' stop :'+x+':'+y);
+                     }
                 }
                 self.lastX = x;
                 self.lastY = y;
+
+                lastCX = camera.x;
+                lastCY = camera.y;
 
                 if(self.isShooting)
                 {
@@ -193,20 +208,24 @@
                 ctx.translate(self.x, self.y);
                 ctx.rotate(self.rotation + ((-90 * Math.PI) / 180)); // rotate
 
-                if (self.id === selfId) {
-
-                    //console.log(self.indexMoveX[self.index]+':'+self.indexMoveY[self.index]);
-                    if (self.isShooting) {
+                if (self.id === selfId)
+                {
+                    if (self.isShooting)
+                    {
                         ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height,-(self.size/2),-(self.size/2),self.size, self.size);
-                    } else {
+                    }
+                    else
+                    {
                         ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
                     }
                 }
-                else {
+                else
+                {
                     if (self.isShooting) {
                         ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
                     }
-                    else {
+                    else
+                    {
                         ctx.drawImage(Img.playerSheet_enemy, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
                     }
 
@@ -368,6 +387,8 @@
 	    if(data.selfId)
 	        selfId = data.selfId;
 		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
+        players = {};
+        bullets = {};
 		for(var i = 0 ; i < data.player.length; i++){
             if(data.player[i].id === selfId)
             {
@@ -382,8 +403,8 @@
 	});
 	
 	socket.on('update',function(data){
-        //if(data.selfId)
-            //selfId = data.selfId;
+/*        if(data.selfId)
+            selfId = data.selfId;*/
         //{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
         for(var i = 0 ; i < data.player.length; i++){
             //new Player(data.player[i]);

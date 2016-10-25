@@ -7,14 +7,14 @@ var Player = function(id){
 	var self = Entity();
 	self.id = id;
 	self.number = "" + Math.floor(10 * Math.random());
-    self.size = 32;// car le sprite des wizard fait 32x32 pix
+   self.size = 32;// car le sprite des wizard fait 32x32 pix
 
-    self.time =0;
+   self.time =0;
 
 	self.rotation = 0;
 	self.angularVelocity = 0;
-    self.isOrientationGood = false;
-    self.isPositionGood = false;
+   self.isOrientationGood = false;
+   self.isPositionGood = false;
 
 	self.goalDest = {
         x:self.x,
@@ -51,15 +51,15 @@ var Player = function(id){
 	};
 
     self.spellBinding = {
-        A: "fireball",
-        Z: "blink",
-        E: "lightning",
+      A: "fireball",
+      Z: "blink",
+      E: "lightning",
 		R: "scurge",
     };
 
 	self.targetVisible = false;
 	self.targetType = '';
-    self.Spell = [];
+   self.Spell = [];
 	self.isShooting = false;
 	self.aimGoalPoint = {
 		x:self.x,
@@ -70,8 +70,8 @@ var Player = function(id){
 
 	//var super_update = self.update;
 	self.update = function(){
-        self.updateFriction();
-	    self.updatePosition();
+      self.updateFriction();
+	   self.updatePosition();
 		self.updateCooldowns();
 
         //super_update();

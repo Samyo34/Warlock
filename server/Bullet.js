@@ -96,7 +96,9 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
                 {
                     p.hp = 0;
                 }
-				self.toRemove = true;
+
+                self.toRemove = true;
+
                 var direction = Math.atan2(self.y - p.y,self.x - p.x);
                 p.enemySpellActionVelocity.x = -self.action * Math.cos(direction);
                 p.enemySpellActionVelocity.y = -self.action * Math.sin(direction);
