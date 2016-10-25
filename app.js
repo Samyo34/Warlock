@@ -66,15 +66,21 @@ io.sockets.on('connection', function(socket){
 	Player.onConnect(socket);
 	for(var i in SOCKET_LIST)
 	{
-		var socket = SOCKET_LIST[i];
-		socket.emit('init',{
-			player:Player.getAllInitPack(),
-			bullet:Bullet.getAllInitPack()});
+		if(SOCKET_LIST[i].id  !== socket.id)
+		{
+				var socket = SOCKET_LIST[i];
+				socket.emit('init',{
+					player:Player.getAllInitPack(),
+					bullet:Bullet.getAllInitPack()});
+		}
+
 	}
 
 	socket.on('disconnect',function(){
-		delete SOCKET_LIST[socket.id];
+		console.log('disconnect : '+socket.id);
 		Player.onDisconnect(socket);
+		delete SOCKET_LIST[socket.id];
+		
 /*		for(var i in SOCKET_LIST)
 		{
 			var socket = SOCKET_LIST[i];
@@ -83,6 +89,7 @@ io.sockets.on('connection', function(socket){
 				bullet:Bullet.getAllInitPack()});
 		}*/
 	});
+
 	socket.on('sendMsgToServer',function(data){
 		var playerName = ("" + socket.id).slice(2,7);
 		for(var i in SOCKET_LIST){
@@ -109,13 +116,13 @@ setInterval(function(){
 		player:Player.update(),
 		bullet:Bullet.update(),
 	};
-	
+	var nbPlayer = 0;
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
        // socket.emit('init',initPack);
         //console.log('app99 : removepack :'+removePack.bullet.length);
         socket.emit('update',pack);
-
+        nbPlayer++;
         if(removePack.bullet.length>0 || removePack.player.length>0)
         {
             console.log('app105 : remove');
@@ -123,6 +130,7 @@ setInterval(function(){
         }
 
 	}
+	console.log('nb players : '+nbPlayer);
 	initPack.player = [];
 	initPack.bullet = [];
 	removePack.player = [];

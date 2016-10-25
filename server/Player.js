@@ -426,7 +426,7 @@ var Player = function(id){
 Player.list = {};
 
 Player.onConnect = function(socket){
-	//console.log("Player connected.");
+	console.log("Player connected." + socket.id);
 	
 	var player = Player(socket.id);
 	
@@ -515,7 +515,7 @@ Player.getAllInitPack = function(){
 
 Player.onDisconnect = function(socket){
 	delete Player.list[socket.id];
-	removePack.player.push(socket.id);
+	removePack.player.push({id:socket.id});
 };
 
 Player.update = function(){
