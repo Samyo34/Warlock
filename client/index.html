@@ -388,12 +388,22 @@
 	        selfId = data.selfId;
 		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
         players = {};
+        for(var i in players)
+        {
+            delete players[i];
+        }
         bullets = {};
+        for (var i in bullets)
+        {
+            delete bullets[i];
+        }
+
 		for(var i = 0 ; i < data.player.length; i++){
             if(data.player[i].id === selfId)
             {
                 camera.moveTo(data.player[i].x,data.player[i].y);
             }
+             console.log('addNew init');
             players[data.player[i].id] = new Player(data.player[i]);
             //Player.list[data.player[i]]= new Player(data.player[i]);
 		}
@@ -422,7 +432,7 @@
             }
             else
             {
-                console.log('addNew');
+                console.log('addNew update');
                 players[data.player[i].id] = new Player(data.player[i]);
                 //Player.list[data.player[i].id] = new Player(data.player[i]);
             }

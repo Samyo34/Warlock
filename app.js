@@ -64,21 +64,24 @@ io.sockets.on('connection', function(socket){
 	SOCKET_LIST[socket.id] = socket;
 
 	Player.onConnect(socket);
+	for(var i in SOCKET_LIST)
+	{
+		var socket = SOCKET_LIST[i];
+		socket.emit('init',{
+			player:Player.getAllInitPack(),
+			bullet:Bullet.getAllInitPack()});
+	}
 
 	socket.on('disconnect',function(){
 		delete SOCKET_LIST[socket.id];
 		Player.onDisconnect(socket);
-		
-		for(var i in SOCKET_LIST)
+/*		for(var i in SOCKET_LIST)
 		{
-			if(SOCKET_LIST[i].id !== id)
-			{
-				var socket = SOCKET_LIST[i];
-				socket.emit('init',{
-					player:Player.getAllInitPack(),
-					bullet:Bullet.getAllInitPack()});
-			}
-		}
+			var socket = SOCKET_LIST[i];
+			socket.emit('init',{
+				player:Player.getAllInitPack(),
+				bullet:Bullet.getAllInitPack()});
+		}*/
 	});
 	socket.on('sendMsgToServer',function(data){
 		var playerName = ("" + socket.id).slice(2,7);
@@ -94,16 +97,7 @@ io.sockets.on('connection', function(socket){
 		socket.emit('evalAnswer',res);		
 	});
 
-	for(var i in SOCKET_LIST)
-	{
-		if(SOCKET_LIST[i].id !== id)
-		{
-			var socket = SOCKET_LIST[i];
-			socket.emit('init',{
-				player:Player.getAllInitPack(),
-				bullet:Bullet.getAllInitPack()});
-		}
-	}
+
 	
 });
 
