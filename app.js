@@ -81,7 +81,7 @@ io.sockets.on('connection', function(socket){
 		Player.onDisconnect(socket);
 		delete SOCKET_LIST[socket.id];
 		
-/*		for(var i in SOCKET_LIST)
+		/*for(var i in SOCKET_LIST)
 		{
 			var socket = SOCKET_LIST[i];
 			socket.emit('init',{
@@ -130,7 +130,7 @@ setInterval(function(){
         }
 
 	}
-	console.log('nb players : '+nbPlayer);
+	//console.log('nb players : '+nbPlayer);
 	initPack.player = [];
 	initPack.bullet = [];
 	removePack.player = [];

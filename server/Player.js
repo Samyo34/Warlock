@@ -61,6 +61,7 @@ var Player = function(id){
 	self.targetType = '';
    self.Spell = [];
 	self.isShooting = false;
+	self.isMoving = false;
 	self.aimGoalPoint = {
 		x:self.x,
 		y:self.y
@@ -115,7 +116,8 @@ var Player = function(id){
 			targetVisible:self.targetVisible,
 			targetType:self.targetType,
 			isShooting:self.isShooting,
-            sizePlayer:self.size,
+			isMoving:self.isMoving,
+         sizePlayer:self.size,
 			isDead:self.isDead,
 		};		
 	};
@@ -141,8 +143,9 @@ var Player = function(id){
 			targetVisible: self.targetVisible,
 			targetType: self.targetType,
 			isDead: self.isDead,
-			isShooting:self.isShooting,
-            sizePlayer:self.size,
+			isShooting: self.isShooting,
+			isMoving: self.isMoving,
+         sizePlayer: self.size,
 			spellCooldowns: self.getCooldownsPack()
 		}
 	};
@@ -255,12 +258,12 @@ var Player = function(id){
 
 	self.updatePosition = function() {
 	    if(self.linkedSpells[0])
-        {
+	    {
             self.linkedSpells[0].x = self.x;
             self.linkedSpells[0].y = self.y;
-        }
+       }
 	    if(self.spellsToCast[0])
-        {
+	    {
             //console.log('spell to cast : '+self.spellsToCast[0].spellName);
             if(self.spellsToCast[0].spellType === "noBullet")
             {
@@ -290,7 +293,7 @@ var Player = function(id){
             {
                 self.isPositionGood = true;
             }
-        }
+       }
 
 		if (self.isShooting) // we turn the wizard toward the aimGoalPoint
 		{
@@ -331,8 +334,13 @@ var Player = function(id){
 				self.spdX = 0;
 				self.spdY = 0;
 				self.currentSpeed = 0;
+				self.isMoving = false;
               /*  self.angularVelocity = 0;
                 self.isOrientationGood = true;*/
+			}
+			else
+			{
+				self.isMoving = true;
 			}
 			//else {
             var d = new Date();
