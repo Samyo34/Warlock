@@ -126,7 +126,9 @@
 		self.targetType = initPack.targetType;
 		self.isDead = initPack.isDead;
         self.isShooting = initPack.isShooting;
+        self.isMoving = initPack.isMoving;
         self.size = initPack.sizePlayer;
+
 
         self.indexMove = 0;
         self.indexCast = 0;
@@ -157,39 +159,8 @@
                 var width = 44;
                 var height = 44;
 
-                if(Date.now() > self.lastChangeTransiTime + 1000/25){
-                    self.indexMove++;
-                    //changement de transition
-                    if(self.indexMove >= self.indexMoveX.length-1){
-                        self.indexMove = 0;
-                    }
+                
 
-                    self.lastChangeTransiTime = Date.now();
-                }
-
-               // console.log(camera.x+':'+camera.y+' || '+lastCX+':'+lastCY);
-                if (self.id === selfId)
-                {
-                    if(camera.x === lastCX || camera.y === lastCY)
-                    {
-                        self.indexMove =0;
-                        self.lastChangeTransiTime = 0;
-                    }
-                }
-                else
-                {
-                     if(self.lastX === self.x || self.lastY === self.y)
-                     {
-                        self.indexMove =0;
-                        self.lastChangeTransiTime = 0;
-                     //console.log(self.id +' stop :'+x+':'+y);
-                     }
-                }
-                self.lastX = x;
-                self.lastY = y;
-
-                lastCX = camera.x;
-                lastCY = camera.y;
 
                 if(self.isShooting)
                 {
@@ -203,6 +174,28 @@
                         self.lastChangeTransiTimeC = Date.now();
                     }
                 }
+                else
+                {
+                    if(Date.now() > self.lastChangeTransiTime + 1000/25){
+                        self.indexMove++;
+                        
+                        //changement de transition
+                        if(self.indexMove >= self.indexMoveX.length-1)
+                        {
+                            self.indexMove = 0;
+                        }
+
+                            self.lastChangeTransiTime = Date.now();
+                    }
+
+                   // console.log(camera.x+':'+camera.y+' || '+lastCX+':'+lastCY);
+                }
+
+                if(self.isMoving === false)
+                {
+                    self.indexMove = 0;
+                }
+                //console.log('id : '+self.id + ':'+selfId);
 
                 ctx.save(); // save current state
                 ctx.translate(self.x, self.y);
@@ -302,6 +295,7 @@
             self.isDead = updatePack.isDead;
             self.size = updatePack.sizePlayer;
             self.isShooting = updatePack.isShooting;
+            self.isMoving = updatePack.isMoving;
         };
 		
 		Player.list[self.id] = self;
