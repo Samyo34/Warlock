@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
 
-var profiler = require('v8-profiler');
+//var profiler = require('v8-profiler');
 var fs = require('fs');
 
 eval(fs.readFileSync('./Server/Player.js')+'');
@@ -138,7 +138,7 @@ setInterval(function(){
 	
 },1000/25);
 
-var startProfiling = function(time)
+/*var startProfiling = function(time)
 {
     profiler.startProfiling('1',true);
     setTimeout(function() {
@@ -151,4 +151,4 @@ var startProfiling = function(time)
 
     },time);
 }
-startProfiling(10000);
+startProfiling(10000);*/
