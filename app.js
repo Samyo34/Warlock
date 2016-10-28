@@ -5,8 +5,8 @@ var serv = require('http').Server(app);
 //var profiler = require('v8-profiler');
 var fs = require('fs');
 
-eval(fs.readFileSync('./Server/Player.js')+'');
-eval(fs.readFileSync('./Server/Bullet.js')+'');
+eval(fs.readFileSync(__dirname+'./Server/Player.js')+'');
+eval(fs.readFileSync(__dirname+'./Server/Bullet.js')+'');
 
 
 app.set('port', (process.env.PORT || 5000));
