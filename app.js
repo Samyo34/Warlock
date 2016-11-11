@@ -6,8 +6,8 @@ var serv = require('http').Server(app);
 var fs = require('fs');
 console.log(__dirname+'/Server/Player.js');
 
-eval(fs.readFileSync(__dirname+'/Server/Player.js')+'');
-eval(fs.readFileSync(__dirname+'/Server/Bullet.js')+'');
+eval(fs.readFileSync(__dirname+'/Player.js')+'');
+eval(fs.readFileSync(__dirname+'/Bullet.js')+'');
 
 
 app.set('port', (process.env.PORT || 5000));
