@@ -1,10 +1,7 @@
 {
-  "name": "warlock",
-  "version": "^1.0.0",
-  "engines":{
-    "node": "^6.4.0"
-  },
-  "description": "multi player game",
+  "name": "Warlock",
+  "version": "1.0.0",
+  "description": "",
   "main": "app.js",
   "dependencies": {
     "express": "^4.14.0",
@@ -16,22 +13,13 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Samyo34/Warlock.git"
   },
-  "keywords": [
-    "node",
-    "heroku",
-    "express",
-    "fs",
-    "jQuery",
-    "node-uuid",
-    "socket.io"    
-  ],
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
