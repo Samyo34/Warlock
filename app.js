@@ -4,6 +4,7 @@ var serv = require('http').Server(app);
 
 //var profiler = require('v8-profiler');
 var fs = require('fs');
+console.log(__dirname+'/Server/Player.js');
 
 eval(fs.readFileSync(__dirname+'/Server/Player.js')+'');
 eval(fs.readFileSync(__dirname+'/Server/Bullet.js')+'');
