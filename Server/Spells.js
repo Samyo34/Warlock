@@ -98,6 +98,11 @@ fireBall.prototype.getInitPack = function(){
 };
 
 fireBall.prototype.getDistance = function(pt){
-	    //console.log('getDist : '+self.x+':'+self.y +' | ' + pt.x+':'+pt.y);
 		return Math.sqrt(Math.pow(this.x-pt.x,2) + Math.pow(this.y-pt.y,2));
+};
+
+var blink = function(parent, aimGoalPoint)
+{
+	parent.x = aimGoalPoint.x;
+	parent.y = aimGoalPoint.y;
 };

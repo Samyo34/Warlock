@@ -34,6 +34,7 @@ var Player = function(id){
 
     self.spellList = [];
     self.spellList.push(new fireballCard(self));
+    self.spellList.push(new blinkCard(self));
 
     self.spellsParams = SpellsParam();
     self.spellsToCast = [];
@@ -185,12 +186,14 @@ if(self.spellCooldowns[name]["current"] != 0)
                                 range: 32};
                                 self.aimGoalPoint.x = aimGoalPoint.x;
                                 self.aimGoalPoint.y = aimGoalPoint.y;
+                                self.spellsToCast.push(self.spellList[0]/*spellDescriptor*/);
 		}
 		else if(name == "blink")
 		{
 			spellDescriptor = {spellName:"blink", spellType:"noBullet",x: aimGoalPoint.x, y: aimGoalPoint.y};
 			                                self.aimGoalPoint.x = aimGoalPoint.x;
                                 self.aimGoalPoint.y = aimGoalPoint.y;
+                                self.spellsToCast.push(self.spellList[1]/*spellDescriptor*/);
 			//self.spellsToCast.push(spellDescriptor);
 /*			spellDescriptor = {	spellName:"blink",
 								spellType:"noBullet",
@@ -227,7 +230,7 @@ if(self.spellCooldowns[name]["current"] != 0)
             self.linkedSpells.push(spellDescriptor);
         }
 
-		self.spellsToCast.push(self.spellList[0]/*spellDescriptor*/);
+		
 	};
 
 	// then, when the wizard have the right orientation we cast it

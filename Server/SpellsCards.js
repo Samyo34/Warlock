@@ -26,5 +26,18 @@ fireballCard.prototype.cast = function(aimGoalPoint)
 		this.action,
 		this.actionTime,
 		this.lifeTime);
+};
 
+var blinkCard = function(parent)
+{
+	this.name = "blink";
+	this.parent = parent;
+
+	this.range = 100;
+	this.cd = 5;
+};
+
+blinkCard.prototype.cast = function(aimGoalPoint)
+{
+	return new blink(this.parent,aimGoalPoint);
 };
