@@ -66,4 +66,22 @@ lightningCard.prototype.cast = function(aimGoalPoint)
 		this.action,
 		this.actionTime,
 		this.lifeTime);
+};
+
+var scurgeCard = function(parent)
+{
+	this.name = 'scurge';
+	this.parent = parent;
+
+	this.damages = 10;
+	this.lifeTime = 10;
+	this.cd = 5000;
+	this.range = parent.size * 4;
+	this.rangeAction = null;
+};
+
+scurgeCard.prototype.cast = function(aimGoalPoint)
+{
+	return new scurge(this.parent, this.damages, this.lifeTime,this.range);
 }
+

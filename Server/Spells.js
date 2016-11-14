@@ -193,7 +193,7 @@ lightning.prototype.getUpdatePack = function(){
 		x:this.x,
 		y:this.y,
 		orientation:Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x),
-		range:this.range,
+		range:this.range
 	};
 };
 
@@ -211,3 +211,67 @@ lightning.prototype.getInitPack = function(){
 lightning.prototype.getDistance = function(pt){
 		return Math.sqrt(Math.pow(this.x-pt.x,2) + Math.pow(this.y-pt.y,2));
 };
+
+var scurge = function(parent, damages, lifeTime,range)
+{
+	this.x = parent.x;
+	this.y = parent.y;
+	this.parent = parent;
+	this.damages = damages;
+	this.lifeTime = lifeTime;
+	this.range = range;
+
+	bullets.BulletList[this.id] = this;
+}
+
+scurge.prototype.update = function()
+{
+	this.x = this.parent.x;
+	this.y = this.parent.y;
+
+	if(this.timer++ > this.lifeTime)
+	{
+		this.toRemove = true;
+	}
+	// TODO : collisions detection
+	for(var i in Player.list){
+		var p = Player.list[i];
+		if(this.parent.id !== p.id)
+		{
+			if(this.getDistance(p) < ((this.range/2) + (p.size/2))) {
+			// bullet this touches player p: handle collision. ex: hp--;
+             if((p.hp - this.damages)>0)
+             {
+                 p.hp -= this.damages;
+             }
+             else
+             {
+                 p.hp = 0;
+             }
+
+             var direction = Math.atan2(this.y - p.y,this.x - p.x);
+             p.enemySpellActionVelocity.x = -this.action * Math.cos(direction);
+             p.enemySpellActionVelocity.y = -this.action * Math.sin(direction);
+             p.actionDuration = this.actionTime;
+             var d = new Date();
+             p.time = d.getTime();
+             p.actionTime = p.time + this.actionTime;
+             //console.log('collision '+ this.action);
+			}
+		}
+		
+	}
+}
+
+scurge.prototype.getUpdatePack = function(){
+
+    //console.log('bullet : '+ self.x+':'+self.y+' | '+self.parent.x+':'+self.parent.y);
+	return {
+		id:this.id,
+		spellName:this.spellName,
+      parentID:this.parent.id,
+		x:this.x,
+		y:this.y,
+		orientation:0,
+		range:this.range
+	};
