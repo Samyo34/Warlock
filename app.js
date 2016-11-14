@@ -8,6 +8,8 @@ console.log(__dirname+'/Server/Player.js');
 
 eval(fs.readFileSync(__dirname+'/Server/Player.js')+'');
 eval(fs.readFileSync(__dirname+'/Server/Bullet.js')+'');
+eval(fs.readFileSync(__dirname+'/Server/SpellsCards.js')+'');
+eval(fs.readFileSync(__dirname+'/Server/Spells.js')+'');
 
 
 app.set('port', (process.env.PORT || 5000));
@@ -35,6 +37,8 @@ var LAVA = 369;
 var TILE_WIDTH = 32;
 var TILE_HEIGHT = 32;
 
+var bullets = new Bullet();
+
 var Entity = function(){
 	var self = {
 		x:250,
@@ -56,7 +60,6 @@ var Entity = function(){
 	};
 	return self;
 };
-
 var DEBUG = true;
 
 var io = require('socket.io')(serv,{});
@@ -72,7 +75,7 @@ io.sockets.on('connection', function(socket){
 				var socket = SOCKET_LIST[i];
 				socket.emit('init',{
 					player:Player.getAllInitPack(),
-					bullet:Bullet.getAllInitPack()});
+					bullet:bullets.getAllInitPack()});
 		}
 
 	}
@@ -115,18 +118,18 @@ var removePack = {player:[],bullet:[]};
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
-		bullet:Bullet.update(),
+		bullet:bullets.update(),
 	};
 	var nbPlayer = 0;
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
        // socket.emit('init',initPack);
-        //console.log('app99 : removepack :'+removePack.bullet.length);
+        //console.log('app124 : removepack :'+removePack.bullet.length);
         socket.emit('update',pack);
         nbPlayer++;
         if(removePack.bullet.length>0 || removePack.player.length>0)
         {
-            console.log('app105 : remove');
+            //console.log('app105 : remove');
             socket.emit('remove',removePack);
         }
 
@@ -137,7 +140,7 @@ setInterval(function(){
 	removePack.player = [];
 	removePack.bullet = [];
 	
-},1000/25);
+},1000/40);
 
 /*var startProfiling = function(time)
 {

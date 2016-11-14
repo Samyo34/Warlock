@@ -40,9 +40,10 @@ var SpellsParam = function(){
 
 
 
-var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
-	console.log("New bullet "+parent.x+':'+parent.y+' '+parent.rotation );
-
+var Bullet = function(){
+    this.BulletList = {};
+	//console.log("New bullet "+parent.x+':'+parent.y+' '+parent.rotation );
+/*
 	var self = Entity();
 	self.id = Math.random();
 	self.spellName = name;
@@ -62,7 +63,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
         self.spdX = Math.cos(self.angle) * speed;
         self.spdY = Math.sin(self.angle) * speed;
     }
-    console.log(self.spdX+':'+self.spdY+' '+self.angle);
+    //console.log(self.spdX+':'+self.spdY+' '+self.angle);
 
 	self.damages = damages;
 
@@ -75,8 +76,8 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
     self.action = 2;
     self.actionTime = 50000;
 
-	console.log("LOl")
-	console.log(lifeTime)
+	//console.log("LOl")
+	//console.log(lifeTime)
 	var super_update = self.update;
 	self.update = function(){
 
@@ -106,7 +107,7 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
                 var d = new Date();
                 p.time = d.getTime();
                 p.actionTime = p.time + self.actionTime;
-                console.log('collision '+ self.action);
+                //console.log('collision '+ self.action);
 			}
 		}
 	};
@@ -142,18 +143,19 @@ var Bullet = function(parent, name, aimGoalPoint, damages,speed,lifeTime){
 
 	initPack.bullet.push(self.getInitPack());
 	
-	return self;
+	return self;*/
 };
 
-Bullet.list = {};
+//Bullet.list = {};
 
-Bullet.update = function(){
+Bullet.prototype.update = function(){
+    //console.log('bullets update '+this.BulletList.length);
 	var pack = [];
-	for(var i in Bullet.list){
-		var bullet = Bullet.list[i];
+	for(var i in this.BulletList){
+		var bullet = this.BulletList[i];
 		bullet.update();
 		if(bullet.toRemove){
-			delete Bullet.list[i];
+			delete this.BulletList[i];
 			removePack.bullet.push(bullet.id);
 		} else
 			pack.push(bullet.getUpdatePack());	
@@ -161,10 +163,10 @@ Bullet.update = function(){
 	return pack;
 };
 
-Bullet.getAllInitPack = function(){
+Bullet.prototype.getAllInitPack = function(){
 	var bullets = [];
-	for(var i in Bullet.list)
-		bullets.push(Bullet.list[i].getInitPack());
+	for(var i in this.BulletList)
+		bullets.push(this.BulletList[i].getInitPack());
 	return bullets;
 };
 

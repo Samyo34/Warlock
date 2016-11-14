@@ -32,6 +32,9 @@ var Player = function(id){
     self.currentSpeed = 0;
     self.isActive = true;
 
+    self.spellList = [];
+    self.spellList.push(new fireballCard(self));
+
     self.spellsParams = SpellsParam();
     self.spellsToCast = [];
     self.enemySpellActionVelocity = {
@@ -56,6 +59,7 @@ var Player = function(id){
       E: "lightning",
 		R: "scurge",
     };
+
 
 	self.targetVisible = false;
 	self.targetType = '';
@@ -90,10 +94,10 @@ var Player = function(id){
 			}
 
 		}
-
 		// Check if player is dead
 		if(self.hp <= 0)
 		{
+
 			self.isDead = true;
 		}
 	};
@@ -163,7 +167,7 @@ var Player = function(id){
 	self.prepareSpell = function(name, aimGoalPoint) {
 		var spellDescriptor;
         //console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
-		if(self.spellCooldowns[name]["current"] != 0)
+if(self.spellCooldowns[name]["current"] != 0)
 		{
 			return;
 		}
@@ -179,11 +183,15 @@ var Player = function(id){
 								lifeTime: 100,
 								cooldown:5000,
                                 range: 32};
+                                self.aimGoalPoint.x = aimGoalPoint.x;
+                                self.aimGoalPoint.y = aimGoalPoint.y;
 		}
 		else if(name == "blink")
 		{
 			spellDescriptor = {spellName:"blink", spellType:"noBullet",x: aimGoalPoint.x, y: aimGoalPoint.y};
-			self.spellsToCast.push(spellDescriptor);
+			                                self.aimGoalPoint.x = aimGoalPoint.x;
+                                self.aimGoalPoint.y = aimGoalPoint.y;
+			//self.spellsToCast.push(spellDescriptor);
 /*			spellDescriptor = {	spellName:"blink",
 								spellType:"noBullet",
 								xx: xx,
@@ -201,7 +209,9 @@ var Player = function(id){
 								speed: 30,
 								lifeTime: 5,
 								cooldown:5000,
-                                range:32};
+                        range:32};
+         self.aimGoalPoint.x = aimGoalPoint.x;
+         self.aimGoalPoint.y = aimGoalPoint.y;
 		}
 		else if (name == "scurge")
         {
@@ -217,17 +227,19 @@ var Player = function(id){
             self.linkedSpells.push(spellDescriptor);
         }
 
-		self.spellsToCast.push(spellDescriptor);
+		self.spellsToCast.push(self.spellList[0]/*spellDescriptor*/);
 	};
 
 	// then, when the wizard have the right orientation we cast it
 	self.castSpell = function() {
 		if(self.spellsToCast.length > 0)
 		{
-			var s = Spell(self, self.spellsToCast[0]);
+			self.spellsToCast[0].cast(self.aimGoalPoint);
+			self.spellsToCast.shift();
+			/*var s = Spell(self, self.spellsToCast[0]);
 			var name = self.spellsToCast[0].spellName;
 			self.spellCooldowns[name].current = self.spellCooldowns[name].total;
-			self.spellsToCast.shift();
+			self.spellsToCast.shift();*/
             /*if(self.linkedSpells[0])
             {
                self.linkedSpells.shift();
@@ -265,12 +277,12 @@ var Player = function(id){
 	    if(self.spellsToCast[0])
 	    {
             //console.log('spell to cast : '+self.spellsToCast[0].spellName);
-            if(self.spellsToCast[0].spellType === "noBullet")
-            {
+/*            if(self.spellsToCast[0].spellType === "noBullet")
+            {*/
 
-                if(Math.sqrt(((self.spellsToCast[0].x-self.x)*(self.spellsToCast[0].x-self.x))+
-                        ((self.spellsToCast[0].y-self.y)*(self.spellsToCast[0].y-self.y))) <=
-                    self.spellsParams.getParams(self.spellsToCast[0].spellName).range)
+                if(Math.sqrt(((self.aimGoalPoint.x-self.x)*(self.aimGoalPoint.x-self.x))+
+                        ((self.aimGoalPoint.y-self.y)*(self.aimGoalPoint.y-self.y))) >=
+                    self.spellsToCast[0].rangeAction)
                 {
                     self.goalDest.x = self.x;
                     self.goalDest.y = self.y;
@@ -281,18 +293,18 @@ var Player = function(id){
                 }
                 else
                 {
-                    self.goalDest.x = self.spellsToCast[0].x;
-                    self.goalDest.y = self.spellsToCast[0].y;
+                    self.goalDest.x = self.aimGoalPoint.x;
+                    self.goalDest.y = self.aimGoalPoint.y;
                     self.currentSpeed = self.SPEED;
                     self.isShooting = false;
                     self.isPositionGood = false;
                 }
-
+/*
             }
             else if (self.spellsToCast[0].spellType === "bullet")
             {
                 self.isPositionGood = true;
-            }
+            }*/
        }
 
 		if (self.isShooting) // we turn the wizard toward the aimGoalPoint
@@ -476,7 +488,7 @@ Player.onConnect = function(socket){
 		player.isOrientationGood = false;
         player.setGoalDest(data.x,data.y);
         player.currentSpeed = player.SPEED;
-		console.log("Right Click");
+		//console.log("Right Click");
 	});
 
 	socket.on('mouseLeftClick',function(data){
@@ -510,7 +522,7 @@ Player.onConnect = function(socket){
 	socket.emit('init',{
 		selfId:socket.id,
 		player:Player.getAllInitPack(),
-		bullet:Bullet.getAllInitPack()
+		bullet:bullets.getAllInitPack()
 	})
 };
 
@@ -535,3 +547,4 @@ Player.update = function(){
 	}
 	return pack;
 };
+
