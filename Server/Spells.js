@@ -212,17 +212,26 @@ lightning.prototype.getDistance = function(pt){
 		return Math.sqrt(Math.pow(this.x-pt.x,2) + Math.pow(this.y-pt.y,2));
 };
 
-var scurge = function(parent, damages, lifeTime,range)
+var scurge = function(parent, damages, lifeTime,range,action,actionTime)
 {
+	this.id = Math.random();
 	this.x = parent.x;
 	this.y = parent.y;
+	this.spellName = "scurge";
 	this.parent = parent;
 	this.damages = damages;
 	this.lifeTime = lifeTime;
 	this.range = range;
+	this.action = action;
+	this.actionTime = actionTime;
+	this.toRemove = false;
+
+	this.timer = 0;
+
+	this.playerTouched = [];
 
 	bullets.BulletList[this.id] = this;
-}
+};
 
 scurge.prototype.update = function()
 {
@@ -240,6 +249,19 @@ scurge.prototype.update = function()
 		{
 			if(this.getDistance(p) < ((this.range/2) + (p.size/2))) {
 			// bullet this touches player p: handle collision. ex: hp--;
+				var isTouched = false;
+				for(var j in this.playerTouched)
+				{
+					if(p.id === this.playerTouched[j])
+					{
+						isTouched = true;
+					}
+				}
+				if(isTouched)
+				{
+					return;
+				}
+				this.playerTouched.push(p.id);
              if((p.hp - this.damages)>0)
              {
                  p.hp -= this.damages;
@@ -261,7 +283,7 @@ scurge.prototype.update = function()
 		}
 		
 	}
-}
+};
 
 scurge.prototype.getUpdatePack = function(){
 
@@ -275,3 +297,22 @@ scurge.prototype.getUpdatePack = function(){
 		orientation:0,
 		range:this.range
 	};
+};
+
+scurge.prototype.getInitPack = function()
+{
+
+	return {
+		id:this.id,
+		spellName:this.spellName,
+		x:this.x,
+		y:this.y,
+		orientation:0,
+      range:this.range
+	};
+};
+
+scurge.prototype.getDistance = function(pt)
+{
+	return Math.sqrt(Math.pow(this.x-pt.x,2) + Math.pow(this.y-pt.y,2));
+};

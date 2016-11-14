@@ -36,6 +36,7 @@ var Player = function(id){
     self.spellList.push(new fireballCard(self));
     self.spellList.push(new blinkCard(self));
     self.spellList.push(new lightningCard(self));
+    self.spellList.push(new scurgeCard(self));
 
     self.spellsParams = SpellsParam();
     self.spellsToCast = [];
@@ -230,6 +231,7 @@ if(self.spellCooldowns[name]["current"] != 0)
                                 cooldown:5000,
                                 range: self.size*4};
             self.linkedSpells.push(spellDescriptor);
+            self.spellsToCast.push(self.spellList[3]/*spellDescriptor*/);
         }
 
 		

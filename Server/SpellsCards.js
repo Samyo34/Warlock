@@ -78,10 +78,12 @@ var scurgeCard = function(parent)
 	this.cd = 5000;
 	this.range = parent.size * 4;
 	this.rangeAction = null;
+	this.action = 3;
+	this.actionTime = 50000;
 };
 
 scurgeCard.prototype.cast = function(aimGoalPoint)
 {
-	return new scurge(this.parent, this.damages, this.lifeTime,this.range);
+	return new scurge(this.parent, this.damages, this.lifeTime,this.range, this.action, this.actionTime);
 }
 
