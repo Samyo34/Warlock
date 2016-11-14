@@ -106,3 +106,36 @@ var blink = function(parent, aimGoalPoint)
 	parent.x = aimGoalPoint.x;
 	parent.y = aimGoalPoint.y;
 };
+
+var lightning = function(parent, aimGoalPoint,damages,speed,range,action,actionTime,lifeTime)
+{
+	this.id = Math.random();
+	this.spellName = "lightning";
+	this.parent = parent;
+
+	this.x = parent.x + 16*Math.cos(parent.rotation);
+	this.y = parent.y + 16*Math.sin(parent.rotation);
+
+	this.aimGoalPoint = aimGoalPoint
+
+	this.angle = Math.atan2(aimGoalPoint.y - this.parent.y, aimGoalPoint.x - this.parent.x);
+	this.spdX = 0;
+	this.spdY = 0;
+
+	if(this.angle !== 0)
+   {
+       this.spdX = Math.cos(this.angle) * speed;
+       this.spdY = Math.sin(this.angle) * speed;
+   }
+
+	this.damages=damages;
+   this.range=range;
+   this.action=action;
+   this.actionTime=actionTime;
+
+   this.timer = 0;
+
+   this.toRemove = false;
+
+   bullets.BulletList[this.id] = this;
+}

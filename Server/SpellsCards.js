@@ -10,10 +10,7 @@ var fireballCard = function(parent)
    this.actionTime=50000;
    this.cd=5;
    this.rangeAction = null;
-
-   this.timer = 0;
 	this.lifeTime = 100;
-	this.toRemove = false;
 };
 
 fireballCard.prototype.cast = function(aimGoalPoint)
@@ -41,3 +38,32 @@ blinkCard.prototype.cast = function(aimGoalPoint)
 {
 	return new blink(this.parent,aimGoalPoint);
 };
+
+
+var lightningCard = function(parent)
+{
+	this.name = "lightning";
+	this.parent = parent;
+
+	this.damages = 10;
+	this.speed = 30;
+	this.range = 32;
+	this.action=2;
+	this.actionTime = 50000;
+	this.lifeTime = 5;
+	this.cd = 5000;
+	this.rangeAction = null;
+
+};
+
+lightningCard.prototype.cast = function(aimGoalPoint)
+{
+	return new lightning(this.parent,
+		aimGoalPoint,
+		this.damages,
+		this.speed,
+		this.range,
+		this.action,
+		this.actionTime,
+		this.lifeTime);
+}

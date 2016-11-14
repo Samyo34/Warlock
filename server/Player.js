@@ -35,6 +35,7 @@ var Player = function(id){
     self.spellList = [];
     self.spellList.push(new fireballCard(self));
     self.spellList.push(new blinkCard(self));
+    self.spellList.push(new lightningCard(self));
 
     self.spellsParams = SpellsParam();
     self.spellsToCast = [];
@@ -215,6 +216,7 @@ if(self.spellCooldowns[name]["current"] != 0)
                         range:32};
          self.aimGoalPoint.x = aimGoalPoint.x;
          self.aimGoalPoint.y = aimGoalPoint.y;
+         elf.spellsToCast.push(self.spellList[2]/*spellDescriptor*/);
 		}
 		else if (name == "scurge")
         {
