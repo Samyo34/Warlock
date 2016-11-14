@@ -282,9 +282,10 @@ if(self.spellCooldowns[name]["current"] != 0)
             //console.log('spell to cast : '+self.spellsToCast[0].spellName);
 /*            if(self.spellsToCast[0].spellType === "noBullet")
             {*/
-
-                if(Math.sqrt(((self.aimGoalPoint.x-self.x)*(self.aimGoalPoint.x-self.x))+
-                        ((self.aimGoalPoint.y-self.y)*(self.aimGoalPoint.y-self.y))) >=
+            	console.log('dist : '+Math.sqrt(((self.aimGoalPoint.x-self.x)*(self.aimGoalPoint.x-self.x))+
+                        ((self.aimGoalPoint.y-self.y)*(self.aimGoalPoint.y-self.y))));
+                if(self.spellsToCast[0].rangeAction === null || Math.sqrt(((self.aimGoalPoint.x-self.x)*(self.aimGoalPoint.x-self.x))+
+                        ((self.aimGoalPoint.y-self.y)*(self.aimGoalPoint.y-self.y))) <=
                     self.spellsToCast[0].rangeAction)
                 {
                     self.goalDest.x = self.x;

@@ -9,7 +9,7 @@ var fireballCard = function(parent)
    this.action=2;
    this.actionTime=50000;
    this.cd=5;
-   this.rangeAction = 0;
+   this.rangeAction = null;
 
    this.timer = 0;
 	this.lifeTime = 100;
@@ -33,7 +33,7 @@ var blinkCard = function(parent)
 	this.name = "blink";
 	this.parent = parent;
 
-	this.range = 100;
+	this.rangeAction = 100;
 	this.cd = 5;
 };
 
