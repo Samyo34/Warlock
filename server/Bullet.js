@@ -157,6 +157,7 @@ Bullet.prototype.update = function(){
 		if(bullet.toRemove){
 			delete this.BulletList[i];
 			removePack.bullet.push(bullet.id);
+            console.log('remove bullet');
 		} else
 			pack.push(bullet.getUpdatePack());	
 	}

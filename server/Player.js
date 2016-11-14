@@ -216,7 +216,7 @@ if(self.spellCooldowns[name]["current"] != 0)
                         range:32};
          self.aimGoalPoint.x = aimGoalPoint.x;
          self.aimGoalPoint.y = aimGoalPoint.y;
-         elf.spellsToCast.push(self.spellList[2]/*spellDescriptor*/);
+         self.spellsToCast.push(self.spellList[2]/*spellDescriptor*/);
 		}
 		else if (name == "scurge")
         {
