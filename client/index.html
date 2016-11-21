@@ -17,27 +17,30 @@
 	</form>
 </div>
 
-
-
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src="./client/js/jquery.js"></script>
 <script src = "./client/js/Camera.js"></script>
+<script src = "./client/js/SpellCards.js"></script>
 <script>
-	var WIDTH = 800;
-	var HEIGHT = 800;
-	
 	var socket = io();
-	
+
+	// Variable which stores our ID
+	var selfId;
+
+	// Click position storage
 	var click_Y = 0;
 	var click_X = 0;
 
+	// Mouse position storage
 	var mouse_X = 0;
 	var mouse_Y = 0;
 
+	// Lists which will store all the players and the bullets
     var players = {};
     var bullets = {};
-	
-	//chat
+
+	//=================================================================
+	// Chat management:
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
 	var chatForm = document.getElementById('chat-form');
@@ -48,7 +51,6 @@
 	socket.on('evalAnswer',function(data){
 		console.log(data);
 	});
-	
 	chatForm.onsubmit = function(e){
 		e.preventDefault();
 		if(chatInput.value[0] === '/')
@@ -57,8 +59,9 @@
 			socket.emit('sendMsgToServer',chatInput.value);
 		chatInput.value = '';		
 	};
-	
-	//game
+
+	//=================================================================
+	// Images :
 	var Img = {};
 	Img.player = new Image();
 	Img.player.src = '/client/img/sorcier.png';
@@ -86,32 +89,21 @@
     Img.scurge_indic = new Image();
     Img.scurge_indic.src = '/client/img/spellsIcons.jpg';
 
+	var spellIndicators = [];
+	spellIndicators.push(new spellIndicator("fireball", "A", Img.fireball_indic));
+	spellIndicators.push(new spellIndicator("blink", "Z", Img.blink_indic));
+	spellIndicators.push(new spellIndicator("lightning", "E", Img.lightning_indic));
+	spellIndicators.push(new spellIndicator("scurge", "R", Img.scurge_indic));
 
-	var spellIndicators = {
-		fireball: {	name: "fireball",
-					img: Img.fireball_indic,
-					keyboardKey: "A"},
-		blink: { 	name: "blink",
-					img: Img.blink_indic,
-					keyboardKey: "Z"},
-		lightning: { name: "lightning",
-					 img: Img.lightning_indic,
-					 keyboardKey: "E"},
-        scurge: {   name: "scurge",
-                    img : Img.scurge_indic,
-                    keyboardKey:"R"},
-	};
-
-    var drawMap = function () {
-        ctx.drawImage(Img.map, camera.x, camera.y,camera.width,camera.height,0,0,camera.width,camera.height);
-    };
+	//=================================================================
+    // Init of our context and camera
 	var ctx = document.getElementById("ctx").getContext("2d");
 	ctx.font = '30px Arial';
 
     var camera = new Camera(ctx);
 
-    var lastCX = 0;
-    var lastCY = 0;
+	//=================================================================
+	// Player and Bullet classes :
     var Player = function(initPack){
 		var self = {};
 		self.id = initPack.id;
@@ -129,7 +121,6 @@
         self.isMoving = initPack.isMoving;
         self.size = initPack.sizePlayer;
 
-
         self.indexMove = 0;
         self.indexCast = 0;
         self.lastChangeTransiTime = 0;
@@ -141,7 +132,6 @@
         self.indexMoveY = [148,148,148,148,196,196,196];
         self.indexCastX = [1,51,102,152,197];
         self.indexCastY = [292,292,292,292,292];
-
 
 		self.spellCooldowns = {
 			fireball: 0,
@@ -158,9 +148,6 @@
 				*/
                 var width = 44;
                 var height = 44;
-
-                
-
 
                 if(self.isShooting)
                 {
@@ -245,34 +232,16 @@
                         (self.size/2) - 12, (self.hp* 38 ) / self.hpMax, 5);
 
                 //ctx.restore();
-
-                self.drawSpellIndicators();
             }
         };
-
-		self.drawSpellIndicators = function () {
-			var n = 0;
-			for (var i in spellIndicators) {
-				var spell = spellIndicators[i];
-
-				var contextName = "ctxSpell_" + n;
-				var ctxSpellIndic = document.getElementById(contextName).getContext("2d");
-
-				var progress = self.spellCooldowns[spell.name];
-				draw_spell_indicator(ctxSpellIndic, progress, spell, spell.keyboardKey);
-				n += 1;
-			}
-
-		};
 
 		self.drawTarget = function(){
 			if(self.id === selfId) {
 				if (self.targetVisible === false || self.targetType === "") {
 					return;
 				}
-				else if (self.targetType === spellIndicators["fireball"].keyboardKey ||
-                        self.targetType === spellIndicators["lightning"].keyboardKey||
-                        self.targetType === spellIndicators["blink"].keyboardKey) {
+				else
+				{
 					var width = Img.spell_target.width;
 					var height = Img.spell_target.height;
 					ctx.drawImage(Img.spell_target, mouse_X - (width/2), mouse_Y - (height/2));
@@ -297,28 +266,23 @@
             self.isShooting = updatePack.isShooting;
             self.isMoving = updatePack.isMoving;
         };
-		
-		Player.list[self.id] = self;
+
 		return self;
 	};
-
-	Player.list = {};
-		
 	var Bullet = function(initPack){
 		var self = {};
 		self.id = initPack.id;
 		self.spellName = initPack.spellName;
+
 		self.parentID = initPack.parentID;
 		self.x = initPack.x-camera.x;
 		self.y = initPack.y-camera.y;
         self.orientation = initPack.orientation;
-        self.range =0;
+        self.range = 0;
         if(initPack.range !== undefined)
         {
             self.range = initPack.range;
         }
-
-		Bullet.list[self.id] = self;
 
 		self.draw = function()
         {
@@ -328,30 +292,30 @@
             var width = Img.fireball.width;
             var height = Img.fireball.height;
 
-            if(self.spellName === "fireball") {
+            if(self.spellName === "fireball")
+            {
 				ctx.save(); // save current state
 				ctx.translate(x,y);
 				ctx.rotate(self.orientation); // rotate
                 ctx.drawImage(Img.fireball, 0,0,width,height, -width/2,-height/2,width,height);
 				ctx.restore();
             }
-            else if (self.spellName === "lightning") {
-            	var parent = Player.list[self.parentID];
+            else if (self.spellName === "lightning")
+            {
+            	var parent = players[self.parentID];
 				var x_start = parent.x+16*Math.cos(parent.rotation);
 				var y_start = parent.y+16*Math.sin(parent.rotation);
 				drawLightningSpell(x_start, y_start, x, y);
 			}
             else if(self.spellName === "scurge")
             {
-                var parent = Player.list[self.parentID];
+                var parent = players[self.parentID];
                 var x_start = parent.x;
                 var y_start = parent.y;
                 ctx.save();
                 ctx.translate(x_start,y_start);
-                console.log("draw image : " + x+":"+y);
-                ctx.drawImage(Img.scurge,186,94,87,87,-self.range/2,-self.range/2,self.range,self.range);
+                ctx.drawImage(Img.scurge, 186, 94, 87, 87, -self.range/2, -self.range/2, self.range, self.range);
                 ctx.restore();
-
             }
 
         };
@@ -369,19 +333,19 @@
             {
                 self.range = updatePack.range;
             }
-        }
+        };
 		return self;
 	};
 
-	Bullet.list = {};
-	
-	var selfId;
-
+	//=================================================================
+	// Callbacks on reception of package from server:
+	// on "init" package reception:
 	socket.on('init',function(data){
-	    if(data.selfId)
+		if(data.selfId) // we get our selfId
 	        selfId = data.selfId;
-		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
-        players = {};
+
+		// We destroy all the players and bullets just in case
+		players = {};
         for(var i in players)
         {
             delete players[i];
@@ -392,47 +356,47 @@
             delete bullets[i];
         }
 
-		for(var i = 0 ; i < data.player.length; i++){
+        // We add the players and the bullets already in game to our players and bullets lists
+		for(var i = 0 ; i < data.player.length; i++)
+		{
             if(data.player[i].id === selfId)
             {
                 camera.moveTo(data.player[i].x,data.player[i].y);
             }
-             console.log('addNew init');
+			console.log('addNew init');
             players[data.player[i].id] = new Player(data.player[i]);
-            //Player.list[data.player[i]]= new Player(data.player[i]);
 		}
-		for(var i = 0 ; i < data.bullet.length; i++){
+		for(var i = 0 ; i < data.bullet.length; i++)
+		{
             bullets[data.bullet[i].id] = new Bullet(data.bullet[i]);
 		}
 	});
-	
+
+	// on "update" package reception:
 	socket.on('update',function(data){
-/*        if(data.selfId)
-            selfId = data.selfId;*/
-        //{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
-        for(var i = 0 ; i < data.player.length; i++){
-            //new Player(data.player[i]);
-            //console.log('update player : '+data.player[i].id);
+
+		// data = [ player[{p1}, {p2}, {p3}, ...], bullet[{b1}, {b2}, {b3}, ...], spell[{s1}, {s2}, {s3}, ...] ]
+
+		// we update every players
+        for(var i = 0 ; i < data.player.length; i++)
+        {
             if(players[data.player[i].id])
             {
                 if(data.player[i].id === selfId)
                 {
-                    //console.log('update : '+data.player[i].x+':'+data.player[i].y)
                     camera.moveTo(data.player[i].x,data.player[i].y);
-                }
-                //console.log('update');
-                players[data.player[i].id].onUpdate(data.player[i]);
-                //Player.list[data.player[i].id].onUpdate(data.player[i]);
-            }
-/*            else
-            {
-                console.log('addNew update');
-                players[data.player[i].id] = new Player(data.player[i]);
-                //Player.list[data.player[i].id] = new Player(data.player[i]);
-            }*/
 
+					var cdArray = data.player[i].spellCooldownsArray;
+                }
+
+                // we call the onUpdate method of the Player class
+                players[data.player[i].id].onUpdate(data.player[i]);
+            }
         }
-        for(var i = 0 ; i < data.bullet.length; i++){
+
+		// every bullets
+        for(var i = 0 ; i < data.bullet.length; i++)
+        {
             if(bullets[data.bullet[i].id])
             {
                 bullets[data.bullet[i].id].onUpdate(data.bullet[i]);
@@ -441,56 +405,37 @@
             {
                 bullets[data.bullet[i].id] = new Bullet(data.bullet[i]);
             }
-
         }
-		//{ player : [{id:123,x:0,y:0},{id:1,x:0,y:0}], bullet: []}
-		/*for(var i = 0 ; i < data.player.length; i++){
-			var pack = data.player[i];
-			var p = Player.list[pack.id];
-			if(p){
-				if(pack.x !== undefined)
-					p.x = pack.x;
-				if(pack.y !== undefined)
-					p.y = pack.y;
-				if(pack.rotation !== undefined)
-					p.rotation = pack.rotation;
-				if(pack.targetVisible !== undefined)
-					p.targetVisible = pack.targetVisible;
-				if(pack.targetType !== undefined)
-					p.targetType = pack.targetType;
-				if(pack.hp !== undefined)
-					p.hp = pack.hp;
-				if(pack.isDead !== undefined)
-					p.isDead = pack.isDead;
-				if(pack.spellCooldowns !== undefined)
-					p.spellCooldowns = pack.spellCooldowns;
+
+		// and every spells (ones that don't have cdProgress equal to 0)
+		for(var i = 0 ; i < cdArray.length; i++)
+		{
+			// let's update the right spells
+			for(var j in spellIndicators)
+			{
+				if (spellIndicators[j].spellName === cdArray.name)
+				{
+					spellIndicators[j].cdProgress = cdArray.progress;
+				}
 			}
-		}*/
-	/*	for(var i = 0 ; i < data.bullet.length; i++){
-			var pack = data.bullet[i];
-			var b = Bullet.list[data.bullet[i].id];
-			if(b){
-				if(pack.x !== undefined)
-					b.x = pack.x;
-				if(pack.y !== undefined)
-					b.y = pack.y;
-				if(pack.parentID !== undefined)
-					b.parentID = pack.parentID;
-			}
-		}*/
-	});
-	
-	socket.on('remove',function(data){
-		//{player:[12323],bullet:[12323,123123]}
-		for(var i = 0 ; i < data.player.length; i++){
-            delete players[data.player[i].id];
-			//delete Player.list[data.player[i]];
 		}
-		for(var i = 0 ; i < data.bullet.length; i++){
+
+	});
+
+	// on "remove" package reception:
+	socket.on('remove',function(data){
+		for(var i = 0 ; i < data.player.length; i++)
+		{
+            delete players[data.player[i].id];
+		}
+		for(var i = 0 ; i < data.bullet.length; i++)
+		{
 			delete bullets[data.bullet[i]];
 		}
 	});
 
+	//=================================================================
+	// Key pressed and mouse click detection:
 	// Check the keycode on this website:
 	// http://www.west-wind.com/westwindwebtoolkit/samples/ajax/html5andcss3/keycodechecker.aspx
 	// Be careful, the keycode are not the same if we detect with keyup and down or keypress
@@ -518,6 +463,7 @@
 	var isPressedE = false;
 	var isPressedR = false;
 
+	// Handlers for keys:
 	document.onkeydown = function(event){
 		console.log(event.keyCode);
 		if(event.keyCode === 65) { // key A
@@ -547,7 +493,6 @@
 			}
 		}
 	};
-
 	document.onkeyup = function(event){
 		if(event.keyCode === 65) { // key A
 			socket.emit('keyPress', {inputId: 'A', state: false});
@@ -567,8 +512,9 @@
 		}
 	};
 
+	//=================================================================
+	// Mouse click handlers
 	// jQuery:
-	// Mouse click handler
 	$('#ctx').mousedown(function(event) {
 		click_X = camera.x+event.pageX - $(this).offset().left;
 		click_Y = camera.y+event.pageY - $(this).offset().top;
@@ -595,10 +541,6 @@
 				console.log("Unkown click")
 		}
 	});
-
-	// Disable the popup triggered by the right click
-	$('body').on('contextmenu', '#ctx', function(e){ return false; });
-
 	$("#ctx").mousemove(function( event ) {
 		var parentOffset = $(this).parent().offset();
 		//or $(this).offset(); if you really just want the current element's offset
@@ -606,47 +548,11 @@
 		mouse_Y = event.pageY - parentOffset.top;
 	});
 
-	function draw_spell_indicator(ctx, progress, img, keyboardKey) {
-		var width = ctx.canvas.clientWidth;
-		var height = ctx.canvas.clientHeight;
+	// Disable the popup triggered by the right click
+	$('body').on('contextmenu', '#ctx', function(e){ return false; });
 
-		var x = width/2;
-		var y = height/2;
-		var r = (height/2)*Math.sqrt(2);
-        if(img.name === "scurge")
-        {
-            ctx.drawImage(img.img,41,235,85,83,0,0,width,height);
-        }else
-        {
-            // Draw spell img:
-            ctx.drawImage(img.img, 0,0,width,height);
-        }
+	//=================================================================
 
-
-
-		// Draw shortkey:
-		ctx.font = '20pt Calibri';
-		ctx.fillStyle = 'white';
-		var xx = 7.5*width/10;
-		var yy = 9.5*(height/10);
-		ctx.fillText(keyboardKey, xx, yy);
-
-		// Draw cooldown pie:
-		if(progress < 1) {
-			ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-			ctx.beginPath();
-			ctx.arc(x, y, r,  - Math.PI/2, (Math.PI * 2) * progress -  Math.PI/2, true); // we draw the arc
-			ctx.lineTo(x, y); // we add the center point in order to have a pie
-			ctx.fill();
-
-			ctx.globalCompositeOperation = 'destination-in'
-			var squareSide = (2*r) / Math.sqrt(2);
-			ctx.fillStyle = "rgba(0, 0, 0, 1)";
-			ctx.fillRect(x - squareSide/2, y - squareSide/2, squareSide, squareSide);
-		}
-
-		ctx.globalCompositeOperation = 'source-over';
-	}
 
 	/*var Lightning = function(ctx) {
 		var self = this;
@@ -820,58 +726,42 @@
 		}
 	};
 
-    setInterval(function(){
+
+	//=================================================================
+	// Draw functions :
+	function drawBullets() {
+		for(var i in bullets)
+		{
+			bullets[i].draw();
+		}
+	};
+	function drawPlayers() {
+		for(var i in players)
+		{
+			players[i].draw();
+			players[i].drawTarget();
+		}
+	};
+	function drawSpellIndicators() {
+		for (var i in spellIndicators)
+		{
+			spellIndicators[i].draw();
+		}
+	};
+	function drawMap () {
+		ctx.drawImage(Img.map, camera.x, camera.y,camera.width,camera.height,0,0,camera.width,camera.height);
+	};
+
+	//=================================================================
+	// Update loop :
+	setInterval(function(){
 		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         ctx.save();
-        //ctx.translate(camera.x,camera.y);
+
         drawMap();
-        //ctx.restore();
-        //console.log('setInterval');
-        for(var i in players)
-        {
-            //console.log(i);
-            players[i].draw();
-            players[i].drawTarget();
-        }
- /*       for(var i in Player.list) {
-			/!*ctx.save();
-			ctx.translate(Player.list[i].x,Player.list[i].y);
-			ctx.rotate(Player.list[i].rotation*Math.PI/180);
-			ctx.restore();*!/
-			Player.list[i].draw()
-			Player.list[i].drawTarget()
-		}*/
-		for(var i in bullets) {
-		   /* ctx.save();
-            ctx.translate(Bullet.list[i].x,Bullet.list[i].y);
-            ctx.rotate(Bullet.list[i].orientation*Math.PI/180);
-            ctx.restore();*/
-            bullets[i].draw();
-		}
-
-
-
-		//lightning.strike(50, 90, 540, 420, "#cfefff", "#ffffff", true);
-		/*dx += 50
-		dy += 50
-		if (dx >= 750)
-		{
-
-		}
-		else if (dx >= 200){
-			lightning.strike(450, 250, 250+16, 250,  "#cfefff", "#ffffff");//"#557788", "#7799aa", true);
-			lightning.strike(450, 250, 250+16, 250, "#557788", "#7799aa", true);
-		}
-		else
-		{
-			lightning.strike(250+16+dx, 250, 250+16, 250,  "#cfefff", "#ffffff");//"#557788", "#7799aa", true);
-			lightning.strike(250+16+dx, 250, 250+16, 250, "#557788", "#7799aa", true);
-		}*/
-
-		/*lightning.strike(450, 250, 250+16, 250,  "#cfefff", "#ffffff");//"#557788", "#7799aa", true);
-		lightning.strike( 450, 250, 250+16, 250, "#557788", "#7799aa", true);*/
+		drawBullets();
+		drawPlayers();
+		drawSpellIndicators();
 	},40);
-
-
 
 </script>
