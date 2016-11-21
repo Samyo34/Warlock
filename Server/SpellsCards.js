@@ -1,49 +1,95 @@
-var fireballCard = function(parent)
-{
+/**
+ * Class for the spellcard fireball
+ */
+var fireballCard = function(parent) {
 	this.name = "fireball";
 	this.parent = parent;
 
-   this.damages = 10;
-   this.speed = 10;
-   this.range=32;
-   this.action=2;
-   this.actionTime=50000;
-   this.cd=5;
-   this.rangeAction = null;
-	this.lifeTime = 100;
+	this.key = "A";
+
+    this.damages = 10;
+    this.speed = 10;
+    this.range = 32;
+    this.action = 2;
+    this.actionTime = 50000;
+
+	this.isClickNeeded = true;
+
+    // Cooldowns :
+    this.cd = 100;
+	this.cdCurrent = 0;
+    this.cdProgress = 0;
+
+    this.rangeAction = null;
+    this.lifeTime = 100;
 };
 
-fireballCard.prototype.cast = function(aimGoalPoint)
-{
+fireballCard.prototype.cast = function(aimGoalPoint) {
 	return new fireBall(this.parent,
-		aimGoalPoint,
-		this.damages,
-		this.speed,
-		this.range,
-		this.action,
-		this.actionTime,
-		this.lifeTime);
+                        aimGoalPoint,
+                        this.damages,
+                        this.speed,
+                        this.range,
+                        this.action,
+                        this.actionTime,
+                        this.lifeTime);
 };
 
-var blinkCard = function(parent)
-{
-	this.name = "blink";
-	this.parent = parent;
-
-	this.rangeAction = 100;
-	this.cd = 5;
+fireballCard.prototype.updateCooldown = function() {
+	this.cdCurrent -= 1;
+	if(this.cdCurrent <= 0) // cooldown is finished
+	{
+		this.cdCurrent = 0;
+	}
+	else
+	{
+		this.cdProgress = 1 - this.cdCurrent/this.cd;
+	}
 };
 
-blinkCard.prototype.cast = function(aimGoalPoint)
-{
+/**
+ * Class for the spellcard blink
+ */
+var blinkCard = function(parent) {
+    this.name = "blink";
+    this.parent = parent;
+
+	this.key = "Z";
+
+    this.rangeAction = 100;
+
+	this.isClickNeeded = true;
+
+	// Cooldowns :
+	this.cd = 100;
+	this.cdCurrent = 0;
+	this.cdProgress = 0;
+};
+
+blinkCard.prototype.updateCooldown = function() {
+	this.cdCurrent -= 1;
+	if(this.cdCurrent <= 0) // cooldown is finished
+	{
+		this.cdCurrent = 0;
+	}
+	else
+	{
+		this.cdProgress = 1 - this.cdCurrent/this.cd;
+	}
+};
+
+blinkCard.prototype.cast = function(aimGoalPoint) {
 	return new blink(this.parent,aimGoalPoint);
 };
 
-
-var lightningCard = function(parent)
-{
+/**
+ * Class for the spellcard lightning
+ */
+var lightningCard = function(parent) {
 	this.name = "lightning";
 	this.parent = parent;
+
+	this.key = "E";
 
 	this.damages = 10;
 	this.speed = 30;
@@ -51,39 +97,76 @@ var lightningCard = function(parent)
 	this.action=2;
 	this.actionTime = 50000;
 	this.lifeTime = 5;
-	this.cd = 5000;
+
+	this.isClickNeeded = true;
+
+	// Cooldowns :
+	this.cd = 100;
+	this.cdCurrent = 0;
+	this.cdProgress = 0;
 	this.rangeAction = null;
 
 };
 
-lightningCard.prototype.cast = function(aimGoalPoint)
-{
-	return new lightning(this.parent,
-		aimGoalPoint,
-		this.damages,
-		this.speed,
-		this.range,
-		this.action,
-		this.actionTime,
-		this.lifeTime);
+lightningCard.prototype.updateCooldown = function() {
+	this.cdCurrent -= 1;
+	if(this.cdCurrent <= 0) // cooldown is finished
+	{
+		this.cdCurrent = 0;
+	}
+	else
+	{
+		this.cdProgress = 1 - this.cdCurrent/this.cd;
+	}
 };
 
-var scurgeCard = function(parent)
-{
+lightningCard.prototype.cast = function(aimGoalPoint) {
+	return new lightning(this.parent,
+                         aimGoalPoint,
+                         this.damages,
+                         this.speed,
+                         this.range,
+                         this.action,
+                         this.actionTime,
+                         this.lifeTime);
+};
+
+/**
+ * Class for the spellcard scurge
+ */
+var scurgeCard = function(parent) {
 	this.name = 'scurge';
 	this.parent = parent;
 
+	this.key = "R";
+
 	this.damages = 10;
 	this.lifeTime = 10;
-	this.cd = 5000;
+
+	this.isClickNeeded = false;
+
+	// Cooldowns :
+	this.cd = 100;
+	this.cdCurrent = 0;
+	this.cdProgress = 0;
 	this.range = parent.size * 4;
 	this.rangeAction = null;
 	this.action = 3;
 	this.actionTime = 50000;
 };
 
-scurgeCard.prototype.cast = function(aimGoalPoint)
-{
+scurgeCard.prototype.cast = function() {
 	return new scurge(this.parent, this.damages, this.lifeTime,this.range, this.action, this.actionTime);
-}
+};
 
+scurgeCard.prototype.updateCooldown = function() {
+	this.cdCurrent -= 1;
+	if(this.cdCurrent <= 0) // cooldown is finished
+	{
+		this.cdCurrent = 0;
+	}
+	else
+	{
+		this.cdProgress = 1 - this.cdCurrent/this.cd;
+	}
+};

@@ -7,14 +7,14 @@ var Player = function(id){
 	var self = Entity();
 	self.id = id;
 	self.number = "" + Math.floor(10 * Math.random());
-   self.size = 32;// car le sprite des wizard fait 32x32 pix
+    self.size = 32; // car le sprite des wizard fait 32x32 pix
 
-   self.time =0;
+   	self.time =0;
 
 	self.rotation = 0;
 	self.angularVelocity = 0;
-   self.isOrientationGood = false;
-   self.isPositionGood = false;
+	self.isOrientationGood = false;
+	self.isPositionGood = false;
 
 	self.goalDest = {
         x:self.x,
@@ -32,41 +32,53 @@ var Player = function(id){
     self.currentSpeed = 0;
     self.isActive = true;
 
-    self.spellList = [];
+    self.spellList = []; // array of spells available for the player
     self.spellList.push(new fireballCard(self));
     self.spellList.push(new blinkCard(self));
     self.spellList.push(new lightningCard(self));
     self.spellList.push(new scurgeCard(self));
 
-    self.spellsParams = SpellsParam();
+    //self.spellsParams = SpellsParam();
     self.spellsToCast = [];
-    self.enemySpellActionVelocity = {
+
+	// velocity caused by the enemy spells. This velocity is added to the player one
+	self.enemySpellActionVelocity = {
         x:0,
         y:0
     };
-    self.linkedSpells = [];
-    self.actionTime = 0;// time when the spell action is over
-    self.ratioSpeed = 1;
-    self.actionDuration = 0;// duration of the spell action
 
-	self.spellCooldowns = {
-		fireball: {total: 100, current:0, progress: 0},
-		blink: {total: 100, current:0, progress: 0},
-        lightning: {total : 100,current:0,progress:0},
-		scurge: {total:100,current:0,progress:0}
+    self.linkedSpells = [];
+
+	self.actionTime = 0; // time when the spell action is over
+    self.ratioSpeed = 1;
+    self.actionDuration = 0; // duration of the spell action
+
+    self.getSpellByKey = function(key) {
+		for(var i in self.spellList)
+		{
+			if (self.spellList[i].key === key)
+			{
+				return self.spellList[i];
+			}
+		}
+		return null;
 	};
 
-    self.spellBinding = {
-      A: "fireball",
-      Z: "blink",
-      E: "lightning",
-		R: "scurge",
-    };
+	self.getSpellByName = function(name) {
+		for(var i in self.spellList)
+		{
+			if (self.spellList[i].name === name)
+			{
+				return self.spellList[i];
+			}
+		}
+		return null;
+	};
 
-
-	self.targetVisible = false;
+	self.targetVisible = false; // Is the player pressing a key for a spell
 	self.targetType = '';
-   self.Spell = [];
+
+	self.Spell = [];
 	self.isShooting = false;
 	self.isMoving = false;
 	self.aimGoalPoint = {
@@ -78,64 +90,48 @@ var Player = function(id){
 
 	//var super_update = self.update;
 	self.update = function(){
-      self.updateFriction();
-	   self.updatePosition();
+		self.updateFriction();
+		self.updatePosition();
 		self.updateCooldowns();
 
         //super_update();
 
-		for (var i in self.spellCooldowns) {
-			var spell = self.spellCooldowns[i];
-			spell.current -= 1;
-
-			if(spell.current <= 0) {// cooldown is finished
-				spell.current = 0;
-				spell.progress = 0;
-			}
-			else {
-				spell.progress = spell.current/spell.total;
-			}
-
-		}
 		// Check if player is dead
 		if(self.hp <= 0)
 		{
-
 			self.isDead = true;
 		}
 	};
-
-/*	self.shootBullet = function(angle){
-		var b = Bullet(self.id,angle);
-		b.x = self.x;
-		b.y = self.y;
-	};*/
 	
 	self.getInitPack = function(){
 		return {
-			id:self.id,
-			x:self.x,
-			y:self.y,	
-			rotation:self.rotation,
-			hp:self.hp,
-			hpMax:self.hpMax,
-			score:self.score,
-			targetVisible:self.targetVisible,
-			targetType:self.targetType,
-			isShooting:self.isShooting,
-			isMoving:self.isMoving,
-         sizePlayer:self.size,
-			isDead:self.isDead,
+			id: self.id,
+			x: self.x,
+			y: self.y,
+			rotation: self.rotation,
+			hp: self.hp,
+			hpMax: self.hpMax,
+			score: self.score,
+			targetVisible: self.targetVisible,
+			targetType: self.targetType,
+			isShooting: self.isShooting,
+			isMoving: self.isMoving,
+         	sizePlayer: self.size,
+			isDead: self.isDead,
 		};		
 	};
 
 	self.getCooldownsPack = function(){
-		return {
-			fireball: self.spellCooldowns["fireball"].progress,
-			blink: self.spellCooldowns["blink"].progress,
-			lightning: self.spellCooldowns["lightning"].progress,
-            scurge:self.spellCooldowns["scurge"].progress
-		}
+		var listCd = []; // We will store in this array all the cooldown progress
+		// TODO: we could store only the cd on progress, here we store all the cooldowns even when they are 0
+		/*for (var i in self.spellList)
+		{
+			listCd.push( {	spellName: self.spellList[i].name,
+							cdProgress: self.spellList[i].cdProgress} );
+		}*/
+		listCd.push( {	spellName: self.spellList[0].name,
+						cdProgress: self.spellList[0].cdProgress} );
+		return listCd;
 	};
 	
 	self.getUpdatePack = function(){
@@ -152,8 +148,8 @@ var Player = function(id){
 			isDead: self.isDead,
 			isShooting: self.isShooting,
 			isMoving: self.isMoving,
-         sizePlayer: self.size,
-			spellCooldowns: self.getCooldownsPack()
+         	sizePlayer: self.size,
+			spellCooldownsArray: self.getCooldownsPack()
 		}
 	};
 	
@@ -168,73 +164,35 @@ var Player = function(id){
 	};
 
 	self.prepareSpell = function(name, aimGoalPoint) {
-		var spellDescriptor;
-        //console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
-if(self.spellCooldowns[name]["current"] != 0)
-		{
-			return;
-		}
+        console.log('prepare spell : ' + name);
 
-		if(name == "fireball")
+		self.aimGoalPoint.x = aimGoalPoint.x;
+		self.aimGoalPoint.y = aimGoalPoint.y;
+		self.spellsToCast.push(self.getSpellByName(name));
+
+		/*if(name == "fireball")
 		{
-			spellDescriptor = {	spellName:"fireball",
-								spellType:"bullet",
-								x: aimGoalPoint.x,
-								y: aimGoalPoint.y,
-								damages: 10,
-								speed: 10,
-								lifeTime: 100,
-								cooldown:5000,
-                                range: 32};
-                                self.aimGoalPoint.x = aimGoalPoint.x;
-                                self.aimGoalPoint.y = aimGoalPoint.y;
-                                self.spellsToCast.push(self.spellList[0]/*spellDescriptor*/);
+            self.aimGoalPoint.x = aimGoalPoint.x;
+            self.aimGoalPoint.y = aimGoalPoint.y;
+            self.spellsToCast.push(self.spellList[0]);
 		}
 		else if(name == "blink")
 		{
-			spellDescriptor = {spellName:"blink", spellType:"noBullet",x: aimGoalPoint.x, y: aimGoalPoint.y};
-			                                self.aimGoalPoint.x = aimGoalPoint.x;
-                                self.aimGoalPoint.y = aimGoalPoint.y;
-                                self.spellsToCast.push(self.spellList[1]/*spellDescriptor*/);
-			//self.spellsToCast.push(spellDescriptor);
-/*			spellDescriptor = {	spellName:"blink",
-								spellType:"noBullet",
-								xx: xx,
-								yy: yy,
-								x:x,
-								y:y};*/
+            self.aimGoalPoint.x = aimGoalPoint.x;
+            self.aimGoalPoint.y = aimGoalPoint.y;
+            self.spellsToCast.push(self.spellList[1]);
 		}
 		else if(name == "lightning")
 		{
-			spellDescriptor = { spellName:"lightning",
-								spellType:"bullet",
-								x: aimGoalPoint.x,
-								y: aimGoalPoint.y,
-								damages: 10,
-								speed: 30,
-								lifeTime: 5,
-								cooldown:5000,
-                        range:32};
-         self.aimGoalPoint.x = aimGoalPoint.x;
-         self.aimGoalPoint.y = aimGoalPoint.y;
-         self.spellsToCast.push(self.spellList[2]/*spellDescriptor*/);
+            self.aimGoalPoint.x = aimGoalPoint.x;
+            self.aimGoalPoint.y = aimGoalPoint.y;
+            self.spellsToCast.push(self.spellList[2]);
 		}
 		else if (name == "scurge")
         {
-            //console.log("scurge");
-            spellDescriptor = { spellName:"scurge",
-                                spellType:"bullet",
-                                x:self.x,
-                                y:self.y,
-                                damages:10,
-                                lifeTime:10,
-                                cooldown:5000,
-                                range: self.size*4};
-            self.linkedSpells.push(spellDescriptor);
-            self.spellsToCast.push(self.spellList[3]/*spellDescriptor*/);
-        }
-
-		
+            //self.linkedSpells.push(spellDescriptor);
+            self.spellsToCast.push(self.spellList[3]);
+        }*/
 	};
 
 	// then, when the wizard have the right orientation we cast it
@@ -429,18 +387,9 @@ if(self.spellCooldowns[name]["current"] != 0)
 	};
 
 	self.updateCooldowns = function() {
-		for (var i in self.spellCooldowns) {
-			var spell = self.spellCooldowns[i];
-			spell.current -= 1;
-
-			if(spell.current <= 0) {// cooldown is finished
-				spell.current = 0;
-				spell.progress = 0;
-			}
-			else {
-				spell.progress = 1 - spell.current/spell.total;
-			}
-
+		for (var i in self.spellList)
+		{
+			self.spellList[i].updateCooldown();
 		}
 	};
 	
@@ -459,36 +408,31 @@ Player.onConnect = function(socket){
 	var player = Player(socket.id);
 	
 	socket.on('keyPress',function(data){
-		if(data.inputId === 'A') {
-			player.targetVisible = data.state;
-			player.targetType = 'A';
-			console.log("A")
-		}
-		else if(data.inputId === 'Z') {
-			player.targetVisible = data.state;
-			player.targetType = 'Z';
-			console.log("Z")
-		}
-		else if(data.inputId === 'E') {
-			player.targetVisible = data.state;
-			player.targetType = 'E';
-			console.log("E")
-		}
-		else if(data.inputId === 'R') {
-			player.targetVisible = data.state;
-			player.targetType = 'R';
-            //player.prepareSpell("scurge", player.aimGoalPoint);
-            var spell = player.spellBinding[player.targetType]; // spell = "fireball" for instance
-            if (player.spellCooldowns[spell].current === 0) {
-                player.isShooting = true;
-                player.setAimGoal(player.x,player.y);
-                player.prepareSpell(spell, player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
-               // player.targetVisible = false;
-            }
-			console.log("R")
-		}
-		else if(data.inputId === 'mouseAngle') {
+
+		var spell = player.getSpellByKey(data.inputId);
+
+		if(data.inputId === 'mouseAngle')
+		{
 			player.mouseAngle = data.state;
+		}
+		else if(spell.isClickNeeded)
+		{
+			player.targetVisible = data.state;
+			player.targetType = data.inputId;
+			console.log(data.inputId)
+		}
+		else
+		{
+			player.targetVisible = data.state;
+			player.targetType = data.inputId;
+
+            if (spell.cdCurrent === 0)
+            {
+            	player.isShooting = true;
+            	player.setAimGoal(player.x,player.y);
+            	player.prepareSpell(spell.name, player.aimGoalPoint);
+            }
+			console.log(data.inputId)
 		}
 	});
 	
@@ -501,26 +445,15 @@ Player.onConnect = function(socket){
 
 	socket.on('mouseLeftClick',function(data){
 		player.isOrientationGood = false;
-		// TBD make it for every spells:
-		if(player.targetVisible === true /*&& player.spellCooldowns["fireball"].current === 0*/)
+
+		if(player.targetVisible === true)
 		{
-/*			player.isShooting = true;
-			player.setAimGoal(data.x,data.y);
-			if(player.targetType === 'A')
+            var spell = player.getSpellByKey(player.targetType);
+			if (spell.cdCurrent === 0)
 			{
-				player.prepareSpell("fireball", player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
-			}
-			if(player.targetType === 'Z')
-			{
-			    console.log('blink');
-				player.prepareSpell("blink", player.aimGoalPoint);
-			}
-			player.targetVisible = false;*/
-			var spell = player.spellBinding[player.targetType]; // spell = "fireball" for instance
-			if (player.spellCooldowns[spell].current === 0) {
 				player.isShooting = true;
 				player.setAimGoal(data.x,data.y);
-				player.prepareSpell(spell, player.aimGoalPoint);//, wizard[0].x, wizard[0].y, game.input.x, game.input.y);
+				player.prepareSpell(spell.name, player.aimGoalPoint);
 				player.targetVisible = false;
 			}
 		}
