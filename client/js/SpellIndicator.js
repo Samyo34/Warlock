@@ -39,11 +39,11 @@ spellIndicator.prototype.draw = function() {
     ctx.fillText(this.keyboardKey, xx, yy);
 
     // Draw cooldown pie:
-    if(this.cdProgress < 1)
+    if(this.cdProgress < 1 && this.cdProgress > 0.01)
     {
         ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         ctx.beginPath();
-        ctx.arc(x, y, r,  - Math.PI/2, (Math.PI * 2) * this.cdProgress -  Math.PI/2, true); // we draw the arc
+        ctx.arc(x, y, r,  - Math.PI/2, (Math.PI * 2) * (1-this.cdProgress) -  Math.PI/2, true); // we draw the arc
         ctx.lineTo(x, y); // we add the center point in order to have a pie
         ctx.fill();
 

@@ -20,7 +20,8 @@
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script src="./client/js/jquery.js"></script>
 <script src = "./client/js/Camera.js"></script>
-<script src = "./client/js/SpellCards.js"></script>
+<script src = "./client/js/SpellIndicator.js"></script>
+
 <script>
 	var socket = io();
 
@@ -372,11 +373,14 @@
 		}
 	});
 
+    var cdArray = [];
+
 	// on "update" package reception:
 	socket.on('update',function(data){
 
 		// data = [ player[{p1}, {p2}, {p3}, ...], bullet[{b1}, {b2}, {b3}, ...], spell[{s1}, {s2}, {s3}, ...] ]
 
+        cdArray = [];
 		// we update every players
         for(var i = 0 ; i < data.player.length; i++)
         {
@@ -386,7 +390,9 @@
                 {
                     camera.moveTo(data.player[i].x,data.player[i].y);
 
-					var cdArray = data.player[i].spellCooldownsArray;
+                    // Let's get the cooldown array for our player
+                    // data.player[i].spellCooldownsArray = [{cdProgress = 0, spellName = "fireball"}, ..., ..., ...]
+					cdArray = data.player[i].spellCooldownsArray;
                 }
 
                 // we call the onUpdate method of the Player class
@@ -413,9 +419,9 @@
 			// let's update the right spells
 			for(var j in spellIndicators)
 			{
-				if (spellIndicators[j].spellName === cdArray.name)
+				if (spellIndicators[j].spellName === cdArray[i].spellName)
 				{
-					spellIndicators[j].cdProgress = cdArray.progress;
+					spellIndicators[j].cdProgress = cdArray[i].cdProgress;
 				}
 			}
 		}

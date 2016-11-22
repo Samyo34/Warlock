@@ -25,6 +25,9 @@ var fireballCard = function(parent) {
 };
 
 fireballCard.prototype.cast = function(aimGoalPoint) {
+	// Let's update the cd
+	this.cdCurrent = this.cd;
+
 	return new fireBall(this.parent,
                         aimGoalPoint,
                         this.damages,
@@ -37,13 +40,14 @@ fireballCard.prototype.cast = function(aimGoalPoint) {
 
 fireballCard.prototype.updateCooldown = function() {
 	this.cdCurrent -= 1;
-	if(this.cdCurrent <= 0) // cooldown is finished
+	if(this.cdCurrent < 0) // cooldown is finished
 	{
 		this.cdCurrent = 0;
 	}
 	else
 	{
-		this.cdProgress = 1 - this.cdCurrent/this.cd;
+		this.cdProgress = this.cdCurrent/this.cd;
+		console.log(this.cdProgress)
 	}
 };
 
@@ -68,18 +72,21 @@ var blinkCard = function(parent) {
 
 blinkCard.prototype.updateCooldown = function() {
 	this.cdCurrent -= 1;
-	if(this.cdCurrent <= 0) // cooldown is finished
+	if(this.cdCurrent < 0) // cooldown is finished
 	{
 		this.cdCurrent = 0;
 	}
 	else
 	{
-		this.cdProgress = 1 - this.cdCurrent/this.cd;
+		this.cdProgress = this.cdCurrent/this.cd;
 	}
 };
 
 blinkCard.prototype.cast = function(aimGoalPoint) {
-	return new blink(this.parent,aimGoalPoint);
+    // Let's update the cd
+    this.cdCurrent = this.cd;
+
+    return new blink(this.parent,aimGoalPoint);
 };
 
 /**
@@ -110,18 +117,21 @@ var lightningCard = function(parent) {
 
 lightningCard.prototype.updateCooldown = function() {
 	this.cdCurrent -= 1;
-	if(this.cdCurrent <= 0) // cooldown is finished
+	if(this.cdCurrent < 0) // cooldown is finished
 	{
 		this.cdCurrent = 0;
 	}
 	else
 	{
-		this.cdProgress = 1 - this.cdCurrent/this.cd;
+		this.cdProgress = this.cdCurrent/this.cd;
 	}
 };
 
 lightningCard.prototype.cast = function(aimGoalPoint) {
-	return new lightning(this.parent,
+    // Let's update the cd
+    this.cdCurrent = this.cd;
+
+    return new lightning(this.parent,
                          aimGoalPoint,
                          this.damages,
                          this.speed,
@@ -156,17 +166,20 @@ var scurgeCard = function(parent) {
 };
 
 scurgeCard.prototype.cast = function() {
-	return new scurge(this.parent, this.damages, this.lifeTime,this.range, this.action, this.actionTime);
+    // Let's update the cd
+    this.cdCurrent = this.cd;
+
+    return new scurge(this.parent, this.damages, this.lifeTime,this.range, this.action, this.actionTime);
 };
 
 scurgeCard.prototype.updateCooldown = function() {
 	this.cdCurrent -= 1;
-	if(this.cdCurrent <= 0) // cooldown is finished
+	if(this.cdCurrent < 0) // cooldown is finished
 	{
 		this.cdCurrent = 0;
 	}
 	else
 	{
-		this.cdProgress = 1 - this.cdCurrent/this.cd;
+		this.cdProgress = this.cdCurrent/this.cd;
 	}
 };

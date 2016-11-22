@@ -124,13 +124,11 @@ var Player = function(id){
 	self.getCooldownsPack = function(){
 		var listCd = []; // We will store in this array all the cooldown progress
 		// TODO: we could store only the cd on progress, here we store all the cooldowns even when they are 0
-		/*for (var i in self.spellList)
+		for (var i in self.spellList)
 		{
 			listCd.push( {	spellName: self.spellList[i].name,
 							cdProgress: self.spellList[i].cdProgress} );
-		}*/
-		listCd.push( {	spellName: self.spellList[0].name,
-						cdProgress: self.spellList[0].cdProgress} );
+		}
 		return listCd;
 	};
 	
