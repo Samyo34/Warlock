@@ -62,9 +62,11 @@ var Entity = function(){
 };
 var DEBUG = true;
 
-var io = require('socket.io')(serv,{});
+var io = require('socket.io')(serv);
+
 io.sockets.on('connection', function(socket){
 	socket.id = Math.random();
+	var sock = socket;
 	SOCKET_LIST[socket.id] = socket;
 
 	Player.onConnect(socket);
@@ -77,21 +79,20 @@ io.sockets.on('connection', function(socket){
 					player:Player.getAllInitPack(),
 					bullet:bullets.getAllInitPack()});
 		}
-
 	}
 
 	socket.on('disconnect',function(){
-		console.log('disconnect : '+socket.id);
-		Player.onDisconnect(socket);
-		delete SOCKET_LIST[socket.id];
+		console.log('disconnect : '+sock.id);
+		Player.onDisconnect(sock);
+		delete SOCKET_LIST[sock.id];
 		
-		/*for(var i in SOCKET_LIST)
+		for(var i in SOCKET_LIST)
 		{
 			var socket = SOCKET_LIST[i];
 			socket.emit('init',{
 				player:Player.getAllInitPack(),
-				bullet:Bullet.getAllInitPack()});
-		}*/
+				bullet:bullets.getAllInitPack()});
+		}
 	});
 
 	socket.on('sendMsgToServer',function(data){

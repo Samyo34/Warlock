@@ -5,7 +5,7 @@
 
 var Player = function(id){
 	var self = Entity();
-	self.id = id;
+	self.id = parseFloat(id);
 	self.number = "" + Math.floor(10 * Math.random());
    self.size = 32;// car le sprite des wizard fait 32x32 pix
 
@@ -50,10 +50,10 @@ var Player = function(id){
     self.actionDuration = 0;// duration of the spell action
 
 	self.spellCooldowns = {
-		fireball: {total: 100, current:0, progress: 0},
-		blink: {total: 100, current:0, progress: 0},
-        lightning: {total : 100,current:0,progress:0},
-		scurge: {total:100,current:0,progress:0}
+		"fireball": {total: 100, current:0, progress: 0},
+		"blink": {total: 100, current:0, progress: 0},
+      "lightning": {total : 100,current:0,progress:0},
+		"scurge": {total:100,current:0,progress:0}
 	};
 
     self.spellBinding = {
@@ -139,22 +139,34 @@ var Player = function(id){
 	};
 	
 	self.getUpdatePack = function(){
-		return {
+		return ''+self.id + ';' +
+		parseInt(self.x)+ ';' +
+		parseInt(self.y)+ ';' +
+		parseInt(self.rotation*100000)+ ';' +
+		parseInt(self.hp)+';'+
+		parseInt(self.hpMax)+';'+
+		self.targetVisible +';'+
+		self.targetType+';'+
+		self.isDead+';'+
+		self.isShooting+';'+
+		self.isMoving+';'+
+		parseInt(self.size)+';';
+		/*return {
 			id: self.id,
-			x: self.x,
-			y: self.y,
-			rotation: self.rotation,
-			hp: self.hp,
-			hpMax: self.hpMax,
-			score: self.score,
+			x: Math.floor(self.x),
+			y: Math.floor(self.y),
+			rotation: parseInt(self.rotation*100000),
+			hp: Math.floor(self.hp),
+			hpMax: Math.floor(self.hpMax),
+			score: Math.floor(self.score),
 			targetVisible: self.targetVisible,
 			targetType: self.targetType,
 			isDead: self.isDead,
 			isShooting: self.isShooting,
 			isMoving: self.isMoving,
-         sizePlayer: self.size,
+         sizePlayer: Math.floor(self.size),
 			spellCooldowns: self.getCooldownsPack()
-		}
+		}*/
 	};
 	
 	self.setAimGoal = function(destX, destY){
@@ -170,7 +182,7 @@ var Player = function(id){
 	self.prepareSpell = function(name, aimGoalPoint) {
 		var spellDescriptor;
         //console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
-if(self.spellCooldowns[name]["current"] != 0)
+		if(self.spellCooldowns[name].current != 0)
 		{
 			return;
 		}
@@ -232,9 +244,7 @@ if(self.spellCooldowns[name]["current"] != 0)
                                 range: self.size*4};
             self.linkedSpells.push(spellDescriptor);
             self.spellsToCast.push(self.spellList[3]/*spellDescriptor*/);
-        }
-
-		
+        }	
 	};
 
 	// then, when the wizard have the right orientation we cast it
@@ -444,7 +454,7 @@ if(self.spellCooldowns[name]["current"] != 0)
 		}
 	};
 	
-	Player.list[id] = self;
+	Player.list[self.id] = self;
 	
 	initPack.player.push(self.getInitPack());
 	
@@ -454,7 +464,7 @@ if(self.spellCooldowns[name]["current"] != 0)
 Player.list = {};
 
 Player.onConnect = function(socket){
-	console.log("Player connected." + socket.id);
+	console.log("Player connected " + socket.id);
 	
 	var player = Player(socket.id);
 	

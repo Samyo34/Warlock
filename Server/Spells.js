@@ -242,7 +242,6 @@ scurge.prototype.update = function()
 	{
 		this.toRemove = true;
 	}
-	// TODO : collisions detection
 	for(var i in Player.list){
 		var p = Player.list[i];
 		if(this.parent.id !== p.id)
