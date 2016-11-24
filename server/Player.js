@@ -142,11 +142,50 @@ var Player = function(id){
 		valuesArray[3] = parseInt(self.rotation*100000000);
 		valuesArray[4] = parseInt(self.hp);
 		valuesArray[5] = parseInt(self.hpMax);
-		valuesArray[6] = parseInt(self.targetVisible);
-		valuesArray[7] = parseInt(self.targetType);
-		valuesArray[8] = parseInt(self.isDead);
-		valuesArray[9] = parseInt(self.isShooting);
-		valuesArray[10] = parseInt(self.isMoving);
+		if(self.targetVisible)
+		{
+			valuesArray[6] = parseInt(1);
+		}
+		else
+		{
+			valuesArray[6] = parseInt(0);
+		}
+
+		if(self.targetType)
+		{
+			valuesArray[7] = parseInt(1);
+		}
+		else
+		{
+			valuesArray[7] = parseInt(0);
+		}
+		
+		if(self.isDead)
+		{
+			valuesArray[8] = parseInt(1);
+		}
+		else
+		{
+			valuesArray[8] = parseInt(0);
+		}
+
+		if(self.isShooting)
+		{
+			valuesArray[9] = parseInt(1);
+		}
+		else
+		{
+			valuesArray[9] = parseInt(0);
+		}
+
+		if(self.isMoving)
+		{
+			valuesArray[10] = parseInt(1);
+		}
+		else
+		{
+			valuesArray[10] = parseInt(0);
+		}
 		valuesArray[11] = parseInt(self.size);
 		valuesArray[12] = parseInt(10);
 		return valuesArray;

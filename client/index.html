@@ -178,8 +178,8 @@ var socket = io();
                     self.lastChangeTransiTime = Date.now();
                 }
             }
-
-            if(self.isMoving === 1)
+            console.log(self.isMoving);
+            if(self.isMoving === 0)
             {
                 self.indexMove = 0;
             }
