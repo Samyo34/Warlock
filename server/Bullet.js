@@ -149,8 +149,22 @@ var Bullet = function(){
 //Bullet.list = {};
 
 Bullet.prototype.update = function(){
-    //console.log('bullets update '+this.BulletList.length);
-	var pack = [];
+    var sizeBufferBullet = 4*7;
+    var sizeBuffer = (sizeBufferBullet*Object.keys(this.BulletList).length);
+    var arrayBufferAllBullet = new ArrayBuffer(sizeBuffer);
+    var viewArrayBufferAllPlayer = new Int32Array(arrayBufferAllBullet);
+    var indexBullet = 0;
+    for(var i in this.BulletList)
+    {
+        var bullet =  this.BulletList[i];
+        bullet.update();
+        var updatePack = bullet.getUpdatePack();
+        pushBuffer(arrayBufferAllBullet,updatePack,indexBullet);
+        indexBullet++;
+    }
+    return arrayBufferAllBullet;
+
+/*	var pack = [];
 	for(var i in this.BulletList){
 		var bullet = this.BulletList[i];
 		bullet.update();
@@ -161,7 +175,7 @@ Bullet.prototype.update = function(){
 		} else
 			pack.push(bullet.getUpdatePack());	
 	}
-	return pack;
+	return pack;*/
 };
 
 Bullet.prototype.getAllInitPack = function(){
@@ -171,7 +185,17 @@ Bullet.prototype.getAllInitPack = function(){
 	return bullets;
 };
 
-var Spell = function (parent, spellDescriptor) {
+function pushBuffer(buffer, array,index)
+{
+    var viewArrayBuffer = new Int32Array(buffer);
+    var sizePlayer = array.length;
+    for (var i = 0;i<sizePlayer;i++)
+    {
+        viewArrayBuffer[index*sizePlayer+i+1]=array[i];
+    }
+};
+
+/*var Spell = function (parent, spellDescriptor) {
 	var type = spellDescriptor.spellType;
 	var name = spellDescriptor.spellName;
 	var cooldown = spellDescriptor.cooldown;
@@ -210,3 +234,4 @@ var Spell = function (parent, spellDescriptor) {
 
 	return self;
 };
+*/

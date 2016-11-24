@@ -178,7 +178,6 @@ var socket = io();
                     self.lastChangeTransiTime = Date.now();
                 }
             }
-            console.log(self.isMoving);
             if(self.isMoving === 0)
             {
                 self.indexMove = 0;
@@ -797,6 +796,6 @@ var isPressedR = false;
         drawBullets();
         drawPlayers();
         drawSpellIndicators();
-    },40);
+    },25);
 
     </script>

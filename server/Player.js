@@ -133,9 +133,8 @@ var Player = function(id){
 	};
 	
 	self.getUpdatePack = function(){
-		var ab = new ArrayBuffer(4*13);
 		//console.log('size : ' + ab.byteLength);
-		var valuesArray = new Int32Array(ab);
+		var valuesArray = new Int32Array(4*13);
 		valuesArray[0] = parseInt(self.id*100000000);
 		valuesArray[1] = parseInt(self.x);
 		valuesArray[2] = parseInt(self.y);
@@ -232,7 +231,8 @@ var Player = function(id){
 
 	self.prepareSpell = function(name, aimGoalPoint) {
         //console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
-		if(self.spellCooldowns[name].current != 0)
+        console.log(self.getSpellByName(name).cdCurrent);
+		if(self.getSpellByName(name).cdCurrent != 0)
 		{
 			return;
 		}
@@ -533,13 +533,13 @@ Player.onConnect = function(socket){
 
 		if(player.targetVisible === true)
 		{
-            var spell = player.getSpellByKey(player.targetType);
+         var spell = player.getSpellByKey(player.targetType);
 			if (spell.cdCurrent === 0)
 			{
-				player.isShooting = true;
+				player.isShooting = 1;
 				player.setAimGoal(data.x,data.y);
 				player.prepareSpell(spell.name, player.aimGoalPoint);
-				player.targetVisible = false;
+				player.targetVisible = 0;
 			}
 		}
 		console.log("Left Click");

@@ -1,9 +1,16 @@
 /**
  * Class for the spell fireBall
  */
+
+function getInt32Array()
+{
+	return new Int32Array(4*7);
+}
+
 var fireBall = function(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
 	this.id = Math.random();
 	this.spellName = "fireball";
+	this.spellCode = 0;
 	this.parent = parent;
 
 	this.x = parent.x + 16*Math.cos(parent.rotation);
@@ -79,7 +86,19 @@ fireBall.prototype.update = function() {
 fireBall.prototype.getUpdatePack = function() {
 
     //console.log('bullet : '+ self.x+':'+self.y+' | '+self.parent.x+':'+self.parent.y);
-	return {
+    var valuesArray = getInt32Array();
+    valuesArray[0] = parseInt(this.id*100000000);
+    valuesArray[1] = parseInt(this.spellCode);
+    valuesArray[2] = parseInt(this.parent.id*100000000);
+    valuesArray[3] = parseInt(this.x);
+    valuesArray[4] = parseInt(this.y);
+    var orientation = Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x)
+    valuesArray[5] = parseInt(orientation*100000000);
+    valuesArray[6] = parseInt(this.range);
+    console.log('getUpdatePack '+ valuesArray.length);
+    return valuesArray;
+
+/*	return {
 		id: this.id,
 		spellName: this.spellName,
         parentID: this.parent.id,
@@ -87,7 +106,7 @@ fireBall.prototype.getUpdatePack = function() {
 		y: this.y,
 		orientation: Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x),
 		range: this.range,
-	};
+	};*/
 };
 
 fireBall.prototype.getInitPack = function() {
@@ -119,6 +138,7 @@ var blink = function(parent, aimGoalPoint) {
 var lightning = function(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
 	this.id = Math.random();
 	this.spellName = "lightning";
+	this.spellCode = 1
 	this.parent = parent;
 
 	this.x = parent.x + 16*Math.cos(parent.rotation);
@@ -192,7 +212,17 @@ lightning.prototype.update = function() {
 lightning.prototype.getUpdatePack = function() {
 
     //console.log('bullet : '+ self.x+':'+self.y+' | '+self.parent.x+':'+self.parent.y);
-	return {
+    var valuesArray = getInt32Array();
+    valuesArray[0] = parseInt(this.id*100000000);
+    valuesArray[1] = parseInt(this.spellCode);
+    valuesArray[2] = parseInt(this.parent.id*100000000);
+    valuesArray[3] = parseInt(this.x);
+    valuesArray[4] = parseInt(this.y);
+    var orientation = Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x)
+    valuesArray[5] = parseInt(orientation*100000000);
+    valuesArray[6] = parseInt(this.range);
+    return valuesArray;
+/*	return {
 		id: this.id,
 		spellName: this.spellName,
         parentID: this.parent.id,
@@ -200,7 +230,7 @@ lightning.prototype.getUpdatePack = function() {
 		y: this.y,
 		orientation: Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x),
 		range: this.range
-	};
+	};*/
 };
 
 lightning.prototype.getInitPack = function() {
@@ -228,6 +258,7 @@ var scurge = function(parent, damages, lifeTime,range,action,actionTime) {
 	this.x = parent.x;
 	this.y = parent.y;
 	this.spellName = "scurge";
+	this.spellCode = 2;
 	this.parent = parent;
 	this.damages = damages;
 	this.lifeTime = lifeTime;
@@ -296,7 +327,17 @@ scurge.prototype.update = function() {
 scurge.prototype.getUpdatePack = function() {
 
     //console.log('bullet : '+ self.x+':'+self.y+' | '+self.parent.x+':'+self.parent.y);
-	return {
+   var valuesArray = getInt32Array();
+   valuesArray[0] = parseInt(this.id*100000000);
+   valuesArray[1] = parseInt(this.spellCode);
+   valuesArray[2] = parseInt(this.parent.id*100000000);
+   valuesArray[3] = parseInt(this.x);
+   valuesArray[4] = parseInt(this.y);
+   valuesArray[5] = parseInt(0);
+   valuesArray[6] = parseInt(this.range);
+   return valuesArray;
+
+/*	return {
 		id: this.id,
 		spellName: this.spellName,
         parentID: this.parent.id,
@@ -304,7 +345,7 @@ scurge.prototype.getUpdatePack = function() {
 		y: this.y,
 		orientation: 0,
 		range: this.range
-	};
+	};*/
 };
 
 scurge.prototype.getInitPack = function() {

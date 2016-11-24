@@ -119,18 +119,31 @@ var removePack = {player:[],bullet:[]};
 
 setInterval(function(){
 	//console.log(Player.update().byteLength);
-	var pack = {
-		player:Player.update()/*,
-		bullet:bullets.update(),*/
+	var bufferPlayers = Player.update();
+	var bufferBullets = bullets.update();
+	var viewPackBuffer = new Int32Array(bufferPlayers.byteLength+bufferBullets.byteLength);
+	viewPackBuffer.set(new Int32Array(bufferPlayers),0);
+	if(bufferBullets.byteLength > 0)
+		viewPackBuffer.set(new Int32Array(bufferBullets),bufferPlayers.byteLength);
+
+	var packBuffer = viewPackBuffer.buffer;
+
+	//console.log(packBuffer.byteLength+' '+bufferPlayers.byteLength+' '+bufferBullets.byteLength);
+
+
+/*	var pack = {
+		player:Player.update(),
+		bullet:bullets.update(),
 	};
-	var pack = Player.update();
+	*/
+/*	var pack = Player.update();*/
 	var nbPlayer = 0;
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
 		//socket.send(new ArrayBuffer);
        // socket.emit('init',initPack);
         //console.log('app124 : removepack :'+removePack.bullet.length);
-        socket.emit('update',pack);
+        socket.emit('update',packBuffer);
         nbPlayer++;
         if(removePack.bullet.length>0 || removePack.player.length>0)
         {
