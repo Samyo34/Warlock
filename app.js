@@ -64,6 +64,7 @@ var DEBUG = true;
 
 var io = require('socket.io')(serv);
 
+
 io.sockets.on('connection', function(socket){
 	socket.id = Math.random();
 	var sock = socket;
@@ -117,13 +118,16 @@ var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
 
 setInterval(function(){
+	//console.log(Player.update().byteLength);
 	var pack = {
-		player:Player.update(),
-		bullet:bullets.update(),
+		player:Player.update()/*,
+		bullet:bullets.update(),*/
 	};
+	var pack = Player.update();
 	var nbPlayer = 0;
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
+		//socket.send(new ArrayBuffer);
        // socket.emit('init',initPack);
         //console.log('app124 : removepack :'+removePack.bullet.length);
         socket.emit('update',pack);
