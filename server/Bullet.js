@@ -159,9 +159,19 @@ Bullet.prototype.update = function(){
         var bullet =  this.BulletList[i];
         bullet.update();
         var updatePack = bullet.getUpdatePack();
-        pushBuffer(arrayBufferAllBullet,updatePack,indexBullet);
+        for (var j = 0;j<updatePack.length;j++)
+        {
+            viewArrayBufferAllPlayer[(indexBullet*updatePack.length)+j]=updatePack[j];
+        }
         indexBullet++;
+
+        if(bullet.toRemove)
+        {
+            delete this.BulletList[i];
+            removePack.bullet.push(bullet.id)
+        }
     }
+    //console.log('bullets '+arrayBufferAllBullet.byteLength);
     return arrayBufferAllBullet;
 
 /*	var pack = [];

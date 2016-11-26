@@ -5,7 +5,7 @@
 
 var Player = function(id){
 	var self = Entity();
-	self.id = parseFloat(id);
+	self.id = id;
 	self.number = "" + Math.floor(10 * Math.random());
     self.size = 32; // car le sprite des wizard fait 32x32 pix
 
@@ -134,7 +134,7 @@ var Player = function(id){
 	
 	self.getUpdatePack = function(){
 		//console.log('size : ' + ab.byteLength);
-		var valuesArray = new Int32Array(4*13);
+		var valuesArray = new Int32Array(13);
 		valuesArray[0] = parseInt(self.id*100000000);
 		valuesArray[1] = parseInt(self.x);
 		valuesArray[2] = parseInt(self.y);
@@ -231,7 +231,7 @@ var Player = function(id){
 
 	self.prepareSpell = function(name, aimGoalPoint) {
         //console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
-        console.log(self.getSpellByName(name).cdCurrent);
+        //console.log(self.getSpellByName(name).cdCurrent);
 		if(self.getSpellByName(name).cdCurrent != 0)
 		{
 			return;
@@ -480,7 +480,7 @@ var Player = function(id){
 	
 	Player.list[self.id] = self;
 	
-	initPack.player.push(self.getInitPack());
+	//initPack.player.push(self.getInitPack());
 	
 	return self;
 };
@@ -490,7 +490,7 @@ Player.list = {};
 Player.onConnect = function(socket){
 	console.log("Player connected " + socket.id);
 	
-	var player = Player(socket.id);
+	var player = new Player(socket.id);
 	
 	socket.on('keyPress',function(data){
 
@@ -561,7 +561,7 @@ Player.getAllInitPack = function(){
 
 Player.onDisconnect = function(socket){
 	delete Player.list[socket.id];
-	removePack.player.push({id:socket.id});
+	removePack.player.push({id:parseInt(socket.id*100000000)});
 };
 
 Player.update = function(){
@@ -576,9 +576,14 @@ Player.update = function(){
 		var player = Player.list[i];
 		player.update();
 		var updatePack = player.getUpdatePack();
-		pushBuffer(arrayBufferAllPlayer,updatePack,indexPlayer);
+		//console.log(updatePack);
+		for (var j = 0;j<updatePack.length;j++)
+		{
+			viewArrayBufferAllPlayer[(indexPlayer*updatePack.length)+j+1]=updatePack[j];
+		}
 		indexPlayer++;
 	}
+	//console.log('player '+viewArrayBufferAllPlayer[12]);
 	return arrayBufferAllPlayer;
 /*	var pack = [];
 	console.log(Object.keys(Player.list).length);
@@ -589,14 +594,18 @@ Player.update = function(){
 	}
 	return pack;*/
 };
+
 // push the array(int32array) into buffer at the index (index = 0 for first element, = 1 for second...)
 // The arrays' size must match with the buffer size
-function pushBuffer(buffer, array,index)
+Player.pushBuffer = function(buffer, array,index)
 {
-	var viewArrayBuffer = new Int32Array(buffer);
+
+	console.log('pushBuffer '+buffer.length);
+	//var viewArrayBuffer = new Int32Array(buffer);
 	var sizePlayer = array.length;
 	for (var i = 0;i<sizePlayer;i++)
 	{
-		viewArrayBuffer[index*sizePlayer+i+1]=array[i];
+		buffer[(index*sizePlayer)+i+1]=array[i];
 	}
+	console.log('pushBuffer2 '+((index*sizePlayer)+1)+ ':'+buffer[(index*sizePlayer)+2]+' '+buffer[index*sizePlayer+3]);
 };

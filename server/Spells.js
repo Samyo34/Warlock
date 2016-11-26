@@ -4,7 +4,7 @@
 
 function getInt32Array()
 {
-	return new Int32Array(4*7);
+	return new Int32Array(7);
 }
 
 var fireBall = function(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
@@ -95,7 +95,7 @@ fireBall.prototype.getUpdatePack = function() {
     var orientation = Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x)
     valuesArray[5] = parseInt(orientation*100000000);
     valuesArray[6] = parseInt(this.range);
-    console.log('getUpdatePack '+ valuesArray.length);
+    //console.log('getUpdatePack '+ valuesArray.length);
     return valuesArray;
 
 /*	return {
@@ -111,7 +111,7 @@ fireBall.prototype.getUpdatePack = function() {
 
 fireBall.prototype.getInitPack = function() {
 	return {
-		id: this.id,
+		id: parseInt(this.id/100000000),
 		spellName: this.spellName,
 		x: this.x,
 		y: this.y,
@@ -235,7 +235,7 @@ lightning.prototype.getUpdatePack = function() {
 
 lightning.prototype.getInitPack = function() {
 	return {
-		id: this.id,
+		id: parseInt(this.id/100000000),
 		spellName: this.spellName,
 		parent: this.parent,
 		x: this.x,
@@ -350,7 +350,7 @@ scurge.prototype.getUpdatePack = function() {
 
 scurge.prototype.getInitPack = function() {
 	return {
-		id: this.id,
+		id: parseInt(this.id/100000000),
 		spellName: this.spellName,
 		parent: this.parent,
 		x: this.x,

@@ -114,20 +114,21 @@ io.sockets.on('connection', function(socket){
 	
 });
 
-var initPack = {player:[],bullet:[]};
+//var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
 
 setInterval(function(){
 	//console.log(Player.update().byteLength);
 	var bufferPlayers = Player.update();
 	var bufferBullets = bullets.update();
-	var viewPackBuffer = new Int32Array(bufferPlayers.byteLength+bufferBullets.byteLength);
+	var packBuffer = new ArrayBuffer((bufferPlayers.byteLength+bufferBullets.byteLength));
+	var viewPackBuffer = new Int32Array(packBuffer);
+	//console.log(bufferPlayers.byteLength+' '+bufferBullets.byteLength+' '+packBuffer.byteLength+' '+viewPackBuffer.length*4);
 	viewPackBuffer.set(new Int32Array(bufferPlayers),0);
 	if(bufferBullets.byteLength > 0)
-		viewPackBuffer.set(new Int32Array(bufferBullets),bufferPlayers.byteLength);
+		viewPackBuffer.set(new Int32Array(bufferBullets),bufferPlayers.byteLength/4);
 
-	var packBuffer = viewPackBuffer.buffer;
-
+//console.log(viewPackBuffer[0]+' '+viewPackBuffer[14]);
 	//console.log(packBuffer.byteLength+' '+bufferPlayers.byteLength+' '+bufferBullets.byteLength);
 
 
@@ -153,8 +154,8 @@ setInterval(function(){
 
 	}
 	//console.log('nb players : '+nbPlayer);
-	initPack.player = [];
-	initPack.bullet = [];
+/*	initPack.player = [];
+	initPack.bullet = [];*/
 	removePack.player = [];
 	removePack.bullet = [];
 	

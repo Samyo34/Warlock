@@ -109,7 +109,7 @@ var socket = io();
 	// Player and Bullet classes :
     var Player = function(initPack){
         var self = {};
-        self.id = initPack.id;
+        self.id = parseFloat(initPack.id/100000000);
         self.number = initPack.number;
         self.x = parseInt(initPack.x-camera.x);
         self.y = parseInt(initPack.y-camera.y);
@@ -195,6 +195,7 @@ var socket = io();
                 }
                 else
                 {
+                    console.log('draw '+self.size);
                     ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
                 }
             }
@@ -263,6 +264,7 @@ var socket = io();
 
             self.isShooting = dataArray[9];
             self.isMoving = dataArray[10];
+            //console.log('update '+self.id+' '+dataArray[11]);
             self.size = parseInt(dataArray[11]);
            /* self.id = updatePack.id;
             self.number = updatePack.number;
@@ -283,6 +285,7 @@ var socket = io();
     };
 
     var Bullet = function(initPack){
+
       var self = {};
       self.id = initPack.id;
       self.spellName = initPack.spellName;
@@ -295,65 +298,63 @@ var socket = io();
       if(initPack.range !== undefined)
       {
         self.range = initPack.range;
-    }
+      }
 
-    self.draw = function()
-    {
-        var x = self.x;
-        var y = self.y;
-
-        var width = Img.fireball.width;
-        var height = Img.fireball.height;
-
-        if(self.spellName === "fireball")
+        self.draw = function()
         {
-				ctx.save(); // save current state
-				ctx.translate(x,y);
-				ctx.rotate(self.orientation); // rotate
-                ctx.drawImage(Img.fireball, 0,0,width,height, -width/2,-height/2,width,height);
-                ctx.restore();
-            }
-            else if (self.spellName === "lightning")
-            {
-            	var parent = players[self.parentID];
-                var x_start = parent.x+16*Math.cos(parent.rotation);
-                var y_start = parent.y+16*Math.sin(parent.rotation);
-                drawLightningSpell(x_start, y_start, x, y);
-            }
-            else if(self.spellName === "scurge")
-            {
-                var parent = players[self.parentID];
-                var x_start = parent.x;
-                var y_start = parent.y;
-                ctx.save();
-                ctx.translate(x_start,y_start);
-                //console.log("draw image : " + x+":"+y);
-                ctx.drawImage(Img.scurge,186,94,87,87,-self.range/2,-self.range/2,self.range,self.range);
-            }
 
-        };
+            var x = self.x;
+            var y = self.y;
 
-        self.onUpdate = function(updatePack)
-        {
-            self.id = updatePack.id;
-            self.spellName = updatePack.spellName;
-            self.parentID = updatePack.parentID;
-            self.x = updatePack.x-camera.x;
-            self.y = updatePack.y-camera.y;
-            self.orientation = updatePack.orientation;
-            self.range =0;
-            if(updatePack.range !== undefined)
+            var width = Img.fireball.width;
+            var height = Img.fireball.height;
+
+            if(self.spellName === 0/*"fireball"*/)
             {
-                self.range = updatePack.range;
-            }
-        };
-        return self;
+    				ctx.save(); // save current state
+    				ctx.translate(x,y);
+    				ctx.rotate(self.orientation); // rotate
+                    ctx.drawImage(Img.fireball, 0,0,width,height, -width/2,-height/2,width,height);
+                    ctx.restore();
+                }
+                else if (self.spellName === 1/*"lightning"*/)
+                {
+                	var parent = players[self.parentID];
+                    var x_start = parent.x+16*Math.cos(parent.rotation);
+                    var y_start = parent.y+16*Math.sin(parent.rotation);
+                    drawLightningSpell(x_start, y_start, x, y);
+                }
+                else if(self.spellName === 2/*"scurge"*/)
+                {
+                    var parent = players[self.parentID];
+                    var x_start = parent.x;
+                    var y_start = parent.y;
+                    ctx.save();
+                    ctx.translate(x_start,y_start);
+                    //console.log("draw image : " + x+":"+y);
+                    ctx.drawImage(Img.scurge,186,94,87,87,-self.range/2,-self.range/2,self.range,self.range);
+                }
+            };
+
+            self.onUpdate = function(updatePack)
+            {
+                self.id = parseFloat(updatePack[0]/100000000);
+                self.spellName = updatePack[1];
+                self.parentID = parseFloat(updatePack[2]/100000000);
+                self.x = updatePack[3]-camera.x;
+                self.y = updatePack[4]-camera.y;
+                self.orientation = parseFloat(updatePack[5]/100000000);
+                self.range =updatePack[6];
+            };
+
+            return self;
     };
 
 	//=================================================================
 	// Callbacks on reception of package from server:
 	// on "init" package reception:
 	socket.on('init',function(data){
+        console.log('init');
         if(data.selfId){
            selfId = parseFloat(data.selfId/100000000);
        }
@@ -376,14 +377,15 @@ var socket = io();
                 camera.moveTo(data.player[i].x,data.player[i].y);
             }
             console.log('addNew init '+data.player[i].id);
-            players[parseFloat(data.player[i].id/100000000)] = new Player(data.player[i]);
+            var id = parseFloat(data.player[i].id/100000000);
+            players[id] = new Player(data.player[i]);
             /*console.log(players[data.player[i].id]);*/
             //Player.list[data.player[i]]= new Player(data.player[i]);
 
         }
         for(var i = 0 ; i < data.bullet.length; i++)
         {
-            bullets[data.bullet[i].id] = new Bullet(data.bullet[i]);
+            bullets[parseFloat(data.bullet[i].id/100000000)] = new Bullet(data.bullet[i]);
         }
     });
 
@@ -393,23 +395,49 @@ var cdArray = [];
 	socket.on('update',function(data){
         //var buffView = new Int32Array(data.player);
       //  var nbPlayer = data.player.byteLength / (13*4);
-      var slice = data.slice(0);
-      var buffView = new Int32Array(slice);
+      //console.log(data.byteLength);
+      var buffView = new Int32Array(data);
+     // console.log(buffView.length+ ' '+data.byteLength);
         for(var i = 1; i < (buffView[0]*13)+1; i+=13)// for all players
         {
 
             var playerUpdate = [];
+            var debug = i+': ';
             for(var j =0;j<13;j++)// for all element concerning the player
             {
+                debug+=buffView[i+j] + '|';
                 playerUpdate.push(buffView[i+j]);
             }
+            //console.log(debug);
             var idPlayer = parseFloat(playerUpdate[0]/100000000);
             if(idPlayer===selfId)
             {
                 camera.moveTo(playerUpdate[1],playerUpdate[2]);
             }
-            //console.log(idPlayer+':'+selfId+' '+(idPlayer===selfId));
+            //console.log('onUpdate '+idPlayer+' '+playerUpdate[0]+' '+playerUpdate[1]);
             players[idPlayer].onUpdate(playerUpdate);
+        }
+
+        for (var i = (buffView[0]*13)+1;i<buffView.length;i+=7)// for all element concerning bullets
+        {
+            var bulletUpdated = [];
+            var debug = i+': ';
+            for (var j = 0; j<7;j++)
+            {
+                debug+=buffView[i+j] +'|';
+                bulletUpdated.push(buffView[i+j]);
+            }
+console.log(debug);
+            var idBullet = parseFloat(bulletUpdated[0]/100000000);
+
+            if(bullets[idBullet])
+            {
+                bullets[idBullet].onUpdate(bulletUpdated);
+            }
+            else
+            {
+                bullets[idBullet] = new Bullet(bulletUpdated);
+            }
         }
 
 
@@ -460,12 +488,12 @@ var cdArray = [];
 	socket.on('remove',function(data){
 		//{player:[12323],bullet:[12323,123123]}
 		for(var i = 0 ; i < data.player.length; i++){
-            delete players[parseFloat(data.player[i].id)];
+            delete players[parseFloat(data.player[i].id/100000000)];
 			//delete Player.list[data.player[i]];
         }
         for(var i = 0 ; i < data.bullet.length; i++)
         {
-           delete bullets[data.bullet[i]];
+           delete bullets[parseFloat(data.bullet[i]/100000000)];
        }
    });
 

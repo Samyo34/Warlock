@@ -47,7 +47,7 @@ fireballCard.prototype.updateCooldown = function() {
 	else
 	{
 		this.cdProgress = this.cdCurrent/this.cd;
-		console.log(this.cdProgress)
+		//console.log(this.cdProgress)
 	}
 };
 
