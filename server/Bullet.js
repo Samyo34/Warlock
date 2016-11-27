@@ -158,18 +158,23 @@ Bullet.prototype.update = function(){
     {
         var bullet =  this.BulletList[i];
         bullet.update();
-        var updatePack = bullet.getUpdatePack();
-        for (var j = 0;j<updatePack.length;j++)
-        {
-            viewArrayBufferAllPlayer[(indexBullet*updatePack.length)+j]=updatePack[j];
-        }
-        indexBullet++;
-
         if(bullet.toRemove)
         {
+            removePack.bullet.push({id:parseInt(bullet.id*100000000)});
             delete this.BulletList[i];
-            removePack.bullet.push(bullet.id)
         }
+        else
+        {
+            var updatePack = bullet.getUpdatePack();
+            for (var j = 0;j<updatePack.length;j++)
+            {
+                viewArrayBufferAllPlayer[(indexBullet*updatePack.length)+j]=updatePack[j];
+            }
+            indexBullet++;
+        }
+
+
+
     }
     //console.log('bullets '+arrayBufferAllBullet.byteLength);
     return arrayBufferAllBullet;

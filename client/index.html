@@ -195,7 +195,7 @@ var socket = io();
                 }
                 else
                 {
-                    console.log('draw '+self.size);
+                    //console.log('draw '+self.size);
                     ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
                 }
             }
@@ -287,10 +287,10 @@ var socket = io();
     var Bullet = function(initPack){
 
       var self = {};
-      self.id = initPack.id;
+      self.id = parseFloat(initPack.id/100000000);
       self.spellName = initPack.spellName;
 
-      self.parentID = initPack.parentID;
+      self.parentID = parseFloat(initPack.parentID/100000000);
       self.x = initPack.x-camera.x;
       self.y = initPack.y-camera.y;
       self.orientation = initPack.orientation;
@@ -333,6 +333,7 @@ var socket = io();
                     ctx.translate(x_start,y_start);
                     //console.log("draw image : " + x+":"+y);
                     ctx.drawImage(Img.scurge,186,94,87,87,-self.range/2,-self.range/2,self.range,self.range);
+                    ctx.restore();
                 }
             };
 
@@ -359,7 +360,7 @@ var socket = io();
            selfId = parseFloat(data.selfId/100000000);
        }
 		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
-        players = {};
+/*        players = {};
         for(var i in players)
         {
             delete players[i];
@@ -368,7 +369,7 @@ var socket = io();
         for (var i in bullets)
         {
             delete bullets[i];
-        }
+        }*/
 
         // We add the players and the bullets already in game to our players and bullets lists
         for(var i = 0 ; i < data.player.length; i++){
@@ -385,6 +386,7 @@ var socket = io();
         }
         for(var i = 0 ; i < data.bullet.length; i++)
         {
+            console.log('add new bullet');
             bullets[parseFloat(data.bullet[i].id/100000000)] = new Bullet(data.bullet[i]);
         }
     });
@@ -427,17 +429,17 @@ var cdArray = [];
                 debug+=buffView[i+j] +'|';
                 bulletUpdated.push(buffView[i+j]);
             }
-console.log(debug);
+//console.log(debug);
             var idBullet = parseFloat(bulletUpdated[0]/100000000);
-
+            console.log(bullets[idBullet]);
             if(bullets[idBullet])
             {
                 bullets[idBullet].onUpdate(bulletUpdated);
-            }
+            }/*
             else
             {
                 bullets[idBullet] = new Bullet(bulletUpdated);
-            }
+            }*/
         }
 
 
@@ -493,7 +495,10 @@ console.log(debug);
         }
         for(var i = 0 ; i < data.bullet.length; i++)
         {
-           delete bullets[parseFloat(data.bullet[i]/100000000)];
+            console.log('remove bullet '+data.bullet[i].id);
+           delete bullets[parseFloat(data.bullet[i].id/100000000)];
+            console.log('remove bullet '+data.bullet.length);
+
        }
    });
 
@@ -794,6 +799,7 @@ var isPressedR = false;
 	function drawBullets() {
 		for(var i in bullets)
 		{
+            console.log('draw bulets');
 			bullets[i].draw();
 		}
 	};

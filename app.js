@@ -114,7 +114,7 @@ io.sockets.on('connection', function(socket){
 	
 });
 
-//var initPack = {player:[],bullet:[]};
+var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
 
 setInterval(function(){
@@ -142,7 +142,11 @@ setInterval(function(){
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
 		//socket.send(new ArrayBuffer);
-       // socket.emit('init',initPack);
+			if(initPack.player[0] || initPack.bullet[0])
+			{
+				//console.log(initPack.player[0]);
+       		socket.emit('init',initPack);
+       	}
         //console.log('app124 : removepack :'+removePack.bullet.length);
         socket.emit('update',packBuffer);
         nbPlayer++;
@@ -154,10 +158,11 @@ setInterval(function(){
 
 	}
 	//console.log('nb players : '+nbPlayer);
-/*	initPack.player = [];
-	initPack.bullet = [];*/
-	removePack.player = [];
-	removePack.bullet = [];
+			initPack.player = [];
+			initPack.bullet = [];		
+	 		removePack.player = [];
+			removePack.bullet = [];
+
 	
 },1000/40);
 

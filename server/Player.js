@@ -480,7 +480,7 @@ var Player = function(id){
 	
 	Player.list[self.id] = self;
 	
-	//initPack.player.push(self.getInitPack());
+	initPack.player.push(self.getInitPack());
 	
 	return self;
 };

@@ -39,6 +39,7 @@ var fireBall = function(parent, aimGoalPoint, damages, speed, range, action, act
    this.toRemove = false;
 
    bullets.BulletList[this.id] = this;
+   initPack.bullet.push(this.getInitPack());
 };
 
 fireBall.prototype.update = function() {
@@ -111,12 +112,13 @@ fireBall.prototype.getUpdatePack = function() {
 
 fireBall.prototype.getInitPack = function() {
 	return {
-		id: parseInt(this.id/100000000),
-		spellName: this.spellName,
+		id: parseInt(this.id*100000000),
+		spellName: this.spellCode,
 		x: this.x,
 		y: this.y,
+		parentID:parseInt(this.parent.id*100000000),
 		orientation: Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x),
-        range: this.range
+      range: this.range
 	};
 };
 
@@ -137,6 +139,7 @@ var blink = function(parent, aimGoalPoint) {
  */
 var lightning = function(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
 	this.id = Math.random();
+
 	this.spellName = "lightning";
 	this.spellCode = 1
 	this.parent = parent;
@@ -167,6 +170,7 @@ var lightning = function(parent, aimGoalPoint, damages, speed, range, action, ac
     this.toRemove = false;
 
     bullets.BulletList[this.id] = this;
+    initPack.bullet.push(this.getInitPack());
 };
 
 lightning.prototype.update = function() {
@@ -221,6 +225,7 @@ lightning.prototype.getUpdatePack = function() {
     var orientation = Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x)
     valuesArray[5] = parseInt(orientation*100000000);
     valuesArray[6] = parseInt(this.range);
+    /*console.log('lightning '+this.id);*/
     return valuesArray;
 /*	return {
 		id: this.id,
@@ -235,13 +240,13 @@ lightning.prototype.getUpdatePack = function() {
 
 lightning.prototype.getInitPack = function() {
 	return {
-		id: parseInt(this.id/100000000),
-		spellName: this.spellName,
-		parent: this.parent,
+		id: parseInt(this.id*100000000),
+		spellName: this.spellCode,
+		parent: parseInt(this.parent.id*100000000),
 		x: this.x,
 		y: this.y,
 		orientation: Math.atan2(this.aimGoalPoint.y - this.parent.y, this.aimGoalPoint.x - this.parent.x),
-        range: this.range
+      range: this.range
 	};
 };
 
@@ -272,6 +277,7 @@ var scurge = function(parent, damages, lifeTime,range,action,actionTime) {
 	this.playerTouched = [];
 
 	bullets.BulletList[this.id] = this;
+	initPack.bullet.push(this.getInitPack());
 };
 
 scurge.prototype.update = function() {
@@ -331,8 +337,8 @@ scurge.prototype.getUpdatePack = function() {
    valuesArray[0] = parseInt(this.id*100000000);
    valuesArray[1] = parseInt(this.spellCode);
    valuesArray[2] = parseInt(this.parent.id*100000000);
-   valuesArray[3] = parseInt(this.x);
-   valuesArray[4] = parseInt(this.y);
+   valuesArray[3] = parseInt(this.parent.x);
+   valuesArray[4] = parseInt(this.parent.y);
    valuesArray[5] = parseInt(0);
    valuesArray[6] = parseInt(this.range);
    return valuesArray;
@@ -350,11 +356,11 @@ scurge.prototype.getUpdatePack = function() {
 
 scurge.prototype.getInitPack = function() {
 	return {
-		id: parseInt(this.id/100000000),
-		spellName: this.spellName,
-		parent: this.parent,
-		x: this.x,
-		y: this.y,
+		id: parseInt(this.id*100000000),
+		spellName: this.spellCode,
+		parent: parseInt(this.parent.id*100000000),
+		x: this.parent.x,
+		y: this.parent.y,
 		orientation: 0,
         range: this.range
 	};
