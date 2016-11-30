@@ -73,12 +73,12 @@ io.sockets.on('connection', function(socket){
 	SOCKET_LIST[socket.id] = socket;
 	if(rooms[rooms.length-1] === undefined)
 	{
-		rooms.push(new Room(3,'deathMatch'));
+		rooms.push(new Room(3,'deathMatch',{width:800,height:800}));
 	}
 	var room = rooms[rooms.length-1];
 	if(room.addPlayer(socket) === 0)
 	{
-		rooms.push(new Room(3,'deathMatch'));
+		rooms.push(new Room(3,'deathMatch',{width:800,height:800}));
 		room = rooms[rooms.length-1];
 		room.addPlayer(socket);
 	}

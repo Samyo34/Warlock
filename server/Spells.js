@@ -14,8 +14,8 @@ var fireBall = function(parent, aimGoalPoint, damages, speed, range, action, act
 	this.spellCode = 0;
 	this.parent = parent;
 
-	this.x = parent.x + 16*Math.cos(parent.rotation);
-	this.y = parent.y + 16*Math.sin(parent.rotation);
+	this.x = parent.x + (range/2)*Math.cos(parent.rotation);
+	this.y = parent.y + (range/2)*Math.sin(parent.rotation);
 
 	this.aimGoalPoint = aimGoalPoint
 
@@ -67,6 +67,7 @@ fireBall.prototype.update = function() {
                  else
                  {
                      p.hp = 0;
+                     this.parent.score++;
                  }
 
                  this.toRemove = true;
@@ -196,6 +197,7 @@ lightning.prototype.update = function() {
              else
              {
                  p.hp = 0;
+                 this.parent.score++;
              }
 
              this.toRemove = true;
@@ -316,6 +318,7 @@ scurge.prototype.update = function() {
              else
              {
                  p.hp = 0;
+                 this.parent.score++;
              }
 
              var direction = Math.atan2(this.y - p.y,this.x - p.x);

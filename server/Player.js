@@ -11,11 +11,13 @@ var Player = function(id, room,socket){
 	this.spdX = 0;
 	this.spdY = 0;
 	this.room = room;
-	this.socket = socket;
+
+	//this.socket = socket;
+
 	//this.number = "" + Math.floor(10 * Math.random());
     this.size = 32; // car le sprite des wizard fait 32x32 pix
 
-   	this.time =0;
+   this.time =0;
 
 	this.rotation = 0;
 	this.angularVelocity = 0;
@@ -53,8 +55,6 @@ var Player = function(id, room,socket){
         y:0
     };
 
-    this.linkedSpells = [];
-
 	this.actionTime = 0; // time when the spell action is over
    this.ratioSpeed = 1;
    this.actionDuration = 0; // duration of the spell action
@@ -76,6 +76,41 @@ var Player = function(id, room,socket){
 	
 	//return this;
 };
+
+Player.prototype.initPlayer = function()
+{
+	this.spdX = 0;
+	this.spdY = 0;
+
+	this.isDead = false;
+
+	this.hp = this.hpMax;
+	this.time =0;
+
+	this.score = 0;
+
+	this.rotation = 0;
+	this.angularVelocity = 0;
+	this.isOrientationGood = false;
+	this.isPositionGood = false;
+
+	this.spellsToCast = [];
+	this.enemySpellActionVelocity = {
+        x:0,
+        y:0
+    };
+
+   this.isShooting = false;
+	this.isMoving = false;
+	this.aimGoalPoint = {
+		x:this.x,
+		y:this.y
+	};
+
+	this.mouseAngle = 0;
+
+	this.room.initPack.player.push(this.getInitPack());
+}
 
 Player.prototype.getSpellByKey = function(key) {
 	for(var i in this.spellList)
@@ -331,52 +366,41 @@ Player.prototype.updateFriction = function() {
  };
 
 Player.prototype.updatePosition = function() {
-    if(this.linkedSpells[0])
-    {
-         this.linkedSpells[0].x = this.x;
-         this.linkedSpells[0].y = this.y;
-    }
-    if(this.spellsToCast[0])
-    {
+	if(this.spellsToCast[0])
+	{
          //console.log('spell to cast : '+this.spellsToCast[0].spellName);
 /*            if(this.spellsToCast[0].spellType === "noBullet")
-         {*/
-         	console.log('dist : '+Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
-                     ((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))));
-             if(this.spellsToCast[0].rangeAction === null || Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
-                     ((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))) <=
-                 this.spellsToCast[0].rangeAction)
-             {
-                 this.goalDest.x = this.x;
-                 this.goalDest.y = this.y;
-                 this.currentSpeed = 0;
-                 this.isPositionGood = true;
-                 this.isOrientationGood = true;
-                 this.isShooting = true;
-             }
-             else
-             {
-                 this.goalDest.x = this.aimGoalPoint.x;
-                 this.goalDest.y = this.aimGoalPoint.y;
-                 this.currentSpeed = this.SPEED;
-                 this.isShooting = false;
-                 this.isPositionGood = false;
-             }
-/*
-         }
-         else if (this.spellsToCast[0].spellType === "bullet")
-         {
-             this.isPositionGood = true;
-         }*/
-    }
+{*/
+	console.log('dist : '+Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
+		((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))));
+	if(this.spellsToCast[0].rangeAction === null || Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
+		((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))) <=
+		this.spellsToCast[0].rangeAction)
+	{
+		this.goalDest.x = this.x;
+		this.goalDest.y = this.y;
+		this.currentSpeed = 0;
+		this.isPositionGood = true;
+		this.isOrientationGood = true;
+		this.isShooting = true;
+	}
+	else
+	{
+		this.goalDest.x = this.aimGoalPoint.x;
+		this.goalDest.y = this.aimGoalPoint.y;
+		this.currentSpeed = this.SPEED;
+		this.isShooting = false;
+		this.isPositionGood = false;
+	}
+}
 
 	if (this.isShooting) // we turn the wizard toward the aimGoalPoint
 	{
 	    //console.log('ishooting : '+this.isOrientationGood +' '+ this.isPositionGood );
 		//this.body.velocity.setTo(0, 0);
-         this.spdX = 0;
-         this.spdY = 0;
-         this.currentSpeed = 0;
+		this.spdX = 0;
+		this.spdY = 0;
+		this.currentSpeed = 0;
 
 		if(this.isOrientationGood && this.isPositionGood)
 		{
@@ -411,18 +435,18 @@ Player.prototype.updatePosition = function() {
 			this.currentSpeed = 0;
 			this.isMoving = false;
            /*  this.angularVelocity = 0;
-             this.isOrientationGood = true;*/
-		}
-		else
-		{
-			this.isMoving = true;
-		}
+           this.isOrientationGood = true;*/
+        }
+        else
+        {
+        	this.isMoving = true;
+        }
 		//else {
-         var d = new Date();
-		if(d.getTime() < this.actionTime)
-		{
+			var d = new Date();
+			if(d.getTime() < this.actionTime)
+			{
 
-			var cd = this.actionTime - d.getTime();
+				var cd = this.actionTime - d.getTime();
 			//console.log('spell action : '+cd + ' '+ this.actionTime + ' '+this.time.getTime());
 			//console.log('action time '+this.actionTime + ' '+time.getTime());
 			var ratioSpeed =  (((100*cd)/this.actionDuration) /100);
@@ -441,10 +465,10 @@ Player.prototype.updatePosition = function() {
 		var error = angleDesired - this.rotation;
 		var tempRot = this.rotation;
         // console.log('angle : '+(error*180/Math.PI));
-		if(Math.abs((error*180/Math.PI))>10)
-		{
-			tempRot = angleDesired;
-		}
+        if(Math.abs((error*180/Math.PI))>10)
+        {
+        	tempRot = angleDesired;
+        }
 
 		//console.log(this.id+" : currentSpeed: " + Math.cos(this.rotation) + ' '+ Math.sin(this.rotation));
 		this.spdX = this.friction * this.currentSpeed * Math.cos(tempRot) + this.enemySpellActionVelocity.x;
@@ -478,7 +502,7 @@ Player.prototype.updatePosition = function() {
 		this.y += this.spdY;
 
 		this.rotation += this.angularVelocity/1000; // Why /1000 ?
-         this.angularVelocity = 0;
+		this.angularVelocity = 0;
 	}
 	
 };
