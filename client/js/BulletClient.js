@@ -1,10 +1,11 @@
-    var Bullet = function(initPack){
+    var Bullet = function(initPack, players){
 
       var self = {};
       self.id = parseFloat(initPack.id/100000000);
       self.spellName = initPack.spellName;
+      self.players = players;
 
-      self.parentID = parseFloat(initPack.parentID/100000000);
+      self.parentID = parseFloat(initPack.parent/100000000);
       self.x = initPack.x-camera.x;
       self.y = initPack.y-camera.y;
       self.orientation = initPack.orientation;
@@ -33,14 +34,15 @@
                 }
                 else if (self.spellName === 1/*"lightning"*/)
                 {
-                	var parent = players[self.parentID];
+                	var parent = self.players[self.parentID];
                     var x_start = parent.x+16*Math.cos(parent.rotation);
                     var y_start = parent.y+16*Math.sin(parent.rotation);
                     drawLightningSpell(x_start, y_start, x, y);
                 }
                 else if(self.spellName === 2/*"scurge"*/)
                 {
-                    var parent = players[self.parentID];
+                    console.log(self.parentID)
+                    var parent = self.players[self.parentID];
                     var x_start = parent.x;
                     var y_start = parent.y;
                     ctx.save();

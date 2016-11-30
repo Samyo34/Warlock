@@ -38,9 +38,7 @@ var SpellsParam = function(){
     return this;
 };
 
-
-
-var Bullet = function(){
+var BulletManager = function(){
     this.BulletList = {};
 	//console.log("New bullet "+parent.x+':'+parent.y+' '+parent.rotation );
 /*
@@ -139,16 +137,16 @@ var Bullet = function(){
 		};
 	};
 
-	Bullet.list[self.id] = self;
+	BulletManagerlist[self.id] = self;
 
 	initPack.bullet.push(self.getInitPack());
 	
 	return self;*/
 };
 
-//Bullet.list = {};
+//BulletManagerlist = {};
 
-Bullet.prototype.update = function(){
+BulletManager.prototype.update = function(){
     var sizeBufferBullet = 4*7;
     var sizeBuffer = (sizeBufferBullet*Object.keys(this.BulletList).length);
     var arrayBufferAllBullet = new ArrayBuffer(sizeBuffer);
@@ -176,7 +174,7 @@ Bullet.prototype.update = function(){
 
 
     }
-    //console.log('bullets '+arrayBufferAllBullet.byteLength);
+    //console.log('bullets '+arrayBufferAllBulletManagerbyteLength);
     return arrayBufferAllBullet;
 
 /*	var pack = [];
@@ -193,7 +191,7 @@ Bullet.prototype.update = function(){
 	return pack;*/
 };
 
-Bullet.prototype.getAllInitPack = function(){
+BulletManager.prototype.getAllInitPack = function(){
 	var bullets = [];
 	for(var i in this.BulletList)
 		bullets.push(this.BulletList[i].getInitPack());

@@ -9,6 +9,7 @@ function getInt32Array()
 
 var fireBall = function(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
 	this.id = Math.random();
+	this.room = parent.room;
 	this.spellName = "fireball";
 	this.spellCode = 0;
 	this.parent = parent;
@@ -38,8 +39,8 @@ var fireBall = function(parent, aimGoalPoint, damages, speed, range, action, act
 
    this.toRemove = false;
 
-   bullets.BulletList[this.id] = this;
-   initPack.bullet.push(this.getInitPack());
+   this.room.addBullet(this);
+   this.room.initPack.bullet.push(this.getInitPack());
 };
 
 fireBall.prototype.update = function() {
@@ -51,9 +52,9 @@ fireBall.prototype.update = function() {
 	this.x += this.spdX;
 	this.y += this.spdY;
 	// TODO : collisions detection
-	for(var i in Player.list)
+	for(var i in this.room.players)
 	{
-		var p = Player.list[i];
+		var p = this.room.players[i];
 		if(this.parent.id !== p.id)
 		{
 			if(this.getDistance(p) < ((this.range/2) + (p.size/2)))
@@ -139,7 +140,7 @@ var blink = function(parent, aimGoalPoint) {
  */
 var lightning = function(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
 	this.id = Math.random();
-
+	this.room = parent.room;
 	this.spellName = "lightning";
 	this.spellCode = 1
 	this.parent = parent;
@@ -169,8 +170,8 @@ var lightning = function(parent, aimGoalPoint, damages, speed, range, action, ac
 
     this.toRemove = false;
 
-    bullets.BulletList[this.id] = this;
-    initPack.bullet.push(this.getInitPack());
+    this.room.addBullet(this);
+    this.room.initPack.bullet.push(this.getInitPack());
 };
 
 lightning.prototype.update = function() {
@@ -182,8 +183,8 @@ lightning.prototype.update = function() {
 	this.x += this.spdX;
 	this.y += this.spdY;
 	// TODO : collisions detection
-	for(var i in Player.list){
-		var p = Player.list[i];
+	for(var i in this.room.players){
+		var p = this.room.players[i];
 		if(this.parent.id !== p.id)
 		{
 			if(this.getDistance(p) < ((this.range/2) + (p.size/2))) {
@@ -260,6 +261,7 @@ lightning.prototype.getDistance = function(pt) {
  */
 var scurge = function(parent, damages, lifeTime,range,action,actionTime) {
 	this.id = Math.random();
+	this.room = parent.room;
 	this.x = parent.x;
 	this.y = parent.y;
 	this.spellName = "scurge";
@@ -276,8 +278,8 @@ var scurge = function(parent, damages, lifeTime,range,action,actionTime) {
 
 	this.playerTouched = [];
 
-	bullets.BulletList[this.id] = this;
-	initPack.bullet.push(this.getInitPack());
+	this.room.addBullet(this);
+	this.room.initPack.bullet.push(this.getInitPack());
 };
 
 scurge.prototype.update = function() {
@@ -288,14 +290,14 @@ scurge.prototype.update = function() {
 	{
 		this.toRemove = true;
 	}
-	for(var i in Player.list){
-		var p = Player.list[i];
+	for(var i =0; i<this.room.players.length;i++){
+		var p = this.room.players[i];
 		if(this.parent.id !== p.id)
 		{
 			if(this.getDistance(p) < ((this.range/2) + (p.size/2))) {
 			// bullet this touches player p: handle collision. ex: hp--;
 				var isTouched = false;
-				for(var j in this.playerTouched)
+				for(var j =0;j< this.playerTouched.length;j++)
 				{
 					if(p.id === this.playerTouched[j])
 					{

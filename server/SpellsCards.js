@@ -145,13 +145,13 @@ lightningCard.prototype.cast = function(aimGoalPoint) {
  * Class for the spellcard scurge
  */
 var scurgeCard = function(parent) {
-	this.name = 'scurge';
+	this.name = "scurge";
 	this.parent = parent;
 
 	this.key = "R";
 
 	this.damages = 10;
-	this.lifeTime = 10;
+	this.lifeTime = 5;
 
 	this.isClickNeeded = false;
 

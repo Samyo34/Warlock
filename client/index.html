@@ -17,8 +17,6 @@
 	</form>
 </div>
 
-
-
 <script src="/socket.io/socket.io.js"></script>
 <script src="./client/js/jquery.js"></script>
 <script src = "./client/js/Camera.js"></script>
@@ -27,7 +25,7 @@
 <script src = "./client/js/BulletClient.js"></script>
 <script src = "./client/js/controle.js"></script>
 <script>
-var socket = io();
+    var socket = io();
 
 	// Variable which stores our ID
 	var selfId;
@@ -111,7 +109,7 @@ var socket = io();
 	// Callbacks on reception of package from server:
 	// on "init" package reception:
 	socket.on('init',function(data){
-        console.log('init');
+        //console.log('init '+data.selfId);
         if(data.selfId){
            selfId = parseFloat(data.selfId/100000000);
        }
@@ -126,7 +124,6 @@ var socket = io();
         {
             delete bullets[i];
         }*/
-
         // We add the players and the bullets already in game to our players and bullets lists
         for(var i = 0 ; i < data.player.length; i++){
             if(parseFloat(data.player[i].id/100000000) === selfId)
@@ -143,7 +140,7 @@ var socket = io();
         for(var i = 0 ; i < data.bullet.length; i++)
         {
             console.log('add new bullet');
-            bullets[parseFloat(data.bullet[i].id/100000000)] = new Bullet(data.bullet[i]);
+            bullets[parseFloat(data.bullet[i].id/100000000)] = new Bullet(data.bullet[i],players);
         }
     });
 
@@ -153,7 +150,8 @@ var cdArray = [];
 	socket.on('update',function(data){
         //var buffView = new Int32Array(data.player);
       //  var nbPlayer = data.player.byteLength / (13*4);
-      //console.log(data.byteLength);
+      console.log(data.byteLength);
+      
       var buffView = new Int32Array(data);
      // console.log(buffView.length+ ' '+data.byteLength);
         for(var i = 1; i < (buffView[0]*13)+1; i+=13)// for all players
@@ -251,6 +249,7 @@ var cdArray = [];
         }
         for(var i = 0 ; i < data.bullet.length; i++)
         {
+            console.log('remove bullet');
            delete bullets[parseFloat(data.bullet[i].id/100000000)];
        }
    });

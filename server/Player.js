@@ -3,491 +3,500 @@
  */
 
 
-var Player = function(id){
-	var self = Entity();
-	self.id = id;
-	self.number = "" + Math.floor(10 * Math.random());
-    self.size = 32; // car le sprite des wizard fait 32x32 pix
+var Player = function(id, room,socket){
+	//var this = Entity();
+	this.id = id;
+	this.x = 250;
+	this.y = 250;
+	this.spdX = 0;
+	this.spdY = 0;
+	this.room = room;
+	this.socket = socket;
+	//this.number = "" + Math.floor(10 * Math.random());
+    this.size = 32; // car le sprite des wizard fait 32x32 pix
 
-   	self.time =0;
+   	this.time =0;
 
-	self.rotation = 0;
-	self.angularVelocity = 0;
-	self.isOrientationGood = false;
-	self.isPositionGood = false;
+	this.rotation = 0;
+	this.angularVelocity = 0;
+	this.isOrientationGood = false;
+	this.isPositionGood = false;
 
-	self.goalDest = {
-        x:self.x,
-        y:self.y
+	this.goalDest = {
+        x:this.x,
+        y:this.y
     };
 
-    self.isDead = false;
+    this.isDead = false;
 
-    self.hpMax = 200;
-    self.hp = 200;
+    this.hpMax = 200;
+    this.hp = 200;
 
-    self.SPEED = 4;
+    this.SPEED = 4;
 
-    self.friction = 1;
-    self.currentSpeed = 0;
-    self.isActive = true;
+    this.friction = 1;
+    this.currentSpeed = 0;
+    this.isActive = true;
 
-    self.spellList = []; // array of spells available for the player
-    self.spellList.push(new fireballCard(self));
-    self.spellList.push(new blinkCard(self));
-    self.spellList.push(new lightningCard(self));
-    self.spellList.push(new scurgeCard(self));
+    this.spellList = []; // array of spells available for the player
+    this.spellList.push(new fireballCard(this));
+    this.spellList.push(new blinkCard(this));
+    this.spellList.push(new lightningCard(this));
+    this.spellList.push(new scurgeCard(this));
 
-    //self.spellsParams = SpellsParam();
-    self.spellsToCast = [];
+    //this.spellsParams = SpellsParam();
+    this.spellsToCast = [];
 
 	// velocity caused by the enemy spells. This velocity is added to the player one
-	self.enemySpellActionVelocity = {
+	this.enemySpellActionVelocity = {
         x:0,
         y:0
     };
 
-    self.linkedSpells = [];
+    this.linkedSpells = [];
 
-	self.actionTime = 0; // time when the spell action is over
-    self.ratioSpeed = 1;
-    self.actionDuration = 0; // duration of the spell action
+	this.actionTime = 0; // time when the spell action is over
+   this.ratioSpeed = 1;
+   this.actionDuration = 0; // duration of the spell action
 
-    self.getSpellByKey = function(key) {
-		for(var i in self.spellList)
-		{
-			if (self.spellList[i].key === key)
-			{
-				return self.spellList[i];
-			}
-		}
-		return null;
+   this.targetVisible = false; // Is the player pressing a key for a spell
+	this.targetType = '';
+
+	this.Spell = [];
+	this.isShooting = false;
+	this.isMoving = false;
+	this.aimGoalPoint = {
+		x:this.x,
+		y:this.y
 	};
 
-	self.getSpellByName = function(name) {
-		for(var i in self.spellList)
-		{
-			if (self.spellList[i].name === name)
-			{
-				return self.spellList[i];
-			}
-		}
-		return null;
-	};
-
-	self.targetVisible = false; // Is the player pressing a key for a spell
-	self.targetType = '';
-
-	self.Spell = [];
-	self.isShooting = false;
-	self.isMoving = false;
-	self.aimGoalPoint = {
-		x:self.x,
-		y:self.y
-	};
-
-	self.mouseAngle = 0;
-
-	//var super_update = self.update;
-	self.update = function(){
-		self.updateFriction();
-		self.updatePosition();
-		self.updateCooldowns();
-
-        //super_update();
-
-		// Check if player is dead
-		if(self.hp <= 0)
-		{
-			self.isDead = true;
-		}
-	};
+	this.mouseAngle = 0;
+	this.room.players.push(this);
+	//this.room.initPack.player.push(this.getInitPack());
 	
-	self.getInitPack = function(){
-		return {
-			id: parseInt(self.id*100000000),
-			x: self.x,
-			y: self.y,
-			rotation: self.rotation,
-			hp: self.hp,
-			hpMax: self.hpMax,
-			score: self.score,
-			targetVisible: self.targetVisible,
-			targetType: self.targetType,
-			isShooting: self.isShooting,
-			isMoving: self.isMoving,
-         sizePlayer: self.size,
-			isDead: self.isDead,
-		};		
-	};
-
-	self.getCooldownsPack = function(){
-		var listCd = []; // We will store in this array all the cooldown progress
-		// TODO: we could store only the cd on progress, here we store all the cooldowns even when they are 0
-		for (var i in self.spellList)
-		{
-			listCd.push( {	spellName: self.spellList[i].name,
-							cdProgress: self.spellList[i].cdProgress} );
-		}
-		return listCd;
-	};
-	
-	self.getUpdatePack = function(){
-		//console.log('size : ' + ab.byteLength);
-		var valuesArray = new Int32Array(13);
-		valuesArray[0] = parseInt(self.id*100000000);
-		valuesArray[1] = parseInt(self.x);
-		valuesArray[2] = parseInt(self.y);
-		valuesArray[3] = parseInt(self.rotation*100000000);
-		valuesArray[4] = parseInt(self.hp);
-		valuesArray[5] = parseInt(self.hpMax);
-		if(self.targetVisible)
-		{
-			valuesArray[6] = parseInt(1);
-		}
-		else
-		{
-			valuesArray[6] = parseInt(0);
-		}
-
-		if(self.targetType)
-		{
-			valuesArray[7] = parseInt(1);
-		}
-		else
-		{
-			valuesArray[7] = parseInt(0);
-		}
-		
-		if(self.isDead)
-		{
-			valuesArray[8] = parseInt(1);
-		}
-		else
-		{
-			valuesArray[8] = parseInt(0);
-		}
-
-		if(self.isShooting)
-		{
-			valuesArray[9] = parseInt(1);
-		}
-		else
-		{
-			valuesArray[9] = parseInt(0);
-		}
-
-		if(self.isMoving)
-		{
-			valuesArray[10] = parseInt(1);
-		}
-		else
-		{
-			valuesArray[10] = parseInt(0);
-		}
-		valuesArray[11] = parseInt(self.size);
-		valuesArray[12] = parseInt(10);
-		return valuesArray;
-/*		return ''+self.id + ';' +
-		parseInt(self.x)+ ';' +
-		parseInt(self.y)+ ';' +
-		parseInt(self.rotation*100000)+ ';' +
-		parseInt(self.hp)+';'+
-		parseInt(self.hpMax)+';'+
-		self.targetVisible +';'+
-		self.targetType+';'+
-		self.isDead+';'+
-		self.isShooting+';'+
-		self.isMoving+';'+
-		parseInt(self.size)+';'+
-		self.getCooldownsPack()+'';*/
-		/*return {
-			id: self.id,
-			x: Math.floor(self.x),
-			y: Math.floor(self.y),
-			rotation: parseInt(self.rotation*100000),
-			hp: Math.floor(self.hp),
-			hpMax: Math.floor(self.hpMax),
-			score: Math.floor(self.score),
-			targetVisible: self.targetVisible,
-			targetType: self.targetType,
-			isDead: self.isDead,
-			isShooting: self.isShooting,
-			isMoving: self.isMoving,
-         sizePlayer: Math.floor(self.size),
-			spellCooldowns: self.getCooldownsPack()
-		}*/
-	};
-	
-	self.setAimGoal = function(destX, destY){
-		self.aimGoalPoint.x = destX;
-		self.aimGoalPoint.y = destY;
-	};
-
-	self.setGoalDest = function(destX, destY){
-		self.goalDest.x = destX;
-		self.goalDest.y = destY;
-	};
-
-	self.prepareSpell = function(name, aimGoalPoint) {
-        //console.log('prepare spell : '+name + ','+self.spellCooldowns[name]["current"]);
-        //console.log(self.getSpellByName(name).cdCurrent);
-		if(self.getSpellByName(name).cdCurrent != 0)
-		{
-			return;
-		}
-        console.log('prepare spell : ' + name);
-
-		self.aimGoalPoint.x = aimGoalPoint.x;
-		self.aimGoalPoint.y = aimGoalPoint.y;
-		self.spellsToCast.push(self.getSpellByName(name));
-
-		/*if(name == "fireball")
-		{
-            self.aimGoalPoint.x = aimGoalPoint.x;
-            self.aimGoalPoint.y = aimGoalPoint.y;
-            self.spellsToCast.push(self.spellList[0]);
-		}
-		else if(name == "blink")
-		{
-            self.aimGoalPoint.x = aimGoalPoint.x;
-            self.aimGoalPoint.y = aimGoalPoint.y;
-            self.spellsToCast.push(self.spellList[1]);
-		}
-		else if(name == "lightning")
-		{
-            self.aimGoalPoint.x = aimGoalPoint.x;
-            self.aimGoalPoint.y = aimGoalPoint.y;
-            self.spellsToCast.push(self.spellList[2]);
-		}
-		else if (name == "scurge")
-        {
-            //console.log("scurge");
-            spellDescriptor = { spellName:"scurge",
-                                spellType:"bullet",
-                                x:self.x,
-                                y:self.y,
-                                damages:10,
-                                lifeTime:10,
-                                cooldown:5000,
-                                range: self.size*4};
-            self.linkedSpells.push(spellDescriptor);
-            self.spellsToCast.push(self.spellList[3]/*spellDescriptor);
-        }
-            //self.linkedSpells.push(spellDescriptor);
-            //self.spellsToCast.push(self.spellList[3]);
-        }
-        */
-	};
-
-	// then, when the wizard have the right orientation we cast it
-	self.castSpell = function() {
-		if(self.spellsToCast.length > 0)
-		{
-			self.spellsToCast[0].cast(self.aimGoalPoint);
-			self.spellsToCast.shift();
-			/*var s = Spell(self, self.spellsToCast[0]);
-			var name = self.spellsToCast[0].spellName;
-			self.spellCooldowns[name].current = self.spellCooldowns[name].total;
-			self.spellsToCast.shift();*/
-            /*if(self.linkedSpells[0])
-            {
-               self.linkedSpells.shift();
-            }*/
-		}
-		else
-		{
-			self.isShooting = false;
-		}
-	};
-
-	self.updateFriction = function() {
-        // Check if the player is on the lava:
-        var line = Math.floor(self.x / TILE_WIDTH);
-        var column = Math.floor(self.y / TILE_HEIGHT);
-
-        var indexInMapArray = column*25 + line;
-        if (map_array[indexInMapArray] == LAVA) // player on lava
-        {
-            self.friction = 0.5;
-            self.hp -= 2;
-        }
-        else
-        {
-            self.friction = 1;
-        }
-    };
-
-	self.updatePosition = function() {
-	    if(self.linkedSpells[0])
-	    {
-            self.linkedSpells[0].x = self.x;
-            self.linkedSpells[0].y = self.y;
-       }
-	    if(self.spellsToCast[0])
-	    {
-            //console.log('spell to cast : '+self.spellsToCast[0].spellName);
-/*            if(self.spellsToCast[0].spellType === "noBullet")
-            {*/
-            	console.log('dist : '+Math.sqrt(((self.aimGoalPoint.x-self.x)*(self.aimGoalPoint.x-self.x))+
-                        ((self.aimGoalPoint.y-self.y)*(self.aimGoalPoint.y-self.y))));
-                if(self.spellsToCast[0].rangeAction === null || Math.sqrt(((self.aimGoalPoint.x-self.x)*(self.aimGoalPoint.x-self.x))+
-                        ((self.aimGoalPoint.y-self.y)*(self.aimGoalPoint.y-self.y))) <=
-                    self.spellsToCast[0].rangeAction)
-                {
-                    self.goalDest.x = self.x;
-                    self.goalDest.y = self.y;
-                    self.currentSpeed = 0;
-                    self.isPositionGood = true;
-                    self.isOrientationGood = true;
-                    self.isShooting = true;
-                }
-                else
-                {
-                    self.goalDest.x = self.aimGoalPoint.x;
-                    self.goalDest.y = self.aimGoalPoint.y;
-                    self.currentSpeed = self.SPEED;
-                    self.isShooting = false;
-                    self.isPositionGood = false;
-                }
-/*
-            }
-            else if (self.spellsToCast[0].spellType === "bullet")
-            {
-                self.isPositionGood = true;
-            }*/
-       }
-
-		if (self.isShooting) // we turn the wizard toward the aimGoalPoint
-		{
-		    //console.log('ishooting : '+self.isOrientationGood +' '+ self.isPositionGood );
-			//this.body.velocity.setTo(0, 0);
-            self.spdX = 0;
-            self.spdY = 0;
-            self.currentSpeed = 0;
-
-			if(self.isOrientationGood && self.isPositionGood)
-			{
-				self.castSpell();
-			}
-
-			//================ Update rotation ================
-			// we compute the desiredAngle towards the clicked point (in radians)
-			self.angleDesired = Math.atan2(self.aimGoalPoint.y - self.y, self.aimGoalPoint.x - self.x);
-
-			// we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
-			var error = self.angleDesired - self.rotation;
-
-			// If the error is small enough, we set the angular velocity to zero
-			//console.log("error : " +  Math.abs(error))
-			if (Math.abs(error)%3.14 <= 0.1)
-			{
-				self.angularVelocity = 0;
-				self.isOrientationGood = true;
-			}
-			else
-			{
-				error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
-				self.angularVelocity = 250 * error; // we multiply the error by a gain K in order to converge faster
-				self.rotation += self.angularVelocity/1000; // Why /1000 ?
-			}
-		}
-		else {
-			if(Math.abs(self.x - self.goalDest.x) <= 8 && Math.abs(self.y - self.goalDest.y) <= 8 ) {
-				self.spdX = 0;
-				self.spdY = 0;
-				self.currentSpeed = 0;
-				self.isMoving = false;
-              /*  self.angularVelocity = 0;
-                self.isOrientationGood = true;*/
-			}
-			else
-			{
-				self.isMoving = true;
-			}
-			//else {
-            var d = new Date();
-			if(d.getTime() < self.actionTime)
-			{
-
-				var cd = self.actionTime - d.getTime();
-				//console.log('spell action : '+cd + ' '+ self.actionTime + ' '+self.time.getTime());
-				//console.log('action time '+self.actionTime + ' '+time.getTime());
-				var ratioSpeed =  (((100*cd)/self.actionDuration) /100);
-				self.enemySpellActionVelocity.x = self.enemySpellActionVelocity.x*ratioSpeed;
-				self.enemySpellActionVelocity.y = self.enemySpellActionVelocity.y*ratioSpeed;
-			}
-			else
-			{
-				self.enemySpellActionVelocity.x = 0;
-				self.enemySpellActionVelocity.y = 0;
-			}
-			angleDesired = Math.atan2(self.goalDest.y - self.y, self.goalDest.x - self.x);
-			//console.log("AngleDesired: " + angleDesired);
-
-			// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
-			var error = angleDesired - self.rotation;
-			var tempRot = self.rotation;
-           // console.log('angle : '+(error*180/Math.PI));
-			if(Math.abs((error*180/Math.PI))>10)
-			{
-				tempRot = angleDesired;
-			}
-
-			//console.log(self.id+" : currentSpeed: " + Math.cos(self.rotation) + ' '+ Math.sin(self.rotation));
-			self.spdX = self.friction * self.currentSpeed * Math.cos(tempRot) + self.enemySpellActionVelocity.x;
-			self.spdY = self.friction * self.currentSpeed * Math.sin(tempRot) + self.enemySpellActionVelocity.y;
-			//}
-
-			if(self.isOrientationGood != true) {
-				angleDesired = Math.atan2(self.goalDest.y - self.y, self.goalDest.x - self.x);
-				//console.log("AngleDesired: " + angleDesired);
-
-				// we compute the gap in radians (self.rotation is in radians and self.angle in degrees)
-				var error = angleDesired - self.rotation;
-				//console.log("rotation: " + self.rotation)
-				//console.log("angleDesired: " + angleDesired)
-
-				//console.log("error :" + error)
-
-				// If the error is small enough, we set the angular velocity to zero
-				if (Math.abs(error) <= 0.001) {
-					self.angularVelocity = 0;
-					self.isOrientationGood = true;
-				}
-				else {
-					error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
-
-					self.angularVelocity = 250 * error; // we multiply the error by a gain K in order to converge faster
-				}
-			}
-
-			self.x += self.spdX;
-			self.y += self.spdY;
-
-			self.rotation += self.angularVelocity/1000; // Why /1000 ?
-            self.angularVelocity = 0;
-		}
-		
-	};
-
-	self.updateCooldowns = function() {
-		for (var i in self.spellList)
-		{
-			self.spellList[i].updateCooldown();
-		}
-	};
-	
-	Player.list[self.id] = self;
-	
-	initPack.player.push(self.getInitPack());
-	
-	return self;
+	//return this;
 };
 
-Player.list = {};
+Player.prototype.getSpellByKey = function(key) {
+	for(var i in this.spellList)
+	{
+		if (this.spellList[i].key === key)
+		{
+			return this.spellList[i];
+		}
+	}
+	return null;
+};
 
-Player.onConnect = function(socket){
+Player.prototype.getSpellByName = function(name) {
+	for(var i in this.spellList)
+	{
+		if (this.spellList[i].name === name)
+		{
+			return this.spellList[i];
+		}
+	}
+	return null;
+};
+
+
+
+//var super_update = this.update;
+Player.prototype.update = function(){
+	this.updateFriction();
+	this.updatePosition();
+	this.updateCooldowns();
+
+     //super_update();
+
+	// Check if player is dead
+	if(this.hp <= 0)
+	{
+		this.isDead = true;
+	}
+};
+	
+Player.prototype.getInitPack = function(){
+	return {
+		id: parseInt(this.id*100000000),
+		x: this.x,
+		y: this.y,
+		rotation: this.rotation,
+		hp: this.hp,
+		hpMax: this.hpMax,
+		score: this.score,
+		targetVisible: this.targetVisible,
+		targetType: this.targetType,
+		isShooting: this.isShooting,
+		isMoving: this.isMoving,
+      sizePlayer: this.size,
+		isDead: this.isDead,
+	};		
+};
+
+Player.prototype.getCooldownsPack = function(){
+	var listCd = []; // We will store in this array all the cooldown progress
+	// TODO: we could store only the cd on progress, here we store all the cooldowns even when they are 0
+	for (var i in this.spellList)
+	{
+		listCd.push( {	spellName: this.spellList[i].name,
+						cdProgress: this.spellList[i].cdProgress} );
+	}
+	return listCd;
+};
+
+Player.prototype.getUpdatePack = function(){
+	//console.log('size : ' + ab.byteLength);
+	var valuesArray = new Int32Array(13);
+	valuesArray[0] = parseInt(this.id*100000000);
+	valuesArray[1] = parseInt(this.x);
+	valuesArray[2] = parseInt(this.y);
+	valuesArray[3] = parseInt(this.rotation*100000000);
+	valuesArray[4] = parseInt(this.hp);
+	valuesArray[5] = parseInt(this.hpMax);
+	if(this.targetVisible)
+	{
+		valuesArray[6] = parseInt(1);
+	}
+	else
+	{
+		valuesArray[6] = parseInt(0);
+	}
+
+	if(this.targetType)
+	{
+		valuesArray[7] = parseInt(1);
+	}
+	else
+	{
+		valuesArray[7] = parseInt(0);
+	}
+	
+	if(this.isDead)
+	{
+		valuesArray[8] = parseInt(1);
+	}
+	else
+	{
+		valuesArray[8] = parseInt(0);
+	}
+
+	if(this.isShooting)
+	{
+		valuesArray[9] = parseInt(1);
+	}
+	else
+	{
+		valuesArray[9] = parseInt(0);
+	}
+
+	if(this.isMoving)
+	{
+		valuesArray[10] = parseInt(1);
+	}
+	else
+	{
+		valuesArray[10] = parseInt(0);
+	}
+	valuesArray[11] = parseInt(this.size);
+	valuesArray[12] = parseInt(10);
+	return valuesArray;
+/*		return ''+this.id + ';' +
+	parseInt(this.x)+ ';' +
+	parseInt(this.y)+ ';' +
+	parseInt(this.rotation*100000)+ ';' +
+	parseInt(this.hp)+';'+
+	parseInt(this.hpMax)+';'+
+	this.targetVisible +';'+
+	this.targetType+';'+
+	this.isDead+';'+
+	this.isShooting+';'+
+	this.isMoving+';'+
+	parseInt(this.size)+';'+
+	this.getCooldownsPack()+'';*/
+	/*return {
+		id: this.id,
+		x: Math.floor(this.x),
+		y: Math.floor(this.y),
+		rotation: parseInt(this.rotation*100000),
+		hp: Math.floor(this.hp),
+		hpMax: Math.floor(this.hpMax),
+		score: Math.floor(this.score),
+		targetVisible: this.targetVisible,
+		targetType: this.targetType,
+		isDead: this.isDead,
+		isShooting: this.isShooting,
+		isMoving: this.isMoving,
+      sizePlayer: Math.floor(this.size),
+		spellCooldowns: this.getCooldownsPack()
+	}*/
+};
+	
+Player.prototype.setAimGoal = function(destX, destY){
+	this.aimGoalPoint.x = destX;
+	this.aimGoalPoint.y = destY;
+};
+
+Player.prototype.setGoalDest = function(destX, destY){
+	this.goalDest.x = destX;
+	this.goalDest.y = destY;
+};
+
+Player.prototype.prepareSpell = function(name, aimGoalPoint) {
+     //console.log('prepare spell : '+name + ','+this.spellCooldowns[name]["current"]);
+     //console.log(this.getSpellByName(name).cdCurrent);
+	if(this.getSpellByName(name).cdCurrent != 0)
+	{
+		return;
+	}
+     console.log('prepare spell : ' + name);
+
+	this.aimGoalPoint.x = aimGoalPoint.x;
+	this.aimGoalPoint.y = aimGoalPoint.y;
+	this.spellsToCast.push(this.getSpellByName(name));
+
+	/*if(name == "fireball")
+replaceAll('data name')            this.aimGoalPoint.x = aimGoalPoint.x;
+         this.aimGoalPoint.y = aimGoalPoint.y;
+         this.spellsToCast.push(this.spellList[0]);
+	}
+	else if(name == "blink")
+	{
+         this.aimGoalPoint.x = aimGoalPoint.x;
+         this.aimGoalPoint.y = aimGoalPoint.y;
+         this.spellsToCast.push(this.spellList[1]);
+	}
+	else if(name == "lightning")
+	{
+         this.aimGoalPoint.x = aimGoalPoint.x;
+         this.aimGoalPoint.y = aimGoalPoint.y;
+         this.spellsToCast.push(this.spellList[2]);
+	}
+	else if (name == "scurge")
+     {
+         //console.log("scurge");
+         spellDescriptor = { spellName:"scurge",
+                             spellType:"bullet",
+                             x:this.x,
+                             y:this.y,
+                             damages:10,
+                             lifeTime:10,
+                             cooldown:5000,
+                             range: this.size*4};
+         this.linkedSpells.push(spellDescriptor);
+         this.spellsToCast.push(this.spellList[3]/*spellDescriptor);
+     }
+         //this.linkedSpells.push(spellDescriptor);
+         //this.spellsToCast.push(this.spellList[3]);
+     }
+     */
+};
+
+// then, when the wizard have the right orientation we cast it
+Player.prototype.castSpell = function() {
+	if(this.spellsToCast.length > 0)
+	{
+		this.spellsToCast[0].cast(this.aimGoalPoint);
+		this.spellsToCast.shift();
+		/*var s = Spell(this, this.spellsToCast[0]);
+		var name = this.spellsToCast[0].spellName;
+		this.spellCooldowns[name].current = this.spellCooldowns[name].total;
+		this.spellsToCast.shift();*/
+         /*if(this.linkedSpells[0])
+         {
+            this.linkedSpells.shift();
+         }*/
+	}
+	else
+	{
+		this.isShooting = false;
+	}
+};
+
+Player.prototype.updateFriction = function() {
+     // Check if the player is on the lava:
+     var line = Math.floor(this.x / TILE_WIDTH);
+     var column = Math.floor(this.y / TILE_HEIGHT);
+
+     var indexInMapArray = column*25 + line;
+     if (map_array[indexInMapArray] == LAVA) // player on lava
+     {
+         this.friction = 0.5;
+         this.hp -= 2;
+     }
+     else
+     {
+         this.friction = 1;
+     }
+ };
+
+Player.prototype.updatePosition = function() {
+    if(this.linkedSpells[0])
+    {
+         this.linkedSpells[0].x = this.x;
+         this.linkedSpells[0].y = this.y;
+    }
+    if(this.spellsToCast[0])
+    {
+         //console.log('spell to cast : '+this.spellsToCast[0].spellName);
+/*            if(this.spellsToCast[0].spellType === "noBullet")
+         {*/
+         	console.log('dist : '+Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
+                     ((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))));
+             if(this.spellsToCast[0].rangeAction === null || Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
+                     ((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))) <=
+                 this.spellsToCast[0].rangeAction)
+             {
+                 this.goalDest.x = this.x;
+                 this.goalDest.y = this.y;
+                 this.currentSpeed = 0;
+                 this.isPositionGood = true;
+                 this.isOrientationGood = true;
+                 this.isShooting = true;
+             }
+             else
+             {
+                 this.goalDest.x = this.aimGoalPoint.x;
+                 this.goalDest.y = this.aimGoalPoint.y;
+                 this.currentSpeed = this.SPEED;
+                 this.isShooting = false;
+                 this.isPositionGood = false;
+             }
+/*
+         }
+         else if (this.spellsToCast[0].spellType === "bullet")
+         {
+             this.isPositionGood = true;
+         }*/
+    }
+
+	if (this.isShooting) // we turn the wizard toward the aimGoalPoint
+	{
+	    //console.log('ishooting : '+this.isOrientationGood +' '+ this.isPositionGood );
+		//this.body.velocity.setTo(0, 0);
+         this.spdX = 0;
+         this.spdY = 0;
+         this.currentSpeed = 0;
+
+		if(this.isOrientationGood && this.isPositionGood)
+		{
+			this.castSpell();
+		}
+
+		//================ Update rotation ================
+		// we compute the desiredAngle towards the clicked point (in radians)
+		this.angleDesired = Math.atan2(this.aimGoalPoint.y - this.y, this.aimGoalPoint.x - this.x);
+
+		// we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
+		var error = this.angleDesired - this.rotation;
+
+		// If the error is small enough, we set the angular velocity to zero
+		//console.log("error : " +  Math.abs(error))
+		if (Math.abs(error)%3.14 <= 0.1)
+		{
+			this.angularVelocity = 0;
+			this.isOrientationGood = true;
+		}
+		else
+		{
+			error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
+			this.angularVelocity = 250 * error; // we multiply the error by a gain K in order to converge faster
+			this.rotation += this.angularVelocity/1000; // Why /1000 ?
+		}
+	}
+	else {
+		if(Math.abs(this.x - this.goalDest.x) <= 8 && Math.abs(this.y - this.goalDest.y) <= 8 ) {
+			this.spdX = 0;
+			this.spdY = 0;
+			this.currentSpeed = 0;
+			this.isMoving = false;
+           /*  this.angularVelocity = 0;
+             this.isOrientationGood = true;*/
+		}
+		else
+		{
+			this.isMoving = true;
+		}
+		//else {
+         var d = new Date();
+		if(d.getTime() < this.actionTime)
+		{
+
+			var cd = this.actionTime - d.getTime();
+			//console.log('spell action : '+cd + ' '+ this.actionTime + ' '+this.time.getTime());
+			//console.log('action time '+this.actionTime + ' '+time.getTime());
+			var ratioSpeed =  (((100*cd)/this.actionDuration) /100);
+			this.enemySpellActionVelocity.x = this.enemySpellActionVelocity.x*ratioSpeed;
+			this.enemySpellActionVelocity.y = this.enemySpellActionVelocity.y*ratioSpeed;
+		}
+		else
+		{
+			this.enemySpellActionVelocity.x = 0;
+			this.enemySpellActionVelocity.y = 0;
+		}
+		angleDesired = Math.atan2(this.goalDest.y - this.y, this.goalDest.x - this.x);
+		//console.log("AngleDesired: " + angleDesired);
+
+		// we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
+		var error = angleDesired - this.rotation;
+		var tempRot = this.rotation;
+        // console.log('angle : '+(error*180/Math.PI));
+		if(Math.abs((error*180/Math.PI))>10)
+		{
+			tempRot = angleDesired;
+		}
+
+		//console.log(this.id+" : currentSpeed: " + Math.cos(this.rotation) + ' '+ Math.sin(this.rotation));
+		this.spdX = this.friction * this.currentSpeed * Math.cos(tempRot) + this.enemySpellActionVelocity.x;
+		this.spdY = this.friction * this.currentSpeed * Math.sin(tempRot) + this.enemySpellActionVelocity.y;
+		//}
+
+		if(this.isOrientationGood != true) {
+			angleDesired = Math.atan2(this.goalDest.y - this.y, this.goalDest.x - this.x);
+			//console.log("AngleDesired: " + angleDesired);
+
+			// we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
+			var error = angleDesired - this.rotation;
+			//console.log("rotation: " + this.rotation)
+			//console.log("angleDesired: " + angleDesired)
+
+			//console.log("error :" + error)
+
+			// If the error is small enough, we set the angular velocity to zero
+			if (Math.abs(error) <= 0.001) {
+				this.angularVelocity = 0;
+				this.isOrientationGood = true;
+			}
+			else {
+				error = Math.atan2(Math.sin(error), Math.cos(error)); // in order to be sure that the error is in the range [-pi/2, pi/2]
+
+				this.angularVelocity = 250 * error; // we multiply the error by a gain K in order to converge faster
+			}
+		}
+
+		this.x += this.spdX;
+		this.y += this.spdY;
+
+		this.rotation += this.angularVelocity/1000; // Why /1000 ?
+         this.angularVelocity = 0;
+	}
+	
+};
+
+Player.prototype.updateCooldowns = function() {
+	for (var i in this.spellList)
+	{
+		this.spellList[i].updateCooldown();
+	}
+};
+
+var PlayerManager = function()
+{
+	this.PlayerList = {};
+}
+
+
+PlayerManager.onConnect = function(socket){
 	console.log("Player connected " + socket.id);
 	
 	var player = new Player(socket.id);
@@ -546,34 +555,34 @@ Player.onConnect = function(socket){
 	});
 	
 	socket.emit('init',{
-		selfId:parseInt(socket.id*100000000),
-		player:Player.getAllInitPack(),
+		thisId:parseInt(socket.id*100000000),
+		player:players.getAllInitPack(),
 		bullet:bullets.getAllInitPack()
 	})
 };
 
-Player.getAllInitPack = function(){
+PlayerManager.getAllInitPack = function(){
 	var players = [];
-	for(var i in Player.list)
-		players.push(Player.list[i].getInitPack());
+	for(var i in this.PlayerList)
+		players.push(this.PlayerList[i].getInitPack());
 	return players;
 };
 
-Player.onDisconnect = function(socket){
-	delete Player.list[socket.id];
+PlayerManager.onDisconnect = function(socket){
+	delete this.PlayerList[socket.id];
 	removePack.player.push({id:parseInt(socket.id*100000000)});
 };
 
-Player.update = function(){
+PlayerManager.update = function(){
 	var sizeBufferPlayer = 4*13;
-	var sizeBuffer = (sizeBufferPlayer*Object.keys(Player.list).length)+4;
+	var sizeBuffer = (sizeBufferPlayer*Object.keys(this.PlayerList).length)+4;
 	var arrayBufferAllPlayer = new ArrayBuffer(sizeBuffer);
 	var viewArrayBufferAllPlayer = new Int32Array(arrayBufferAllPlayer);
-	viewArrayBufferAllPlayer[0]=parseInt(Object.keys(Player.list).length);// number of player on the first byte
+	viewArrayBufferAllPlayer[0]=parseInt(Object.keys(this.PlayerList).length);// number of player on the first byte
 	var indexPlayer = 0;
-	for(var i in Player.list)
+	for(var i in this.PlayerList)
 	{
-		var player = Player.list[i];
+		var player = this.PlayerList[i];
 		player.update();
 		var updatePack = player.getUpdatePack();
 		//console.log(updatePack);
@@ -597,7 +606,7 @@ Player.update = function(){
 
 // push the array(int32array) into buffer at the index (index = 0 for first element, = 1 for second...)
 // The arrays' size must match with the buffer size
-Player.pushBuffer = function(buffer, array,index)
+PlayerManager.pushBuffer = function(buffer, array,index)
 {
 
 	console.log('pushBuffer '+buffer.length);
