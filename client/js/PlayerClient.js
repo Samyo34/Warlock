@@ -82,23 +82,23 @@
             {
                 if (self.isShooting === 1)
                 {
-                    ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height,-(self.size/2),-(self.size/2),self.size, self.size);
+                    ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2), -(self.size/2), self.size, self.size);
                 }
                 else
                 {
                     //console.log('draw '+self.size);
-                    ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
+                    ctx.drawImage(Img.playerSheet, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2), -(self.size/2), self.size, self.size);
                 }
             }
             else
             {
                 if (self.isShooting === 1) 
                 {
-                    ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
+                    ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2), -(self.size/2), self.size, self.size);
                 }
                 else
                 {
-                    ctx.drawImage(Img.playerSheet_enemy, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2),-(self.size/2), self.size, self.size);
+                    ctx.drawImage(Img.playerSheet_enemy, self.indexMoveX[self.indexMove], self.indexMoveY[self.indexMove], width, height, -(self.size/2), -(self.size/2), self.size, self.size);
                 }
 
             } //ctx.translate(-transX,-transY);

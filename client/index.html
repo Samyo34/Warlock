@@ -130,7 +130,7 @@
             {
                 camera.moveTo(data.player[i].x,data.player[i].y);
             }
-            console.log('addNew init '+data.player[i].id);
+            //console.log('addNew init '+data.player[i].id);
             var id = parseFloat(data.player[i].id/100000000);
             players[id] = new Player(data.player[i]);
             /*console.log(players[data.player[i].id]);*/
@@ -139,8 +139,9 @@
         }
         for(var i = 0 ; i < data.bullet.length; i++)
         {
-            console.log('add new bullet');
-            bullets[parseFloat(data.bullet[i].id/100000000)] = new Bullet(data.bullet[i],players);
+            //console.log('add new bullet');
+            bullets[parseFloat(data.bullet[i].id/100000000)] =  new Bullet(data.bullet[i],players);
+
         }
     });
 
@@ -154,12 +155,12 @@ var cdArray = [];
       
       var buffView = new Int32Array(data);
      // console.log(buffView.length+ ' '+data.byteLength);
-        for(var i = 1; i < (buffView[0]*13)+1; i+=13)// for all players
+        for(var i = 1; i < (buffView[0]*12)+1; i+=12)// for all players
         {
 
             var playerUpdate = [];
             var debug = i+': ';
-            for(var j =0;j<13;j++)// for all element concerning the player
+            for(var j =0;j<12;j++)// for all element concerning the player
             {
                 debug+=buffView[i+j] + '|';
                 playerUpdate.push(buffView[i+j]);
@@ -189,11 +190,7 @@ var cdArray = [];
             if(bullets[idBullet])
             {
                 bullets[idBullet].onUpdate(bulletUpdated);
-            }/*
-            else
-            {
-                bullets[idBullet] = new Bullet(bulletUpdated);
-            }*/
+            }
         }
 
 
@@ -254,6 +251,31 @@ var cdArray = [];
        }
    });
 
+    socket.on('cd',function(data){
+        for(var i = 0; i<spellIndicators.length;i++)
+        {
+            if(spellIndicators[i].name === data.name)
+            {
+                spellIndicators[i].cd = data.cd;
+                spellIndicators[i].cdCurrent = data.cd;
+                return;
+            }
+        }
+    });
+
+    socket.on('endCD',function(data){
+        for(var i = 0;i<data.spells.length;i++)
+        {
+            for (var j = 0; j<spellIndicators.length;j++)
+            {
+                if(spellIndicators[j].name === data.spells[i])
+                {
+                    spellIndicators[j].cdCurrent = 0;
+                    break;
+                }
+            }
+        }
+    })
 	//=================================================================
 	// Key pressed and mouse click detection:
 	// Check the keycode on this website:

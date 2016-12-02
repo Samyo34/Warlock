@@ -134,8 +134,6 @@ Player.prototype.getSpellByName = function(name) {
 	return null;
 };
 
-
-
 //var super_update = this.update;
 Player.prototype.update = function(){
 	this.updateFriction();
@@ -182,7 +180,7 @@ Player.prototype.getCooldownsPack = function(){
 
 Player.prototype.getUpdatePack = function(){
 	//console.log('size : ' + ab.byteLength);
-	var valuesArray = new Int32Array(13);
+	var valuesArray = new Int32Array(12);
 	valuesArray[0] = parseInt(this.id*100000000);
 	valuesArray[1] = parseInt(this.x);
 	valuesArray[2] = parseInt(this.y);
@@ -234,7 +232,7 @@ Player.prototype.getUpdatePack = function(){
 		valuesArray[10] = parseInt(0);
 	}
 	valuesArray[11] = parseInt(this.size);
-	valuesArray[12] = parseInt(10);
+	//valuesArray[12] = parseInt(10);
 	return valuesArray;
 /*		return ''+this.id + ';' +
 	parseInt(this.x)+ ';' +
@@ -332,6 +330,8 @@ Player.prototype.castSpell = function() {
 	if(this.spellsToCast.length > 0)
 	{
 		this.spellsToCast[0].cast(this.aimGoalPoint);
+		var socket = SOCKET_LIST[this.id];
+		socket.emit('cd',{name:this.spellsToCast[0].name,cd:this.spellsToCast[0].cd});
 		this.spellsToCast.shift();
 		/*var s = Spell(this, this.spellsToCast[0]);
 		var name = this.spellsToCast[0].spellName;
@@ -365,34 +365,33 @@ Player.prototype.updateFriction = function() {
      }
  };
 
-Player.prototype.updatePosition = function() {
-	if(this.spellsToCast[0])
-	{
-         //console.log('spell to cast : '+this.spellsToCast[0].spellName);
-/*            if(this.spellsToCast[0].spellType === "noBullet")
-{*/
-	console.log('dist : '+Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
-		((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))));
-	if(this.spellsToCast[0].rangeAction === null || Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
-		((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))) <=
-		this.spellsToCast[0].rangeAction)
-	{
-		this.goalDest.x = this.x;
-		this.goalDest.y = this.y;
-		this.currentSpeed = 0;
-		this.isPositionGood = true;
-		this.isOrientationGood = true;
-		this.isShooting = true;
-	}
-	else
-	{
-		this.goalDest.x = this.aimGoalPoint.x;
-		this.goalDest.y = this.aimGoalPoint.y;
-		this.currentSpeed = this.SPEED;
-		this.isShooting = false;
-		this.isPositionGood = false;
-	}
-}
+ Player.prototype.updatePosition = function() {
+
+ 	if(this.spellsToCast[0])
+ 	{
+
+ 		//console.log('dist : '+Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
+ 		//	((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))));
+ 		if(this.spellsToCast[0].rangeAction === null || Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
+ 			((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))) <=
+ 			this.spellsToCast[0].rangeAction)
+ 		{
+ 			this.goalDest.x = this.x;
+ 			this.goalDest.y = this.y;
+ 			this.currentSpeed = 0;
+ 			this.isPositionGood = true;
+ 			this.isOrientationGood = true;
+ 			this.isShooting = true;
+ 		}
+ 		else
+ 		{
+ 			this.goalDest.x = this.aimGoalPoint.x;
+ 			this.goalDest.y = this.aimGoalPoint.y;
+ 			this.currentSpeed = this.SPEED;
+ 			this.isShooting = false;
+ 			this.isPositionGood = false;
+ 		}
+ 	}
 
 	if (this.isShooting) // we turn the wizard toward the aimGoalPoint
 	{
@@ -428,25 +427,24 @@ Player.prototype.updatePosition = function() {
 			this.rotation += this.angularVelocity/1000; // Why /1000 ?
 		}
 	}
-	else {
+	else 
+	{
 		if(Math.abs(this.x - this.goalDest.x) <= 8 && Math.abs(this.y - this.goalDest.y) <= 8 ) {
 			this.spdX = 0;
 			this.spdY = 0;
 			this.currentSpeed = 0;
 			this.isMoving = false;
-           /*  this.angularVelocity = 0;
-           this.isOrientationGood = true;*/
-        }
-        else
-        {
-        	this.isMoving = true;
-        }
+		}
+		else
+		{
+			this.isMoving = true;
+		}
 		//else {
 			var d = new Date();
 			if(d.getTime() < this.actionTime)
 			{
 
-				var cd = this.actionTime - d.getTime();
+			var cd = this.actionTime - d.getTime();
 			//console.log('spell action : '+cd + ' '+ this.actionTime + ' '+this.time.getTime());
 			//console.log('action time '+this.actionTime + ' '+time.getTime());
 			var ratioSpeed =  (((100*cd)/this.actionDuration) /100);
@@ -464,11 +462,11 @@ Player.prototype.updatePosition = function() {
 		// we compute the gap in radians (this.rotation is in radians and this.angle in degrees)
 		var error = angleDesired - this.rotation;
 		var tempRot = this.rotation;
-        // console.log('angle : '+(error*180/Math.PI));
-        if(Math.abs((error*180/Math.PI))>10)
-        {
-        	tempRot = angleDesired;
-        }
+     // console.log('angle : '+(error*180/Math.PI));
+     if(Math.abs((error*180/Math.PI))>10)
+     {
+     	tempRot = angleDesired;
+     }
 
 		//console.log(this.id+" : currentSpeed: " + Math.cos(this.rotation) + ' '+ Math.sin(this.rotation));
 		this.spdX = this.friction * this.currentSpeed * Math.cos(tempRot) + this.enemySpellActionVelocity.x;
@@ -504,14 +502,25 @@ Player.prototype.updatePosition = function() {
 		this.rotation += this.angularVelocity/1000; // Why /1000 ?
 		this.angularVelocity = 0;
 	}
-	
 };
 
 Player.prototype.updateCooldowns = function() {
+	var spell = [];
 	for (var i in this.spellList)
 	{
 		this.spellList[i].updateCooldown();
+		if(this.spellList[i].cd > 0 && this.spellList[i].cd < 1 )
+		{
+			spell.push(this.spellList[i].spellName);
+		}
 	}
+	if(spell.length>0)
+	{
+		var socket = SOCKET_LIST[this.id];
+		socket.emit('endCD',{spells:spell});
+	}
+
+
 };
 
 var PlayerManager = function()

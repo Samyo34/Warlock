@@ -5,14 +5,28 @@
 /**
  * Class for the spell card
  */
-var spellIndicator = function(name, keyboardKey, img) {
+var spellIndicator = function(name, keyboardKey, img, cd) {
     this.spellName = name;
     this.keyboardKey = keyboardKey;
     this.img = img;
     this.cdProgress = 0;
+    this.cd = cd;
+    this.cdCurrent=0;
 };
 
 spellIndicator.prototype.draw = function() {
+
+
+    this.cdCurrent -= 1;
+    if(this.cdCurrent < 0) // cooldown is finished
+    {
+        this.cdCurrent = 0;
+    }
+    else
+    {
+        this.cdProgress = this.cdCurrent/this.cd;
+    }
+
     var ctx = getRightCtx(this.keyboardKey);
 
     var width = ctx.canvas.clientWidth;

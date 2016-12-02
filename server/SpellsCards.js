@@ -16,9 +16,9 @@ var fireballCard = function(parent) {
 	this.isClickNeeded = true;
 
     // Cooldowns :
-    this.cd = 100;
+   this.cd = 100;
 	this.cdCurrent = 0;
-    this.cdProgress = 0;
+   this.cdProgress = 0;
 
     this.rangeAction = null;
     this.lifeTime = 100;
@@ -39,6 +39,7 @@ fireballCard.prototype.cast = function(aimGoalPoint) {
 };
 
 fireballCard.prototype.updateCooldown = function() {
+	//console.log('cd '+this.cdCurrent+ ' '+this.cdProgress);
 	this.cdCurrent -= 1;
 	if(this.cdCurrent < 0) // cooldown is finished
 	{
@@ -47,7 +48,7 @@ fireballCard.prototype.updateCooldown = function() {
 	else
 	{
 		this.cdProgress = this.cdCurrent/this.cd;
-		//console.log(this.cdProgress)
+		//console.log('progress '+this.cdProgress)
 	}
 };
 
