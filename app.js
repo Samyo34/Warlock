@@ -6,13 +6,14 @@ var serv = require('http').Server(app);
 var fs = require('fs');
 console.log(__dirname+'/Server/Player.js');
 
-eval(fs.readFileSync(__dirname+'/Server/Room.js')+'');
+/*eval(fs.readFileSync(__dirname+'/Server/Room.js')+'');
 eval(fs.readFileSync(__dirname+'/Server/Player.js')+'');
 eval(fs.readFileSync(__dirname+'/Server/Bullet.js')+'');
 eval(fs.readFileSync(__dirname+'/Server/SpellsCards.js')+'');
-eval(fs.readFileSync(__dirname+'/Server/Spells.js')+'');
+eval(fs.readFileSync(__dirname+'/Server/Spells.js')+'');*/
 
-
+var Room = require('./Server/Room.js');
+var globale = require('./Server/globale.js');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -32,12 +33,9 @@ serv.listen(app.get('port'), function() {
 });
 console.log("Server started.");
 
-var SOCKET_LIST = {};
+//var globalSOCKET_LIST = {};
 
-var map_array = [369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 373, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369, 369];
-var LAVA = 369;
-var TILE_WIDTH = 32;
-var TILE_HEIGHT = 32;
+
 
 var rooms = [];
 
@@ -70,7 +68,7 @@ var io = require('socket.io')(serv);
 io.sockets.on('connection', function(socket){
 	socket.id = Math.random();
 	var sock = socket;
-	SOCKET_LIST[socket.id] = socket;
+	globale.SOCKET_LIST[socket.id] = socket;
 	if(rooms[rooms.length-1] === undefined)
 	{
 		rooms.push(new Room(3,'deathMatch',{width:800,height:800}));
@@ -84,11 +82,11 @@ io.sockets.on('connection', function(socket){
 	}
 /*
 	players.onConnect(socket);
-	for(var i in SOCKET_LIST)
+	for(var i in globale.SOCKET_LIST)
 	{
-		if(SOCKET_LIST[i].id  !== socket.id)
+		if(globale.SOCKET_LIST[i].id  !== socket.id)
 		{
-				var socket = SOCKET_LIST[i];
+				var socket = globale.SOCKET_LIST[i];
 				socket.emit('init',{
 					player:players.getAllInitPack(),
 					bullet:bullets.getAllInitPack()});
@@ -98,11 +96,11 @@ io.sockets.on('connection', function(socket){
 	socket.on('disconnect',function(){
 		console.log('disconnect : '+sock.id);
 		room.removePlayer(sock);
-		delete SOCKET_LIST[sock.id];
+		delete globale.SOCKET_LIST[sock.id];
 /*		
-		for(var i in SOCKET_LIST)
+		for(var i in globale.SOCKET_LIST)
 		{
-			var socket = SOCKET_LIST[i];
+			var socket = globale.SOCKET_LIST[i];
 			socket.emit('init',{
 				player:players.getAllInitPack(),
 				bullet:bullets.getAllInitPack()});
@@ -111,8 +109,8 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('sendMsgToServer',function(data){
 		var playerName = ("" + socket.id).slice(2,7);
-		for(var i in SOCKET_LIST){
-			SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
+		for(var i in globale.SOCKET_LIST){
+			globale.SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
 		}
 	});
 	

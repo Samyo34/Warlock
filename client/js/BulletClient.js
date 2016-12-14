@@ -2,7 +2,8 @@
 
       var self = {};
       self.id = parseFloat(initPack.id/100000000);
-      self.spellName = initPack.spellName;
+      self.spellCode = initPack.spellCode;
+      //self.spellName = self.getNameByCode(self.spellCode);
       self.players = players;
 
       self.parentID = parseFloat(initPack.parent/100000000);
@@ -63,6 +64,25 @@
                 self.orientation = parseFloat(updatePack[5]/100000000);
                 self.range =updatePack[6];
             };
+
+            self.getNameByCode = function(code)
+            {
+                if(code === 0)
+                {
+                    return 'fireball';
+                }
+
+                if(code === 1)
+                {
+                    return 'lightning';
+                }
+
+                if(code === 2)
+                {
+                    return 'scurge';
+                }
+                return '';
+            }
 
             return self;
     };

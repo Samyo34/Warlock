@@ -151,7 +151,7 @@ var cdArray = [];
 	socket.on('update',function(data){
         //var buffView = new Int32Array(data.player);
       //  var nbPlayer = data.player.byteLength / (13*4);
-      console.log(data.byteLength);
+      //console.log(data.byteLength);
       
       var buffView = new Int32Array(data);
      // console.log(buffView.length+ ' '+data.byteLength);
@@ -175,7 +175,7 @@ var cdArray = [];
             players[idPlayer].onUpdate(playerUpdate);
         }
 
-        for (var i = (buffView[0]*13)+1;i<buffView.length;i+=7)// for all element concerning bullets
+        for (var i = (buffView[0]*12)+1;i<buffView.length;i+=7)// for all element concerning bullets
         {
             var bulletUpdated = [];
             var debug = i+': ';
@@ -186,7 +186,7 @@ var cdArray = [];
             }
 //console.log(debug);
             var idBullet = parseFloat(bulletUpdated[0]/100000000);
-            console.log(bullets[idBullet]);
+            //console.log(bullets[idBullet]);
             if(bullets[idBullet])
             {
                 bullets[idBullet].onUpdate(bulletUpdated);
@@ -254,7 +254,8 @@ var cdArray = [];
     socket.on('cd',function(data){
         for(var i = 0; i<spellIndicators.length;i++)
         {
-            if(spellIndicators[i].name === data.name)
+                //console.log('ccd '+' '+spellIndicators[i].spellName+ ':' +data.name); 
+            if(spellIndicators[i].spellName === data.name)
             {
                 spellIndicators[i].cd = data.cd;
                 spellIndicators[i].cdCurrent = data.cd;
@@ -268,7 +269,7 @@ var cdArray = [];
         {
             for (var j = 0; j<spellIndicators.length;j++)
             {
-                if(spellIndicators[j].name === data.spells[i])
+                if(spellIndicators[j].spellName === data.spells[i])
                 {
                     spellIndicators[j].cdCurrent = 0;
                     break;

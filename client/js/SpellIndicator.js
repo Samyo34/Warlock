@@ -5,17 +5,17 @@
 /**
  * Class for the spell card
  */
-var spellIndicator = function(name, keyboardKey, img, cd) {
+var spellIndicator = function(name, keyboardKey, img) {
     this.spellName = name;
     this.keyboardKey = keyboardKey;
     this.img = img;
     this.cdProgress = 0;
-    this.cd = cd;
+    this.cd = 100;
     this.cdCurrent=0;
 };
 
 spellIndicator.prototype.draw = function() {
-
+    //console.log('draw spellIndicator '+this.cdCurrent);
 
     this.cdCurrent -= 1;
     if(this.cdCurrent < 0) // cooldown is finished
