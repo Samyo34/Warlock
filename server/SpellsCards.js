@@ -3,10 +3,10 @@
  */
 
 var Spells = require('./Spells.js');
-var fireBall = require('./Spells.js').spells.fireBall;
-var lightning = require('./Spells.js').spells.lightning;
-var blink = require('./Spells.js').spells.blink;
-var scurge = require('./Spells.js').spells.scurge;
+var fireBall = require('./Spells.js').fireBall;
+var lightning = require('./Spells.js').lightning;
+var blink = require('./Spells.js').blink;
+var scurge = require('./Spells.js').scurge;
 
 (function(){
 	class fireballCard {
@@ -203,7 +203,7 @@ var scurge = require('./Spells.js').spells.scurge;
 	}
  }
 
- module.exports.SpellsCard = {fireballCard : fireballCard, blinkCard : blinkCard, lightningCard : lightningCard, scurgeCard : scurgeCard };
+ module.exports = {fireballCard : fireballCard, blinkCard : blinkCard, lightningCard : lightningCard, scurgeCard : scurgeCard };
 
 
 })();

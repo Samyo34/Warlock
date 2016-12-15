@@ -3,10 +3,10 @@
  */
 "use strict";
 
-var fireballCard = require('./SpellsCards.js').SpellsCard.fireballCard;
-var lightningCard = require('./SpellsCards.js').SpellsCard.lightningCard;
-var blinkCard = require('./SpellsCards.js').SpellsCard.blinkCard;
-var scurgeCard = require('./SpellsCards.js').SpellsCard.scurgeCard;
+var fireballCard = require('./SpellsCards.js').fireballCard;
+var lightningCard = require('./SpellsCards.js').lightningCard;
+var blinkCard = require('./SpellsCards.js').blinkCard;
+var scurgeCard = require('./SpellsCards.js').scurgeCard;
 
 var globale = require('./globale.js');
 
