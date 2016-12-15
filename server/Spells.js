@@ -383,7 +383,7 @@
 	}
 }
 
-module.exports.spells = {fireBall : fireBall , lightning : lightning, blink, blink,scurge : scurge};
+module.exports = {fireBall : fireBall , lightning : lightning, blink, blink,scurge : scurge};
 
 })();
 
