@@ -13,7 +13,9 @@ eval(fs.readFileSync(__dirname+'/Server/SpellsCards.js')+'');
 eval(fs.readFileSync(__dirname+'/Server/Spells.js')+'');*/
 
 var Room = require('./Server/Room.js');
+var PoolOfRoom = require('./Server/PoolOfRoom.js');
 var globale = require('./Server/globale.js');
+var Game = require('./Server/Game.js');
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -33,11 +35,7 @@ serv.listen(app.get('port'), function() {
 });
 console.log("Server started.");
 
-//var globalSOCKET_LIST = {};
-
-
-
-var rooms = [];
+var game = new Game();
 
 var Entity = function(){
 	var self = {
@@ -60,26 +58,30 @@ var Entity = function(){
 	};
 	return self;
 };
+
 var DEBUG = true;
 
 var io = require('socket.io')(serv);
 
-
+// 1) a client connects to the server
 io.sockets.on('connection', function(socket){
+
+	// 2) a random socket id is giving to him
 	socket.id = Math.random();
 	var sock = socket;
 	globale.SOCKET_LIST[socket.id] = socket;
-	if(rooms[rooms.length-1] === undefined)
-	{
-		rooms.push(new Room(3,'deathMatch',{width:800,height:800}));
-	}
-	var room = rooms[rooms.length-1];
-	if(room.addPlayer(socket) === 0)
-	{
-		rooms.push(new Room(3,'deathMatch',{width:800,height:800}));
-		room = rooms[rooms.length-1];
-		room.addPlayer(socket);
-	}
+
+	// 3) When the client enter a pseudo, we add him to a free room
+	socket.on("login", function(data){
+		console.log("LOGIN pseudo " + data);
+
+		// TODO check if pseudo is already taken
+
+		game.createPlayer(socket);
+
+		socket.emit("playerCreated", true);
+	});
+
 /*
 	players.onConnect(socket);
 	for(var i in globale.SOCKET_LIST)
@@ -95,22 +97,21 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('disconnect',function(){
 		console.log('disconnect : '+sock.id);
-		room.removePlayer(sock);
-		delete globale.SOCKET_LIST[sock.id];
-/*		
-		for(var i in globale.SOCKET_LIST)
-		{
-			var socket = globale.SOCKET_LIST[i];
-			socket.emit('init',{
-				player:players.getAllInitPack(),
-				bullet:bullets.getAllInitPack()});
-		}*/
+
+		game.removePlayer(socket);
+		/*var room = rooms.getRoomByPlayerId(sock.id);
+		if(room !== -1)
+			room.removePlayer(sock);
+		else
+			console.log("Player was not in a room");
+		delete globale.SOCKET_LIST[sock.id];*/
+
 	});
 
 	socket.on('sendMsgToServer',function(data){
 		var playerName = ("" + socket.id).slice(2,7);
 		for(var i in globale.SOCKET_LIST){
-			globale.SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
+			globale.SOCKET_LIST[i].emit('addToChat', playerName + ': ' + data);
 		}
 	});
 	
@@ -124,18 +125,19 @@ io.sockets.on('connection', function(socket){
 
 setInterval(function(){
 
-	for(var i = 0; i < rooms.length;i++)
-	{
-		//console.log('update');
-		var room = rooms[i].update();
-		if(room === 0)
-		{
-			delete rooms[i];
-			rooms.splice(i,1);
-		}
-	}
+	//console.log(rooms)
+	// console.log(globale.SOCKET_LIST)
+	game.update();
 	
 },1000/25);
+
+// Loop for placing players in rooms
+setInterval(function(){
+
+	game.findRoomForWaitingPlayer();
+	//console.log(game.gamePlayers)
+
+},1000);
 
 /*var startProfiling = function(time)
 {

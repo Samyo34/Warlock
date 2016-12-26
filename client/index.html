@@ -1,324 +1,456 @@
-<div id="gameDiv">
-	<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Warlock</title>
 
-	<div id="spellIndicatorsArea" style="width:800px;height:100px;border:1px solid #000000;">
-		<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
-		<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
-		<canvas id="ctxSpell_2" width="75" height="75" style="border:1px solid #000000;"></canvas>
-		<canvas id="ctxSpell_3" width="75" height="75" style="border:1px solid #000000;"></canvas>
+	<link rel="stylesheet" href="./client/css/style.css">
+
+</head>
+<body>
+	<div id="container">
+		<div id="loginPanel">
+			<form id="login">
+				<input type="text" placeholder="Pseudo" id="pseudo" autocomplete="off"> <input type="submit" value="Play">
+			</form>
+		</div>
+		<div id="game">
+			<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+			<span if="infos"><b>This text is bold</b></span>
+			<div id="spellIndicatorsArea" style="width:800px;height:100px;border:1px solid #000000;">
+				<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
+				<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
+				<canvas id="ctxSpell_2" width="75" height="75" style="border:1px solid #000000;"></canvas>
+				<canvas id="ctxSpell_3" width="75" height="75" style="border:1px solid #000000;"></canvas>
+			</div>
+
+			<div id="chat">
+				<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+					<div>Hello!</div>
+				</div>
+
+				<form id="chat-form">
+					<input id="chat-input" type="text" style="width:800px"> </input>
+				</form>
+			</div>
+
+		</div>
 	</div>
 
-	<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
-		<div>Hello!</div>
-	</div>
+	<script src = "/socket.io/socket.io.js"></script>
+	<script src = "./client/js/jquery.js"></script>
+	<script src = "./client/js/Camera.js"></script>
+	<script src = "./client/js/SpellIndicator.js"></script>
+	<script src = "./client/js/PlayerClient.js"></script>
+	<script src = "./client/js/BulletClient.js"></script>
+	<script src = "./client/js/controle.js"></script>
 
-	<form id="chat-form">
-		<input id="chat-input" type="text" style="width:800px"> </input>
-	</form>
-</div>
+	<script>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="./client/js/jquery.js"></script>
-<script src = "./client/js/Camera.js"></script>
-<script src = "./client/js/SpellIndicator.js"></script>
-<script src = "./client/js/PlayerClient.js"></script>
-<script src = "./client/js/BulletClient.js"></script>
-<script src = "./client/js/controle.js"></script>
-<script>
-    var socket = io();
+		var socket = io();
 
-	// Variable which stores our ID
-	var selfId;
+		// Variable which stores our ID
+		var selfId;
 
-	// Click position storage
-	var click_Y = 0;
-	var click_X = 0;
+		$("#chat").hide();
+		$("#spellIndicatorsArea").hide();
+		$('#ctx').get(0).style.visibility = "hidden";
+		$("#loginPanel").show();
 
-	// Mouse position storage
-	var mouse_X = 0;
-	var mouse_Y = 0;
+		$("#login").submit(function(e){
+			e.preventDefault();
+			socket.emit("login", $("#pseudo").val());
+		});
 
-	// Lists which will store all the players and the bullets
-    var players = {};
-    var bullets = {};
+		socket.on("playerCreated", function(data){
+			$("#loginPanel").hide();
+		});
 
-	//=================================================================
-	// Chat management:
-	var chatText = document.getElementById('chat-text');
-	var chatInput = document.getElementById('chat-input');
-	var chatForm = document.getElementById('chat-form');
-	
-	socket.on('addToChat',function(data){
-		chatText.innerHTML += '<div>' + data + '</div>';
-	});
-	socket.on('evalAnswer',function(data){
-		console.log(data);
-	});
-	chatForm.onsubmit = function(e){
-		e.preventDefault();
-		if(chatInput.value[0] === '/')
-			socket.emit('evalServer',chatInput.value.slice(1));
-		else
-			socket.emit('sendMsgToServer',chatInput.value);
-		chatInput.value = '';		
-	};
+		socket.on("gameStarted", function(data){
+			$("#loginPanel").hide();
+			$("#chat").show();
+			$("#spellIndicatorsArea").show();
+			$('#ctx').get(0).style.visibility = "visible";
+			//selfId = data;
+		});
 
-	//=================================================================
-	// Images :
-	var Img = {};
-	Img.player = new Image();
-	Img.player.src = '/client/img/sorcier.png';
-	Img.playerSheet = new Image();
-	Img.playerSheet.src = '/client/img/spritesheet_Wizard.png';
-    Img.playerSheet_enemy = new Image();
-    Img.playerSheet_enemy.src = '/client/img/spritesheet_Wizard_enemy.png';
-    Img.enemy = new Image();
-    Img.enemy.src = '/client/img/enemy.png';
-    Img.map = new Image();
-    Img.map.src = '/client/img/map_lave_v1.1.png';
-    Img.spell_target = new Image();
-    Img.spell_target.src = '/client/img/spellarea_2.png';
-    Img.fireball = new Image();
-    Img.fireball.src = '/client/img/fireball2.png';
-    Img.scurge = new Image();
-    Img.scurge.src = '/client/img/explosion.png';
+		// Click position storage
+		var click_Y = 0;
+		var click_X = 0;
 
-    Img.fireball_indic = new Image();
-    Img.fireball_indic.src = '/client/img/fireball_indic.png';
-    Img.blink_indic = new Image();
-    Img.blink_indic.src = '/client/img/blink_indic.png';
-    Img.lightning_indic = new Image();
-    Img.lightning_indic.src = '/client/img/lightning_indic.png';
-    Img.scurge_indic = new Image();
-    Img.scurge_indic.src = '/client/img/spellsIcons.jpg';
+		// Mouse position storage
+		var mouse_X = 0;
+		var mouse_Y = 0;
 
-    var spellIndicators = [];
-    spellIndicators.push(new spellIndicator("fireball", "A", Img.fireball_indic));
-    spellIndicators.push(new spellIndicator("blink", "Z", Img.blink_indic));
-    spellIndicators.push(new spellIndicator("lightning", "E", Img.lightning_indic));
-    spellIndicators.push(new spellIndicator("scurge", "R", Img.scurge_indic));
+		// Lists which will store all the players and the bullets
+		var players = {};
+		var bullets = {};
 
-	//=================================================================
-    // Init of our context and camera
-    var ctx = document.getElementById("ctx").getContext("2d");
-    ctx.font = '30px Arial';
+		//=================================================================
+		// Chat management:
+		var chatText = document.getElementById('chat-text');
+		var chatInput = document.getElementById('chat-input');
+		var chatForm = document.getElementById('chat-form');
 
-    var camera = new Camera(ctx);
+		socket.on('addToChat',function(data){
+			chatText.innerHTML += '<div>' + data + '</div>';
+		});
+		socket.on('evalAnswer',function(data){
+			console.log(data);
+		});
+		chatForm.onsubmit = function(e){
+			e.preventDefault();
+			if(chatInput.value[0] === '/')
+				socket.emit('evalServer',chatInput.value.slice(1));
+			else
+				socket.emit('sendMsgToServer',chatInput.value);
+			chatInput.value = '';
+		};
 
-	//=================================================================
-	// Callbacks on reception of package from server:
-	// on "init" package reception:
-	socket.on('init',function(data){
-        //console.log('init '+data.selfId);
-        if(data.selfId){
-           selfId = parseFloat(data.selfId/100000000);
-       }
-		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
-/*        players = {};
-        for(var i in players)
-        {
-            delete players[i];
-        }
-        bullets = {};
-        for (var i in bullets)
-        {
-            delete bullets[i];
-        }*/
-        // We add the players and the bullets already in game to our players and bullets lists
-        for(var i = 0 ; i < data.player.length; i++){
-            if(parseFloat(data.player[i].id/100000000) === selfId)
-            {
-                camera.moveTo(data.player[i].x,data.player[i].y);
-            }
-            //console.log('addNew init '+data.player[i].id);
-            var id = parseFloat(data.player[i].id/100000000);
-            players[id] = new Player(data.player[i]);
-            /*console.log(players[data.player[i].id]);*/
-            //Player.list[data.player[i]]= new Player(data.player[i]);
+		//=================================================================
+		// Images :
+		var Img = {};
+		Img.player = new Image();
+		Img.player.src = '/client/img/sorcier.png';
+		Img.playerSheet = new Image();
+		Img.playerSheet.src = '/client/img/spritesheet_Wizard.png';
+		Img.playerSheet_enemy = new Image();
+		Img.playerSheet_enemy.src = '/client/img/spritesheet_Wizard_enemy.png';
+		Img.enemy = new Image();
+		Img.enemy.src = '/client/img/enemy.png';
+		Img.map = new Image();
+		Img.map.src = '/client/img/map_lave_v1.1.png';
+		Img.spell_target = new Image();
+		Img.spell_target.src = '/client/img/spellarea_2.png';
+		Img.fireball = new Image();
+		Img.fireball.src = '/client/img/fireball2.png';
+		Img.scurge = new Image();
+		Img.scurge.src = '/client/img/explosion.png';
 
-        }
-        for(var i = 0 ; i < data.bullet.length; i++)
-        {
-            //console.log('add new bullet');
-            bullets[parseFloat(data.bullet[i].id/100000000)] =  new Bullet(data.bullet[i],players);
+		Img.fireball_indic = new Image();
+		Img.fireball_indic.src = '/client/img/fireball_indic.png';
+		Img.blink_indic = new Image();
+		Img.blink_indic.src = '/client/img/blink_indic.png';
+		Img.lightning_indic = new Image();
+		Img.lightning_indic.src = '/client/img/lightning_indic.png';
+		Img.scurge_indic = new Image();
+		Img.scurge_indic.src = '/client/img/spellsIcons.jpg';
 
-        }
-    });
+		var spellIndicators = [];
+		spellIndicators.push(new spellIndicator("fireball", "A", Img.fireball_indic));
+		spellIndicators.push(new spellIndicator("blink", "Z", Img.blink_indic));
+		spellIndicators.push(new spellIndicator("lightning", "E", Img.lightning_indic));
+		spellIndicators.push(new spellIndicator("scurge", "R", Img.scurge_indic));
 
-var cdArray = [];
+		//=================================================================
+		// Init of our context and camera
+		var ctx = document.getElementById("ctx").getContext("2d");
+		ctx.font = '30px Arial';
 
-	// on "update" package reception:
-	socket.on('update',function(data){
-        //var buffView = new Int32Array(data.player);
-      //  var nbPlayer = data.player.byteLength / (13*4);
-      //console.log(data.byteLength);
-      
-      var buffView = new Int32Array(data);
-     // console.log(buffView.length+ ' '+data.byteLength);
-        for(var i = 1; i < (buffView[0]*12)+1; i+=12)// for all players
-        {
+		var camera = new Camera(ctx);
 
-            var playerUpdate = [];
-            var debug = i+': ';
-            for(var j =0;j<12;j++)// for all element concerning the player
-            {
-                debug+=buffView[i+j] + '|';
-                playerUpdate.push(buffView[i+j]);
-            }
-            //console.log(debug);
-            var idPlayer = parseFloat(playerUpdate[0]/100000000);
-            if(idPlayer===selfId)
-            {
-                camera.moveTo(playerUpdate[1],playerUpdate[2]);
-            }
-            //console.log('onUpdate '+idPlayer+' '+playerUpdate[0]+' '+playerUpdate[1]);
-            players[idPlayer].onUpdate(playerUpdate);
-        }
-
-        for (var i = (buffView[0]*12)+1;i<buffView.length;i+=7)// for all element concerning bullets
-        {
-            var bulletUpdated = [];
-            var debug = i+': ';
-            for (var j = 0; j<7;j++)
-            {
-                debug+=buffView[i+j] +'|';
-                bulletUpdated.push(buffView[i+j]);
-            }
-//console.log(debug);
-            var idBullet = parseFloat(bulletUpdated[0]/100000000);
-            //console.log(bullets[idBullet]);
-            if(bullets[idBullet])
-            {
-                bullets[idBullet].onUpdate(bulletUpdated);
-            }
-        }
-
-
- /*       for(var i = 0 ; i < data.player.length; i++){
-            var playerData = data.player[i].split(';');
-            if(playerData[0])
-            {
-                if(parseFloat(playerData[0]) === selfId)
-                {
-                    //console.log('update : '+data.player[i].x+':'+data.player[i].y)
-                    camera.moveTo(parseInt(playerData[1]),parseInt(playerData[2]));
-                    // Let's get the cooldown array for our player
-                    cdArray = data.player[i].spellCooldownsArray;
-                }
-                players[parseFloat(playerData[0])].onUpdate(playerData);
-            }
-        }
-
-		// every bullets
-        for(var i = 0 ; i < data.bullet.length; i++)
-        {
-            if(bullets[data.bullet[i].id])
-            {
-                bullets[data.bullet[i].id].onUpdate(data.bullet[i]);
-            }
-            else
-            {
-                bullets[data.bullet[i].id] = new Bullet(data.bullet[i]);
-            }
-        }
-
-		// and every spells (ones that don't have cdProgress equal to 0)
-		for(var i = 0 ; i < cdArray.length; i++)
-		{
-			// let's update the right spells
-			for(var j in spellIndicators)
-			{
-				if (spellIndicators[j].spellName === cdArray[i].spellName)
+		//=================================================================
+		// Callbacks on reception of package from server:
+		// on "init" package reception:
+		socket.on('init',function(data){
+			//console.log('init '+data.selfId);
+			if(data.selfId){
+				selfId = parseFloat(data.selfId/100000000);
+			}
+			//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
+			/*        players = {};
+			 for(var i in players)
+			 {
+			 delete players[i];
+			 }
+			 bullets = {};
+			 for (var i in bullets)
+			 {
+			 delete bullets[i];
+			 }*/
+			// We add the players and the bullets already in game to our players and bullets lists
+			for(var i = 0 ; i < data.player.length; i++){
+				if(parseFloat(data.player[i].id/100000000) === selfId)
 				{
-					spellIndicators[j].cdProgress = cdArray[i].cdProgress;
+					camera.moveTo(data.player[i].x,data.player[i].y);
+				}
+				//console.log('addNew init '+data.player[i].id);
+				var id = parseFloat(data.player[i].id/100000000);
+				players[id] = new Player(data.player[i]);
+				/*console.log(players[data.player[i].id]);*/
+				//Player.list[data.player[i]]= new Player(data.player[i]);
+
+			}
+			for(var i = 0 ; i < data.bullet.length; i++)
+			{
+				//console.log('add new bullet');
+				bullets[parseFloat(data.bullet[i].id/100000000)] =  new Bullet(data.bullet[i],players);
+
+			}
+		});
+
+		var cdArray = [];
+
+		// on "update" package reception:
+		socket.on('update',function(data){
+			//var buffView = new Int32Array(data.player);
+			//  var nbPlayer = data.player.byteLength / (13*4);
+			//console.log(data.byteLength);
+
+			var buffView = new Int32Array(data);
+			// console.log(buffView.length+ ' '+data.byteLength);
+			for(var i = 1; i < (buffView[0]*12)+1; i+=12)// for all players
+			{
+
+				var playerUpdate = [];
+				var debug = i+': ';
+				for(var j =0;j<12;j++)// for all element concerning the player
+				{
+					debug+=buffView[i+j] + '|';
+					playerUpdate.push(buffView[i+j]);
+				}
+				//console.log(debug);
+				var idPlayer = parseFloat(playerUpdate[0]/100000000);
+				if(idPlayer===selfId)
+				{
+					camera.moveTo(playerUpdate[1],playerUpdate[2]);
+				}
+				//console.log('onUpdate '+idPlayer+' '+playerUpdate[0]+' '+playerUpdate[1]);
+				players[idPlayer].onUpdate(playerUpdate);
+			}
+
+			for (var i = (buffView[0]*12)+1;i<buffView.length;i+=7)// for all element concerning bullets
+			{
+				var bulletUpdated = [];
+				var debug = i+': ';
+				for (var j = 0; j<7;j++)
+				{
+					debug+=buffView[i+j] +'|';
+					bulletUpdated.push(buffView[i+j]);
+				}
+				//console.log(debug);
+				var idBullet = parseFloat(bulletUpdated[0]/100000000);
+				//console.log(bullets[idBullet]);
+				if(bullets[idBullet])
+				{
+					bullets[idBullet].onUpdate(bulletUpdated);
 				}
 			}
-		}*/
 
-	});
 
-	// on "remove" package reception:
-	socket.on('remove',function(data){
-		//{player:[12323],bullet:[12323,123123]}
-		for(var i = 0 ; i < data.player.length; i++){
-            delete players[parseFloat(data.player[i].id/100000000)];
-			//delete Player.list[data.player[i]];
-        }
-        for(var i = 0 ; i < data.bullet.length; i++)
-        {
-            console.log('remove bullet');
-           delete bullets[parseFloat(data.bullet[i].id/100000000)];
-       }
-   });
+			/*       for(var i = 0 ; i < data.player.length; i++){
+			 var playerData = data.player[i].split(';');
+			 if(playerData[0])
+			 {
+			 if(parseFloat(playerData[0]) === selfId)
+			 {
+			 //console.log('update : '+data.player[i].x+':'+data.player[i].y)
+			 camera.moveTo(parseInt(playerData[1]),parseInt(playerData[2]));
+			 // Let's get the cooldown array for our player
+			 cdArray = data.player[i].spellCooldownsArray;
+			 }
+			 players[parseFloat(playerData[0])].onUpdate(playerData);
+			 }
+			 }
 
-    socket.on('cd',function(data){
-        for(var i = 0; i<spellIndicators.length;i++)
-        {
-                //console.log('ccd '+' '+spellIndicators[i].spellName+ ':' +data.name); 
-            if(spellIndicators[i].spellName === data.name)
-            {
-                spellIndicators[i].cd = data.cd;
-                spellIndicators[i].cdCurrent = data.cd;
-                return;
-            }
-        }
-    });
+			 // every bullets
+			 for(var i = 0 ; i < data.bullet.length; i++)
+			 {
+			 if(bullets[data.bullet[i].id])
+			 {
+			 bullets[data.bullet[i].id].onUpdate(data.bullet[i]);
+			 }
+			 else
+			 {
+			 bullets[data.bullet[i].id] = new Bullet(data.bullet[i]);
+			 }
+			 }
 
-    socket.on('endCD',function(data){
-        for(var i = 0;i<data.spells.length;i++)
-        {
-            for (var j = 0; j<spellIndicators.length;j++)
-            {
-                if(spellIndicators[j].spellName === data.spells[i])
-                {
-                    spellIndicators[j].cdCurrent = 0;
-                    break;
-                }
-            }
-        }
-    })
-	//=================================================================
-	// Key pressed and mouse click detection:
-	// Check the keycode on this website:
-	// http://www.west-wind.com/westwindwebtoolkit/samples/ajax/html5andcss3/keycodechecker.aspx
-	// Be careful, the keycode are not the same if we detect with keyup and down or keypress
-	/*$(document).keypress(function(e) {
-		var code = e.keyCode || e.which;
-		if(code == 97) { // key a
-			socket.emit('keyPress', {inputId: 'a', state: true});
-			console.log("a pressed")
+			 // and every spells (ones that don't have cdProgress equal to 0)
+			 for(var i = 0 ; i < cdArray.length; i++)
+			 {
+			 // let's update the right spells
+			 for(var j in spellIndicators)
+			 {
+			 if (spellIndicators[j].spellName === cdArray[i].spellName)
+			 {
+			 spellIndicators[j].cdProgress = cdArray[i].cdProgress;
+			 }
+			 }
+			 }*/
+
+		});
+
+		// on "remove" package reception:
+		socket.on('remove',function(data){
+			//{player:[12323],bullet:[12323,123123]}
+			for(var i = 0 ; i < data.player.length; i++){
+				delete players[parseFloat(data.player[i].id/100000000)];
+				//delete Player.list[data.player[i]];
+			}
+			for(var i = 0 ; i < data.bullet.length; i++)
+			{
+				console.log('remove bullet');
+				delete bullets[parseFloat(data.bullet[i].id/100000000)];
+			}
+		});
+
+		socket.on('cd',function(data){
+			for(var i = 0; i<spellIndicators.length;i++)
+			{
+				//console.log('ccd '+' '+spellIndicators[i].spellName+ ':' +data.name);
+				if(spellIndicators[i].spellName === data.name)
+				{
+					spellIndicators[i].cd = data.cd;
+					spellIndicators[i].cdCurrent = data.cd;
+					return;
+				}
+			}
+		});
+
+		socket.on('endCD',function(data){
+			for(var i = 0;i<data.spells.length;i++)
+			{
+				for (var j = 0; j<spellIndicators.length;j++)
+				{
+					if(spellIndicators[j].spellName === data.spells[i])
+					{
+						spellIndicators[j].cdCurrent = 0;
+						break;
+					}
+				}
+			}
+		});
+
+		socket.on('infoRoom', function(data){
+			console.log("LoOL")
+			ctx.fillText("Player: " + data.nbPlayer + "/" + data.nbPlayerMax,10,50);
+			ctx.fillText("Round: " + data.round + "/" + data.roundMax,10,100);
+		});
+		//=================================================================
+		// Key pressed and mouse click detection:
+		// Check the keycode on this website:
+		// http://www.west-wind.com/westwindwebtoolkit/samples/ajax/html5andcss3/keycodechecker.aspx
+		// Be careful, the keycode are not the same if we detect with keyup and down or keypress
+		/*$(document).keypress(function(e) {
+		 var code = e.keyCode || e.which;
+		 if(code == 97) { // key a
+		 socket.emit('keyPress', {inputId: 'a', state: true});
+		 console.log("a pressed")
+		 }
+		 else if(code === 122) { // key z
+		 socket.emit('keyPress', {inputId: 'z', state: true});
+		 console.log("z pressed")
+		 }
+		 else if(code === 101) { // key e
+		 socket.emit('keyPress',{inputId:'e',state:true});
+		 console.log("e pressed")
+		 }
+		 else if(code === 114) { // key r
+		 socket.emit('keyPress', {inputId: 'r', state: true});
+		 console.log("r pressed")
+		 }
+		 });*/
+		/********************************************************/
+
+		//=================================================================
+
+
+		/*var Lightning = function(ctx) {
+		 var self = this;
+
+		 // (x1, y1) starting point
+		 // (x2, y2) ending point
+		 self.strike = function(x1, y1, x2, y2, color1, color2, drawOrbs) {
+		 var x = x2 - x1;
+		 var y = y2 - y1;
+		 var segments = 10;
+		 var distance = Math.sqrt(x * x + y * y);
+		 var width = distance / segments;
+		 var prevX = x1;
+		 var prevY = y1;
+
+		 if(drawOrbs) {
+		 // Draw point
+		 ctx.strokeStyle = color1;
+		 ctx.fillStyle = color1;
+		 ctx.lineWidth = 2;
+		 ctx.beginPath();
+		 ctx.arc(x1, y1, 3 + (Math.random() * 4), 0, 2 * Math.PI, false);
+		 ctx.fill();
+		 }
+
+		 for(var i = 0; i <= segments; i++) {
+		 var magnitude = (width * i) / distance;
+
+		 var x3 = magnitude * x2 + (1 - magnitude) * x1;
+		 var y3 = magnitude * y2 + (1 - magnitude) * y1;
+
+		 if(i !== 0 && i !== segments) {
+		 x3 += (Math.random() * width) - (width / 2);
+		 y3 += (Math.random() * width) - (width / 2);
+		 }
+
+		 // Draw line
+		 ctx.strokeStyle = color1;
+		 ctx.lineWidth = 1 ;
+		 ctx.beginPath();
+		 ctx.moveTo(prevX, prevY);
+		 ctx.lineTo(x3, y3);
+		 ctx.closePath();
+		 ctx.stroke();
+
+		 // Draw point
+		 ctx.strokeStyle = color1;
+		 ctx.fillStyle = color1;
+		 ctx.beginPath();
+		 ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
+		 ctx.fill();
+
+		 // Draw line
+		 ctx.strokeStyle = color2;
+		 ctx.lineWidth = 1;
+		 ctx.beginPath();
+		 ctx.moveTo(prevX, prevY);
+		 ctx.lineTo(x3, y3);
+		 ctx.closePath();
+		 ctx.stroke();
+
+		 // Draw point
+		 ctx.strokeStyle = color2;
+		 ctx.fillStyle = color2;
+		 ctx.beginPath();
+		 ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
+		 ctx.fill();
+
+		 prevX = x3;
+		 prevY = y3;
+		 }
+
+		 if(drawOrbs) {
+		 // Draw point
+		 ctx.strokeStyle = color2;
+		 ctx.fillStyle = color2;
+		 ctx.lineWidth = 1;
+		 ctx.beginPath();
+		 ctx.arc(x1, y1, 1 + (Math.random() * 4), 0, 2 * Math.PI, false);
+		 ctx.fill();
+		 }
+		 };
+		 };
+		 var lightning = new Lightning(ctx);*/
+
+		function drawLightningSpell(x_start, y_start, x_aimPoint, y_aimPoint) {
+			drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, "#cfefff", "#ffffff");
+			drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, "#557788", "#7799aa", true);
 		}
-		else if(code === 122) { // key z
-			socket.emit('keyPress', {inputId: 'z', state: true});
-			console.log("z pressed")
-		}
-		else if(code === 101) { // key e
-			socket.emit('keyPress',{inputId:'e',state:true});
-			console.log("e pressed")
-		}
-		else if(code === 114) { // key r
-			socket.emit('keyPress', {inputId: 'r', state: true});
-			console.log("r pressed")
-		}
-	});*/
-/********************************************************/
-
-	//=================================================================
-
-
-	/*var Lightning = function(ctx) {
-		var self = this;
-
-		// (x1, y1) starting point
-		// (x2, y2) ending point
-		self.strike = function(x1, y1, x2, y2, color1, color2, drawOrbs) {
-			var x = x2 - x1;
-			var y = y2 - y1;
+		function drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, color1, color2, drawOrbs) {
+			var x = x_start - x_aimPoint;
+			var y = y_start - y_aimPoint;
 			var segments = 10;
 			var distance = Math.sqrt(x * x + y * y);
 			var width = distance / segments;
-			var prevX = x1;
-			var prevY = y1;
+			var prevX = x_aimPoint;
+			var prevY = y_aimPoint;
 
 			if(drawOrbs) {
 				// Draw point
@@ -326,20 +458,25 @@ var cdArray = [];
 				ctx.fillStyle = color1;
 				ctx.lineWidth = 2;
 				ctx.beginPath();
-				ctx.arc(x1, y1, 3 + (Math.random() * 4), 0, 2 * Math.PI, false);
+				ctx.arc(x_aimPoint, y_aimPoint, 3 + (Math.random() * 4), 0, 2 * Math.PI, false);
 				ctx.fill();
 			}
 
 			for(var i = 0; i <= segments; i++) {
 				var magnitude = (width * i) / distance;
 
-				var x3 = magnitude * x2 + (1 - magnitude) * x1;
-				var y3 = magnitude * y2 + (1 - magnitude) * y1;
+				var x3 = magnitude * x_start + (1 - magnitude) * x_aimPoint;
+				var y3 = magnitude * y_start + (1 - magnitude) * y_aimPoint;
 
 				if(i !== 0 && i !== segments) {
 					x3 += (Math.random() * width) - (width / 2);
 					y3 += (Math.random() * width) - (width / 2);
 				}
+
+				ctx.shadowOffsetX = 2;
+				ctx.shadowOffsetY = 2;
+				ctx.shadowBlur    = 4;
+				ctx.shadowColor   = "blue";
 
 				// Draw line
 				ctx.strokeStyle = color1;
@@ -373,6 +510,8 @@ var cdArray = [];
 				ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
 				ctx.fill();
 
+				ctx.shadowColor = "transparent";
+
 				prevX = x3;
 				prevY = y3;
 			}
@@ -383,137 +522,51 @@ var cdArray = [];
 				ctx.fillStyle = color2;
 				ctx.lineWidth = 1;
 				ctx.beginPath();
-				ctx.arc(x1, y1, 1 + (Math.random() * 4), 0, 2 * Math.PI, false);
+				ctx.arc(x_aimPoint, y_aimPoint, 1 + (Math.random() * 4), 0, 2 * Math.PI, false);
 				ctx.fill();
 			}
 		};
-	};
-	var lightning = new Lightning(ctx);*/
 
-	function drawLightningSpell(x_start, y_start, x_aimPoint, y_aimPoint) {
-		drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, "#cfefff", "#ffffff");
-		drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, "#557788", "#7799aa", true);
-	}
-	function drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, color1, color2, drawOrbs) {
-		var x = x_start - x_aimPoint;
-		var y = y_start - y_aimPoint;
-		var segments = 10;
-		var distance = Math.sqrt(x * x + y * y);
-		var width = distance / segments;
-		var prevX = x_aimPoint;
-		var prevY = y_aimPoint;
-
-		if(drawOrbs) {
-			// Draw point
-			ctx.strokeStyle = color1;
-			ctx.fillStyle = color1;
-			ctx.lineWidth = 2;
-			ctx.beginPath();
-			ctx.arc(x_aimPoint, y_aimPoint, 3 + (Math.random() * 4), 0, 2 * Math.PI, false);
-			ctx.fill();
-		}
-
-		for(var i = 0; i <= segments; i++) {
-			var magnitude = (width * i) / distance;
-
-			var x3 = magnitude * x_start + (1 - magnitude) * x_aimPoint;
-			var y3 = magnitude * y_start + (1 - magnitude) * y_aimPoint;
-
-			if(i !== 0 && i !== segments) {
-				x3 += (Math.random() * width) - (width / 2);
-				y3 += (Math.random() * width) - (width / 2);
+		//=================================================================
+		// Draw functions :
+		function drawBullets() {
+			for(var i in bullets)
+			{
+				console.log('draw bullets');
+				bullets[i].draw();
 			}
+		};
+		function drawPlayers() {
+			for(var i in players)
+			{
+				players[i].draw();
+				players[i].drawTarget();
+			}
+		};
+		function drawSpellIndicators() {
+			for (var i in spellIndicators)
+			{
+				spellIndicators[i].draw();
+			}
+		};
+		function drawMap () {
+			ctx.drawImage(Img.map, camera.x, camera.y,camera.width,camera.height,0,0,camera.width,camera.height);
+		};
 
-			ctx.shadowOffsetX = 2;
-			ctx.shadowOffsetY = 2;
-			ctx.shadowBlur    = 4;
-			ctx.shadowColor   = "blue";
+		//=================================================================
+		// Update loop :
+		setInterval(function(){
+			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+			ctx.save();
 
-			// Draw line
-			ctx.strokeStyle = color1;
-			ctx.lineWidth = 1 ;
-			ctx.beginPath();
-			ctx.moveTo(prevX, prevY);
-			ctx.lineTo(x3, y3);
-			ctx.closePath();
-			ctx.stroke();
+			drawMap();
+			drawBullets();
+			drawPlayers();
+			drawSpellIndicators();
+		},25);
 
-			// Draw point
-			ctx.strokeStyle = color1;
-			ctx.fillStyle = color1;
-			ctx.beginPath();
-			ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
-			ctx.fill();
 
-			// Draw line
-			ctx.strokeStyle = color2;
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.moveTo(prevX, prevY);
-			ctx.lineTo(x3, y3);
-			ctx.closePath();
-			ctx.stroke();
+	</script>
+</body>
+</html>
 
-			// Draw point
-			ctx.strokeStyle = color2;
-			ctx.fillStyle = color2;
-			ctx.beginPath();
-			ctx.arc(x3, y3, 1, 0, 2 * Math.PI, false);
-			ctx.fill();
-
-			ctx.shadowColor = "transparent";
-
-			prevX = x3;
-			prevY = y3;
-		}
-
-		if(drawOrbs) {
-			// Draw point
-			ctx.strokeStyle = color2;
-			ctx.fillStyle = color2;
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.arc(x_aimPoint, y_aimPoint, 1 + (Math.random() * 4), 0, 2 * Math.PI, false);
-			ctx.fill();
-		}
-	};
-
-	//=================================================================
-	// Draw functions :
-	function drawBullets() {
-		for(var i in bullets)
-		{
-            console.log('draw bulets');
-			bullets[i].draw();
-		}
-	};
-	function drawPlayers() {
-		for(var i in players)
-		{
-			players[i].draw();
-			players[i].drawTarget();
-		}
-	};
-	function drawSpellIndicators() {
-		for (var i in spellIndicators)
-		{
-			spellIndicators[i].draw();
-		}
-	};
-	function drawMap () {
-		ctx.drawImage(Img.map, camera.x, camera.y,camera.width,camera.height,0,0,camera.width,camera.height);
-	};
-
-	//=================================================================
-	// Update loop :
-	setInterval(function(){
-		ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
-        ctx.save();
-
-        drawMap();
-        drawBullets();
-        drawPlayers();
-        drawSpellIndicators();
-    },25);
-
-    </script>

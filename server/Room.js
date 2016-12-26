@@ -5,10 +5,14 @@ var globale = require('./globale.js');
 
 (function(){
 	class Room {
-	constructor(nbPlayer, type, map){
+	constructor(nbPlayerMax, type, map){
 		this.name = 'Room';
-		this.nbPlayer = nbPlayer;
+		this.nbPlayerMax = nbPlayerMax;
+		this.nbPlayer = 0;
+		this.id = Math.random();
 		this.type = type;// deathmatch, ...
+
+		this.hasToBeRemoved = false;
 
 		this.players = [];
 		this.bullets = [];
@@ -29,7 +33,6 @@ var globale = require('./globale.js');
 
 	getAllPlayersInitPack()
 	{
-
 		var players = [];
 		for(var i = 0; i<this.players.length;i++)
 		{
@@ -51,10 +54,13 @@ var globale = require('./globale.js');
 
 	update()
 	{
+		if(this.hasToBeRemoved)
+		{
+			return 0;
+		}
 		if(this.players.length !== 0)
 		{
-			if(this.gameover === false)
-			{
+			if(this.gameover === false) {
 				var bufferPlayers = this.updatePlayers();
 				var bufferBullets = this.updateBullets();
 				var packBuffer = new ArrayBuffer((bufferPlayers.byteLength+bufferBullets.byteLength));
@@ -67,8 +73,9 @@ var globale = require('./globale.js');
 				
 				var nbDeadPlayer = 0;
 
-				for(var i = 0; i < this.players.length;i++){
+				for(var i = 0; i < this.players.length; i++){
 					var socket = globale.SOCKET_LIST[this.players[i].id];
+
 					if(this.initPack.player[0] || this.initPack.bullet[0])
 					{
 						socket.emit('init',this.initPack);
@@ -107,7 +114,7 @@ var globale = require('./globale.js');
 				if(nbDeadPlayer >= this.players.length-1 && this.players.length > 1)
 				{
 					console.log(nbDeadPlayer+':'+this.players.length+ ' | '+this.currentRound +':'+this.nbRound);
-					// SPELL CHOICE + RESTART
+					// TODO: SPELL CHOICE + RESTART
 					this.startNextRound();
 
 				}
@@ -115,10 +122,8 @@ var globale = require('./globale.js');
 			}
 			return 1;
 		}
-		else// empty room
-		{
-			return 0;
-		}
+
+
 	}
 
 	updatePlayers()
@@ -132,27 +137,32 @@ var globale = require('./globale.js');
 
 	    for(var i = 0; i < this.players.length; i++)
 	    {
-	        var player =  this.players[i];
+	    	var player =  this.players[i];
 	        player.update();
-	         var updatePack = player.getUpdatePack();
-	         for (var j = 0;j<updatePack.length;j++)
-	         {
-	             viewArrayBufferAllPlayer[(indexPlayer*updatePack.length)+j+1]=updatePack[j];
-	         }
-	         indexPlayer++;
+	     	var updatePack = player.getUpdatePack();
+	    	for (var j = 0;j<updatePack.length;j++)
+	     	{
+	     		viewArrayBufferAllPlayer[(indexPlayer*updatePack.length)+j+1]=updatePack[j];
+	     	}
+	     	indexPlayer++;
 	    }
 	    //console.log('bullets '+arrayBufferAllBulletManagerbyteLength);
 	    return arrayBufferAllPlayer;
 	}
 
-	addPlayer(socket)
+	addPlayer(player)
 	{
-		if(this.players.length < this.nbPlayer)
+		console.log("Add player " + player.id + " to room " + this.id)
+		player.room = this;
+		var socket = globale.SOCKET_LIST[player.id];
+		socket.emit("gameStarted", true);
+
+		if(this.players.length < this.nbPlayerMax)
 		{
-			console.log("Player connected " + socket.id);
-		
-			var player = new Player(socket.id,this,socket);
-			//this.players.push(player);
+			console.log("Player connected " + player.id);
+
+			//var player = new Player(socket.id, this, socket);
+			this.players.push(player);
 		
 			socket.on('keyPress',function(data){
 
@@ -188,7 +198,7 @@ var globale = require('./globale.js');
 				player.setGoalDest(data.x,data.y);
 				player.currentSpeed = player.SPEED;
 			//console.log("Right Click");
-		});
+			});
 
 			socket.on('mouseLeftClick',function(data){
 				player.isOrientationGood = false;
@@ -218,13 +228,13 @@ var globale = require('./globale.js');
 				if(socket.id !== this.players[i].id)
 				{
 					var socket = globale.SOCKET_LIST[this.players[i].id];
-					socket.emit('init',{
-						player:this.getAllPlayersInitPack(),
-						bullet:this.getAllBulletsInitPack()
-					});
+					socket.emit('init', { 	player:this.getAllPlayersInitPack(),
+											bullet:this.getAllBulletsInitPack() });
 				}
 			}
 
+			this.nbPlayer +=1;
+			this.updateInfoRoom();
 			return 1;
 		}
 		else // room full
@@ -242,6 +252,12 @@ var globale = require('./globale.js');
 				delete this.players[i];
 				this.players.splice(i,1);
 				this.removePack.player.push({id:parseInt(socket.id*100000000)});
+
+				if(this.players.length === 0)
+					this.hasToBeRemoved = true;
+
+				this.nbPlayer -=1;
+				this.updateInfoRoom();
 				return;
 			}
 		}
@@ -337,6 +353,21 @@ var globale = require('./globale.js');
 		}
 
 		return positions;
+	}
+
+	updateInfoRoom()
+	{
+		for(var i = 0; i < this.players.length; i++)
+		{
+			var player =  this.players[i];
+			var socket = globale.SOCKET_LIST[player.id];
+			console.log("LOL")
+			socket.emit('infoRoom', { 	nbPlayer: this.nbPlayer,
+										nbPlayerMax: this.nbPlayer,
+										round: this.currentRound,
+										roundMax: this.nbRound,
+			});
+		}
 	}
 
 };

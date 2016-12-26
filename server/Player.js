@@ -12,23 +12,23 @@ var globale = require('./globale.js');
 
 class Player{
 
-	constructor(id, room,socket)
+	constructor(socket)
 	{
-		console.log(room.name+ ' '+id);
+		console.log("Player " + socket.id + " created")
 		//var this = Entity();
-		this.id = id;
+		this.id = socket.id;
 		this.x = 250;
 		this.y = 250;
 		this.spdX = 0;
 		this.spdY = 0;
-		this.room = room;
+		this.room = undefined;
 
-		//this.socket = socket;
+		this.socket = socket;
 
 		//this.number = "" + Math.floor(10 * Math.random());
 	    this.size = 32; // car le sprite des wizard fait 32x32 pix
 
-	   this.time =0;
+	    this.time =0;
 
 		this.rotation = 0;
 		this.angularVelocity = 0;
@@ -82,7 +82,7 @@ class Player{
 		};
 
 		this.mouseAngle = 0;
-		this.room.players.push(this);
+		//this.room.players.push(this);
 	}
 	
 	initPlayer()
@@ -117,7 +117,7 @@ class Player{
 
 		this.mouseAngle = 0;
 
-		this.room.initPack.player.push(this.getInitPack());
+		//this.room.initPack.player.push(this.getInitPack());
 	}
 
 	getSpellByKey(key) {
@@ -169,7 +169,7 @@ class Player{
 			targetType: this.targetType,
 			isShooting: this.isShooting,
 			isMoving: this.isMoving,
-	      sizePlayer: this.size,
+	        sizePlayer: this.size,
 			isDead: this.isDead,
 		};		
 	}
@@ -373,7 +373,6 @@ class Player{
 	}
 
 	updatePosition() {
-
 	 	if(this.spellsToCast[0])
 	 	{
 

@@ -78,7 +78,7 @@ var isPressedR = false;
            });
             break;
             default:
-            console.log("Unkown click")
+            console.log("Unknown click")
         }
     });
 	$("#ctx").mousemove(function( event ) {
