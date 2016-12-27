@@ -54,6 +54,10 @@ var globale = require('./globale.js');
 
 	update()
 	{
+		/*if(this.currentRound === 0)
+		{
+			this.startNextRound();
+		}*/
 		if(this.hasToBeRemoved)
 		{
 			return 0;
@@ -317,6 +321,7 @@ var globale = require('./globale.js');
 	{
 		if(this.currentRound <= this.nbRound)
 		{
+			console.log("start Round")
 			var positions = this.getPositions();
 			for(var i = 0; i<this.players.length;i++)
 			{
@@ -326,6 +331,8 @@ var globale = require('./globale.js');
 				p.initPlayer();
 			}
 			this.currentRound++;
+
+			this.updateInfoRoom();
 		}
 		else
 		{
@@ -361,9 +368,9 @@ var globale = require('./globale.js');
 		{
 			var player =  this.players[i];
 			var socket = globale.SOCKET_LIST[player.id];
-			console.log("LOL")
+			console.log("UPDATE INFOS")
 			socket.emit('infoRoom', { 	nbPlayer: this.nbPlayer,
-										nbPlayerMax: this.nbPlayer,
+										nbPlayerMax: this.nbPlayerMax,
 										round: this.currentRound,
 										roundMax: this.nbRound,
 			});

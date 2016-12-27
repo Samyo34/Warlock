@@ -9,3 +9,8 @@
 
 canvas{
   display:inline-block;}
+
+#infos{
+  background-color: aquamarine;
+  position: absolute;
+}

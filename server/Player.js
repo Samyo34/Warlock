@@ -12,8 +12,7 @@ var globale = require('./globale.js');
 
 class Player{
 
-	constructor(socket)
-	{
+	constructor(socket) {
 		console.log("Player " + socket.id + " created")
 		//var this = Entity();
 		this.id = socket.id;
@@ -67,10 +66,10 @@ class Player{
 	    };
 
 		this.actionTime = 0; // time when the spell action is over
-	   this.ratioSpeed = 1;
-	   this.actionDuration = 0; // duration of the spell action
+		this.ratioSpeed = 1;
+	    this.actionDuration = 0; // duration of the spell action
 
-	   this.targetVisible = false; // Is the player pressing a key for a spell
+	    this.targetVisible = false; // Is the player pressing a key for a spell
 		this.targetType = '';
 
 		this.Spell = [];
@@ -85,8 +84,7 @@ class Player{
 		//this.room.players.push(this);
 	}
 	
-	initPlayer()
-	{
+	initPlayer() {
 		this.spdX = 0;
 		this.spdY = 0;
 
@@ -108,7 +106,7 @@ class Player{
 	        y:0
 	    };
 
-	   this.isShooting = false;
+	    this.isShooting = false;
 		this.isMoving = false;
 		this.aimGoalPoint = {
 			x:this.x,
@@ -375,7 +373,6 @@ class Player{
 	updatePosition() {
 	 	if(this.spellsToCast[0])
 	 	{
-
 	 		//console.log('dist : '+Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
 	 		//	((this.aimGoalPoint.y-this.y)*(this.aimGoalPoint.y-this.y))));
 	 		if(this.spellsToCast[0].rangeAction === null || Math.sqrt(((this.aimGoalPoint.x-this.x)*(this.aimGoalPoint.x-this.x))+
@@ -526,7 +523,6 @@ class Player{
 			socket.emit('endCD',{spells:spell});
 		}
 	}
-
 }
 
 module.exports = Player;	

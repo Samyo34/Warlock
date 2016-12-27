@@ -1,4 +1,4 @@
-var Player = function(initPack){
+var Player = function(initPack) {
     var self = {};
     self.id = parseFloat(initPack.id/100000000);
     self.number = initPack.number;
@@ -7,7 +7,6 @@ var Player = function(initPack){
     self.rotation = parseFloat(initPack.rotation);
     self.hp = parseInt(initPack.hp);
     self.hpMax = parseInt(initPack.hpMax);
-    //self.hp = initPack.hp;
     self.targetVisible = initPack.targetVisible;
     self.targetType = initPack.targetType;
     self.isDead = initPack.isDead;
@@ -32,9 +31,9 @@ var Player = function(initPack){
                  blink: 0,
     };
 
-     self.draw = function(){
+     self.draw = function() {
 
-         if(self.isDead === false) {
+         if(self.isDead === 0) {
             var x = self.x;
             var y = self.y;
             /*
@@ -81,8 +80,7 @@ var Player = function(initPack){
             ctx.rotate(self.rotation + ((-90 * Math.PI) / 180)); // rotate
 
              if (self.id === selfId)
-            {
-
+             {
                 if (self.isShooting === 1)
                 {
                     ctx.drawImage(Img.playerSheet, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2), -(self.size/2), self.size, self.size);
@@ -141,9 +139,8 @@ var Player = function(initPack){
         }
     };
 
-    self.onUpdate = function(dataArray)
-    {
-        // console.log(dataArray[0]+';'+dataArray[1]+';'+dataArray[2]+';'+dataArray[3]+';'+parseFloat(dataArray[4]/100000)+';'+dataArray[5]+';'+dataArray[6]+';'+dataArray[7]+';'+dataArray[8]+';'+dataArray[9]);
+    self.onUpdate = function(dataArray) {
+        //console.log(dataArray[0]+';'+dataArray[1]+';'+dataArray[2]+';'+dataArray[3]+';'+parseFloat(dataArray[4]/100000)+';'+dataArray[5]+';'+dataArray[6]+';'+dataArray[7]+';'+dataArray[8]+';'+dataArray[9]);
         self.id = parseFloat(dataArray[0]/100000000);
         //self.number = dataArray[1];
         self.x = parseInt(dataArray[1]-camera.x);
@@ -151,29 +148,14 @@ var Player = function(initPack){
         self.rotation = parseFloat(dataArray[3]/100000000);
         self.hp = parseInt(dataArray[4]);
         self.hpMax = parseInt(dataArray[5]);
-        self.targetVisible = dataArray[6];
-        if(dataArray[7])
-            self.targetType = dataArray[7];
 
+        self.targetVisible = dataArray[6];
+        self.targetType = dataArray[7];
         self.isDead = dataArray[8];
 
         self.isShooting = dataArray[9];
         self.isMoving = dataArray[10];
-        //console.log('update '+self.id+' '+dataArray[11]);
         self.size = parseInt(dataArray[11]);
-        /* self.id = updatePack.id;
-        self.number = updatePack.number;
-        self.x = updatePack.x-camera.x;
-        self.y = updatePack.y-camera.y;
-        self.rotation = parseFloat(updatePack.rotation/100000);
-        self.hp = updatePack.hp;
-        self.hpMax = updatePack.hpMax;
-        self.targetVisible = updatePack.targetVisible;
-        self.targetType = updatePack.targetType;
-        self.isDead = updatePack.isDead;
-        self.size = updatePack.sizePlayer;
-        self.isShooting = updatePack.isShooting;
-        self.isMoving = updatePack.isMoving;*/
     };
 
     return self;

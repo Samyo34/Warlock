@@ -14,8 +14,13 @@
 			</form>
 		</div>
 		<div id="game">
-			<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
-			<span if="infos"><b>This text is bold</b></span>
+			<div id="game1">
+				<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
+				<span id="infos">
+					Player: <span id="playerNb"></span>/<span id="playerNbMax"></span><br />
+					Round: <span id="round"></span>/<span id="roundMax"></span><br />
+				</span>
+			</div>
 			<div id="spellIndicatorsArea" style="width:800px;height:100px;border:1px solid #000000;">
 				<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
 				<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
@@ -323,8 +328,10 @@
 
 		socket.on('infoRoom', function(data){
 			console.log("LoOL")
-			ctx.fillText("Player: " + data.nbPlayer + "/" + data.nbPlayerMax,10,50);
-			ctx.fillText("Round: " + data.round + "/" + data.roundMax,10,100);
+			$("#playerNb").text(data.nbPlayer);
+			$("#playerNbMax").text(data.nbPlayerMax);
+			$("#round").text(data.round);
+			$("#roundMax").text(data.roundMax);
 		});
 		//=================================================================
 		// Key pressed and mouse click detection:
