@@ -12,7 +12,7 @@ var globale = require('./globale.js');
 
 class Player{
 
-	constructor(socket) {
+	constructor(socket, pseudo) {
 		console.log("Player " + socket.id + " created")
 		//var this = Entity();
 		this.id = socket.id;
@@ -22,7 +22,9 @@ class Player{
 		this.spdY = 0;
 		this.room = undefined;
 
-		this.socket = socket;
+		this.pseudo = pseudo;
+
+		//this.socket = socket;
 
 		//this.number = "" + Math.floor(10 * Math.random());
 	    this.size = 32; // car le sprite des wizard fait 32x32 pix
@@ -169,6 +171,7 @@ class Player{
 			isMoving: this.isMoving,
 	        sizePlayer: this.size,
 			isDead: this.isDead,
+			pseudo: this.pseudo,
 		};		
 	}
 

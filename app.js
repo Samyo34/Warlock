@@ -77,7 +77,7 @@ io.sockets.on('connection', function(socket){
 
 		// TODO check if pseudo is already taken
 
-		game.createPlayer(socket);
+		game.createPlayer(socket, data);
 
 		socket.emit("playerCreated", true);
 	});

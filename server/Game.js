@@ -14,8 +14,8 @@ var Player = require('./Player.js');
                                     playersWaiting: [],
                                 };
         }
-        createPlayer(socket) {
-            this.gamePlayers.playersWaiting.push(new Player(socket));
+        createPlayer(socket, pseudo) {
+            this.gamePlayers.playersWaiting.push(new Player(socket, pseudo));
             console.log(this.gamePlayers)
         }
 

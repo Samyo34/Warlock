@@ -1,6 +1,7 @@
 var Player = function(initPack) {
     var self = {};
     self.id = parseFloat(initPack.id/100000000);
+    self.pseudo = initPack.pseudo;
     self.number = initPack.number;
     self.x = parseInt(initPack.x-camera.x);
     self.y = parseInt(initPack.y-camera.y);
@@ -31,7 +32,7 @@ var Player = function(initPack) {
                  blink: 0,
     };
 
-     self.draw = function() {
+    self.draw = function() {
 
          if(self.isDead === 0) {
             var x = self.x;
@@ -107,7 +108,8 @@ var Player = function(initPack) {
 
             ctx.save();
             //ctx.translate(self.x, self.y);
-            // Draw healthbar:
+
+             // Draw healthbar:
             ctx.fillStyle = "#000000";
             // green
             ctx.strokeRect(self.x-(self.size/2)-4, self.y-(self.size/2) - 13, 38+2, 5+ 2);
@@ -118,6 +120,12 @@ var Player = function(initPack) {
             {
                 ctx.fillStyle="#FF0000"; // red
             }
+
+            // Draw pseudo:
+             ctx.font = '18px Impact';
+             var txt = self.pseudo;
+             var txtSize = ctx.measureText(txt).width;
+             ctx.fillText(txt, self.x-(txtSize/2), self.y-(self.size/2) - 20)
 
             ctx.fillRect(self.x-(self.size/2)-3, self.y - (self.size/2) - 12, (self.hp* 38 ) / self.hpMax, 5);
 
