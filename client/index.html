@@ -58,6 +58,7 @@
 
 		$("#chat").hide();
 		$("#spellIndicatorsArea").hide();
+		$("#infos").css('display', 'none');
 		$('#ctx').get(0).style.visibility = "hidden";
 		$("#loginPanel").show();
 
@@ -74,7 +75,9 @@
 			$("#loginPanel").hide();
 			$("#chat").show();
 			$("#spellIndicatorsArea").show();
+			$("#infos").css('display', 'inline-block');
 			$('#ctx').get(0).style.visibility = "visible";
+
 			//selfId = data;
 		});
 
