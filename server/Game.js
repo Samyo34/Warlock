@@ -71,6 +71,24 @@ var Player = require('./Player.js');
             }
         }
 
+        findPlayerBySocket(socket) {
+            for(var i=0; i<this.gamePlayers.playersPlaying.length; i++)
+            {
+                if(this.gamePlayers.playersPlaying[i].id === socket.id)
+                {
+                    return this.gamePlayers.playersPlaying[i];
+                }
+            }
+            for(var i=0; i<this.gamePlayers.playersWaiting.length; i++)
+            {
+                if(this.gamePlayers.playersWaiting[i].id === socket.id)
+                {
+                    return this.gamePlayers.playersWaiting[i];
+                }
+            }
+            return undefined;
+        }
+
         update() {
             //console.log(this.gameRooms)
 

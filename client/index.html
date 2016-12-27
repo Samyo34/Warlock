@@ -9,8 +9,8 @@
 <body>
 	<div id="container">
 		<div id="loginPanel">
-			<form id="login">
-				<input type="text" placeholder="Pseudo" id="pseudo" autocomplete="off"> <input type="submit" value="Play">
+			<form id="loginForm">
+				<input type="text" placeholder="Pseudo" id="pseudo" autocomplete="off"> <input type="submit" id="playButton" value="Play">
 			</form>
 		</div>
 		<div id="game">
@@ -21,7 +21,7 @@
 					Round: <span id="round"></span>/<span id="roundMax"></span><br />
 				</span>
 			</div>
-			<div id="spellIndicatorsArea" style="width:800px;height:100px;border:1px solid #000000;">
+			<div id="spellIndicatorsArea">
 				<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
 				<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
 				<canvas id="ctxSpell_2" width="75" height="75" style="border:1px solid #000000;"></canvas>
@@ -29,12 +29,12 @@
 			</div>
 
 			<div id="chat">
-				<div id="chat-text" style="width:500px;height:100px;overflow-y:scroll">
+				<div id="chat-text" style="width:auto;height:100px;overflow-y:scroll">
 					<div>Hello!</div>
 				</div>
 
 				<form id="chat-form">
-					<input id="chat-input" type="text" style="width:800px"> </input>
+					<input id="chat-input" type="text"> </input>
 				</form>
 			</div>
 
@@ -60,9 +60,8 @@
 		$("#spellIndicatorsArea").hide();
 		$("#infos").css('display', 'none');
 		$('#ctx').get(0).style.visibility = "hidden";
-		$("#loginPanel").show();
 
-		$("#login").submit(function(e){
+		$("#loginForm").submit(function(e){
 			e.preventDefault();
 			socket.emit("login", $("#pseudo").val());
 		});

@@ -109,9 +109,14 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('sendMsgToServer',function(data){
-		var playerName = ("" + socket.id).slice(2,7);
+		var player = game.findPlayerBySocket(socket);
+		if(player === undefined) {
+			console.log("Player attached to socket " + socket.id + " not found.")
+			return;
+		}
+
 		for(var i in globale.SOCKET_LIST){
-			globale.SOCKET_LIST[i].emit('addToChat', playerName + ': ' + data);
+			globale.SOCKET_LIST[i].emit('addToChat', player.pseudo + ': ' + data);
 		}
 	});
 	
