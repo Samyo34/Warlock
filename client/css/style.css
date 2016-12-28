@@ -5,16 +5,27 @@
 }
 
 canvas{
-  display:inline-block;}
+  /*display:inline-block;*/
+}
+
+body {
+    /*background-color: darkslategray;*/
+}
 
 #infos  {
   background-color: aquamarine;
-  position: absolute;
+    display: block;
+
 }
 
 #loginPanel {
-  height:50%;
-  margin:150px auto;
+    height:50%;
+    margin:150px auto;
+}
+
+#loginPanel h1 {
+    text-align: center;
+    font-family: Sans-Serif;
 }
 
 #loginForm {
@@ -31,24 +42,47 @@ canvas{
 
 #playButton {
   padding: 15px;
+  background-color: dodgerblue;
+  color: white;
+  font-size: 150%;
+  border-radius: 8px;
 }
 
-#game {
-  /*border: 2px dotted;*/
-  display: block;
-  width:80%;
-  margin: 5px auto;
+#pseudo {
+  padding: 10px 20px;
+  border: 2px solid #4a86e8;
+  border-radius: 7px;
+  color: rgba(0,142,198,1);
+  background: rgba(252,252,252,1);
+  box-shadow: 1px 2px 2px 0 rgba(0,0,0,0.2) inset;
+  text-shadow: 17px 1px 0 rgba(255,255,255,0.66) ;
+}
+
+#gameArea {
+    /*border: 2px dotted;*/
+    display: block;
+    width:80%;
+    margin: 5px auto;
 }
 
 #game1 {
   width: 50%;
   /*border: dotted 2px red;*/
-  margin: 5px auto;
+  margin: 0px auto;
 }
 
 #spellIndicatorsArea {
-  width: 50%;
-  margin: 0px auto;
+    /*border: solid blue 2px;*/
+    width: 50%;
+    /*background-color: darkslategray;*/
+    margin: 0px auto;
+    padding: 0px;
+    text-align: center;
+}
+
+#spellIndicatorsArea div {
+    /*border: solid red 2px;*/
+    display: inline-block;
 }
 
 #chat {

@@ -9,23 +9,28 @@
 <body>
 	<div id="container">
 		<div id="loginPanel">
+			<h1>Warlock</h1>
 			<form id="loginForm">
 				<input type="text" placeholder="Pseudo" id="pseudo" autocomplete="off"> <input type="submit" id="playButton" value="Play">
 			</form>
 		</div>
-		<div id="game">
+		<div id="gameArea">
 			<div id="game1">
-				<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
-				<span id="infos">
-					Player: <span id="playerNb"></span>/<span id="playerNbMax"></span><br />
-					Round: <span id="round"></span>/<span id="roundMax"></span><br />
-				</span>
+				<div id="infos">
+					Player: <span id="playerNb"></span>/<span id="playerNbMax"></span>
+					Round: <span id="round"></span>/<span id="roundMax"></span>
+				</div>
+
+				<canvas id="ctx" width="600" height="500" style="border:1px solid #000000;"></canvas>
+
 			</div>
 			<div id="spellIndicatorsArea">
-				<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
-				<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
-				<canvas id="ctxSpell_2" width="75" height="75" style="border:1px solid #000000;"></canvas>
-				<canvas id="ctxSpell_3" width="75" height="75" style="border:1px solid #000000;"></canvas>
+				<div>
+					<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
+					<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
+					<canvas id="ctxSpell_2" width="75" height="75" style="border:1px solid #000000;"></canvas>
+					<canvas id="ctxSpell_3" width="75" height="75" style="border:1px solid #000000;"></canvas>
+				</div>
 			</div>
 
 			<div id="chat">
@@ -72,7 +77,7 @@
 
 		socket.on("gameStarted", function(data){
 			$("#loginPanel").hide();
-			$("#chat").show();
+			//$("#chat").show();
 			$("#spellIndicatorsArea").show();
 			$("#infos").css('display', 'inline-block');
 			$('#ctx').get(0).style.visibility = "visible";
