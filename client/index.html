@@ -7,42 +7,42 @@
 
 </head>
 <body>
-	<div id="container">
-		<div id="loginPanel">
+	<div class="wrapper">
+		<div class="loginPanel">
 			<h1>Warlock</h1>
 			<form id="loginForm">
 				<input type="text" placeholder="Pseudo" id="pseudo" autocomplete="off"> <input type="submit" id="playButton" value="Play">
 			</form>
 		</div>
-		<div id="gameArea">
-			<div id="game1">
-				<div id="infos">
-					Player: <span id="playerNb"></span>/<span id="playerNbMax"></span>
-					Round: <span id="round"></span>/<span id="roundMax"></span>
+
+		<div class="gameArea">
+			<div id="infosLeft">
+				<div id="info">
+					<div>Player: <span id="playerNb"></span>/<span id="playerNbMax"></span></div>
+					<div>Round: <span id="round"></span>/<span id="roundMax"></span></div>
 				</div>
+				<div id="chat">
+					<div id="chat-text" style="overflow-y:scroll">
+						<div>Hello!</div>
+					</div>
 
-				<canvas id="ctx" width="600" height="500" style="border:1px solid #000000;"></canvas>
-
+					<form id="chat-form">
+						<input id="chat-input" type="text"></input> <input type="submit" id="sendButton" value="Envoyer">
+					</form>
+				</div>
 			</div>
-			<div id="spellIndicatorsArea">
-				<div>
+			<div id="game" z-index="2">
+				<div id="canvas">
+					<canvas id="ctx" width="800" height="600" style="border:1px solid #000000;" z-index="1"></canvas>
+				</div>
+				<div id="spellIndicatorsArea">
 					<canvas id="ctxSpell_0" width="75" height="75" style="border:1px solid #000000;"></canvas>
 					<canvas id="ctxSpell_1" width="75" height="75" style="border:1px solid #000000;"></canvas>
 					<canvas id="ctxSpell_2" width="75" height="75" style="border:1px solid #000000;"></canvas>
 					<canvas id="ctxSpell_3" width="75" height="75" style="border:1px solid #000000;"></canvas>
 				</div>
 			</div>
-
-			<div id="chat">
-				<div id="chat-text" style="width:auto;height:100px;overflow-y:scroll">
-					<div>Hello!</div>
-				</div>
-
-				<form id="chat-form">
-					<input id="chat-input" type="text"> </input>
-				</form>
-			</div>
-
+			<div id="infosRight"></div>
 		</div>
 	</div>
 
@@ -61,10 +61,8 @@
 		// Variable which stores our ID
 		var selfId;
 
-		$("#chat").hide();
-		$("#spellIndicatorsArea").hide();
-		$("#infos").css('display', 'none');
-		$('#ctx').get(0).style.visibility = "hidden";
+		$(".gameArea").css('display', 'none');
+		$('#ctx')[0].style.visibility = "hidden";
 
 		$("#loginForm").submit(function(e){
 			e.preventDefault();
@@ -72,16 +70,15 @@
 		});
 
 		socket.on("playerCreated", function(data){
-			$("#loginPanel").hide();
+			$(".loginPanel").css('display', 'none');
 		});
 
 		socket.on("gameStarted", function(data){
-			$("#loginPanel").hide();
-			//$("#chat").show();
-			$("#spellIndicatorsArea").show();
-			$("#infos").css('display', 'inline-block');
-			$('#ctx').get(0).style.visibility = "visible";
+			$(".loginPanel").css('display', 'none');
+			$('#ctx')[0].style.visibility = "visible";
+			$(".gameArea").css('display', 'flex');
 
+			camera.setDimensions(ctx.canvas.clientWidth, ctx.canvas.clientHeight);
 			//selfId = data;
 		});
 
@@ -157,6 +154,7 @@
 		// Init of our context and camera
 		var ctx = document.getElementById("ctx").getContext("2d");
 		ctx.font = '30px Arial';
+		document.getElementById("ctx").style.backgroundColor = 'rgba(158, 167, 184, 0.9)';
 
 		var camera = new Camera(ctx);
 

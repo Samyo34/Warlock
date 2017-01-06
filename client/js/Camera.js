@@ -8,8 +8,9 @@ var Camera = function(ctx)
     this.y = 0;
 
     //dimensions of the viewPort
-    this.width = ctx.canvas.clientWidth;;
+    this.width = ctx.canvas.clientWidth;
     this.height = ctx.canvas.clientHeight;
+    console.log("LOOOOOOOOOOOOL" + this.width)
    // console.log('camera set : '+this.x+':'+this.y + ' | '+ this.width +'/'+this.height);
 
 };
@@ -21,3 +22,10 @@ Camera.prototype.moveTo = function(x,y)
     //console.log('camera moved : '+this.x+':'+this.y+' || '+this.width+':'+this.width);
 };
 
+
+Camera.prototype.setDimensions = function(width, height)
+{
+    this.width = width;
+    this.height = height;
+    //console.log('camera moved : '+this.x+':'+this.y+' || '+this.width+':'+this.width);
+};

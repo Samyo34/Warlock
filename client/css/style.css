@@ -1,42 +1,47 @@
+* {
+    box-sizing: border-box; /* pour maîtriser width et flex-basis */
+}
 
+html {
+    display: flex; flex-direction: column; /* correction bug IE de min-height non appliqué à body */
+}
+
+body {
+    display: flex; /* crée un contexte flex pour ses enfants */
+    flex-direction: column; /* affichage vertical */
+    min-height: 100vh; /* toute la hauteur du viewport */
+    padding: 1em;
+}
+
+.wrapper {
+    flex: 1 1 auto; /* occupe la hauteur restante */
+    display: flex; /* crée un contexte flex pour ses enfants */
+    justify-content: center;
+}
 
 .hide {
   display: none;
 }
 
-canvas{
-  /*display:inline-block;*/
-}
-
-body {
-    /*background-color: darkslategray;*/
-}
-
-#infos  {
-  background-color: aquamarine;
-    display: block;
-
-}
-
-#loginPanel {
-    height:50%;
-    margin:150px auto;
+/************ LOGIN PAGE ************/
+.loginPanel {
+    flex: 1 100%; /* in order to take the full width of the wraper */
+    display: flex;
+    flex-direction: column;
+    text-align: center;
 }
 
 #loginPanel h1 {
-    text-align: center;
     font-family: Sans-Serif;
 }
 
 #loginForm {
-  width:20%;
-  display: block;
-  margin: 0px auto;
+    display: flex;
+    flex-direction: column;
 }
 
 #loginForm input {
-  width: 50%;
-  display: block;
+  width: 200px;
   margin: 5px auto;
 }
 
@@ -58,45 +63,142 @@ body {
   text-shadow: 17px 1px 0 rgba(255,255,255,0.66) ;
 }
 
-#gameArea {
-    /*border: 2px dotted;*/
-    display: block;
+
+/************ GAME AREA ************/
+.gameArea {
+    display: none;
+    flex: 1 100%; /* in order to take the full width of the wraper */
+    flex-direction: row;
+    /*text-align: center;*/
+
+    /*background-color: darkblue;*/
+
+    /*display: none;
     width:80%;
-    margin: 5px auto;
+    margin: 5px auto;*/
 }
 
-#game1 {
-  width: 50%;
-  /*border: dotted 2px red;*/
-  margin: 0px auto;
+#infosLeft {
+    background-color: green;
+    flex-grow: 1;
+
+    /*overflow: auto;*/
+    display: flex;
+    flex-direction: column;
+    flex: 1 auto;
+    align-items: stretch;
+    justify-content: flex-start;
+
+}
+
+#infosRight {
+    background-color: yellow;
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1 auto;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+#game {
+    /*background-color: red;*/
+    flex-grow: 2;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1 auto;
+    align-items: stretch;
+    justify-content: flex-start;
+ }
+
+#canvas {
+    background-color: darkorange;
+
+}
+
+#ctx {
+    display: block;
+    margin: 0 auto;
 }
 
 #spellIndicatorsArea {
-    /*border: solid blue 2px;*/
-    width: 50%;
-    /*background-color: darkslategray;*/
-    margin: 0px auto;
-    padding: 0px;
-    text-align: center;
+    background-color: darkturquoise;
+
+
+
+    display: flex;
+    flex-direction: row;
+    flex: 1 auto;
+
+
+    justify-content: center;
+    align-content: center;
+    align-items: flex-start;
+
 }
 
-#spellIndicatorsArea div {
-    /*border: solid red 2px;*/
-    display: inline-block;
+#spellIndicatorsArea canvas{
+    margin: 10px 10px;
+}
+
+
+
+#infosLeft {
+    display: flex;
+    flex-flow: column;
+
+    justify-content: flex-start;
+    align-content: center;
+    align-items: stretch;
+}
+
+#info {
+    background-color: cadetblue;
+    flex: 0 1 auto;
+    min-height: 30%;
 }
 
 #chat {
-  background-color: darkgray;
-  width: 50%;
-  margin: 30px auto;
+    flex: 1 1 auto;
+
+    display: flex;
+    flex-flow: column;
+
+    justify-content: flex-end;
+    align-content: center;
+    align-items: stretch;
+}
+
+#chat-form {
+    flex: 0 1 auto;
+    min-height: 30px;
+    align-self: stretch;
+    background-color: darkorange;
+
+    display: flex;
+    flex-flow:  row;
+    justify-content: flex-end;
+    align-content: flex-end;
+    align-items: stretch;
 }
 
 #chat-input {
-  width: 100%;
-  height: 30px;
-  margin: 0px auto;
+    flex: 1 1 auto;
+    min-height: 30px;
+}
+
+#sendButton {
+    flex: 0 1 auto;
+    min-width: 20%;
+    min-height: 30px;
+}
+
+#chat-text {
+    flex: 1 1 auto;
 }
 
 #chat-text div {
-  padding: 3px 8px;
+    padding: 3px 8px;
 }
