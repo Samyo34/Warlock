@@ -15,6 +15,12 @@ var Player = function(initPack) {
     self.isMoving = initPack.isMoving;
     self.size = parseInt(initPack.sizePlayer);
 
+    self.positions = [];
+    self.positions.t=Date.now();
+
+    self.preX = self.x;
+    self.preY = self.y;
+
     self.indexMove = 0;
     self.indexCast = 0;
     self.lastChangeTransiTime = 0;
@@ -151,8 +157,16 @@ var Player = function(initPack) {
         //console.log(dataArray[0]+';'+dataArray[1]+';'+dataArray[2]+';'+dataArray[3]+';'+parseFloat(dataArray[4]/100000)+';'+dataArray[5]+';'+dataArray[6]+';'+dataArray[7]+';'+dataArray[8]+';'+dataArray[9]);
         self.id = parseFloat(dataArray[0]/100000000);
         //self.number = dataArray[1];
-        self.x = parseInt(dataArray[1]-camera.x);
-        self.y = parseInt(dataArray[2]-camera.y);
+
+        console.log('on update : '+self.pseudo+' '+(parseInt(dataArray[1])-camera.x)+':'+(parseInt(dataArray[1])-camera.y));
+        this.positions.push({x:(parseInt(dataArray[1])-camera.x),
+                            y:(parseInt(dataArray[2])-camera.y),
+                            });
+        this.positions[self.positions.length-1].t = Date.now();
+        //self.x = parseInt(dataArray[1]-camera.x);
+        //self.y = parseInt(dataArray[2]-camera.y);
+
+
         self.rotation = parseFloat(dataArray[3]/100000000);
         self.hp = parseInt(dataArray[4]);
         self.hpMax = parseInt(dataArray[5]);
@@ -164,6 +178,26 @@ var Player = function(initPack) {
         self.isShooting = dataArray[9];
         self.isMoving = dataArray[10];
         self.size = parseInt(dataArray[11]);
+
+    };
+
+    self.interpolate = function(tps){
+        var interptime = tps - 50;
+        //console.log(self.positions);
+        for(var i = 0; self.positions.length-1;i++){
+            if(self.positions[i].t <= interptime && self.positions[i + 1].t >= interptime){
+            self.preX = self.x;
+            self.preY = self.y;
+            var ratio = (interptime - self.positions[i].t)/(self.positions[i + 1].t - self.positions[i].t);
+            var x = Math.round(self.positions[i].x + ratio * (self.positions[i + 1].x - self.positions[i].x));
+            var y = Math.round(self.positions[i].y + ratio * (self.positions[i + 1].y - self.positions[i].y));
+            self.x = x;
+            self.y = y;
+            //console.log('inter '+self.pseudo+' '+x+':'+y);
+            break;
+            self.positions.splice(0, i - 1);
+}
+        }
     };
 
     return self;

@@ -183,8 +183,8 @@
 				{
 					camera.moveTo(data.player[i].x,data.player[i].y);
 				}
-				//console.log('addNew init '+data.player[i].id);
 				var id = parseFloat(data.player[i].id/100000000);
+				console.log('addNew init '+id/*data.player[i].id*/);
 				players[id] = new Player(data.player[i]);
 				/*console.log(players[data.player[i].id]);*/
 				//Player.list[data.player[i]]= new Player(data.player[i]);
@@ -568,6 +568,11 @@
 		//=================================================================
 		// Update loop :
 		setInterval(function(){
+			var t = Date.now();
+			for(var i in players)
+			{
+				players[i].interpolate(t);
+			}
 			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
 			ctx.save();
 
@@ -575,7 +580,7 @@
 			drawBullets();
 			drawPlayers();
 			drawSpellIndicators();
-		},25);
+		},1000/60);
 
 
 	</script>
