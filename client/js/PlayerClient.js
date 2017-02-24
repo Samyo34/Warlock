@@ -181,30 +181,28 @@ var Player = function(initPack) {
 
     };
 
-    self.interpolate = function(tps,camera){
+    self.interpolate = function(tps,isSelfPlayer){
         var interptime = tps - 45;
         //console.log(self.positions);
-        for(var i = 0; self.positions.length-1;i++){
-            console.log(self.positions);
-            if(self.positions[i] !== undefined)
-            {
+        for(var i = 0; self.positions.length-2;i++){
+            //console.log(camera);
                 if(self.positions[i].t <= interptime && self.positions[i + 1].t >= interptime){
 /*                    self.preX = self.x;
                     self.preY = self.y;*/
                     var ratio = (interptime - self.positions[i].t)/(self.positions[i + 1].t - self.positions[i].t);
                     var x = Math.round(self.positions[i].x + ratio * (self.positions[i + 1].x - self.positions[i].x));
                     var y = Math.round(self.positions[i].y + ratio * (self.positions[i + 1].y - self.positions[i].y));
-                    if(camera !== null)
+                    console.log(self.pseudo+" "+camera);
+                    if(isSelfPlayer === true)
                     {
                         camera.moveTo(x,y);
                     }
                     self.x = x-camera.x;
                     self.y = y-camera.y;
-                    console.log('inter '+self.pseudo+' '+x+':'+y);
+                   // console.log('inter '+self.pseudo+' '+x+':'+y);
                     self.positions.splice(0, i);
                     break;
                 }
-            }
         }
     };
 

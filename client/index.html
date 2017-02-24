@@ -575,13 +575,13 @@
 
 				if(players[i].id===selfId)
 				{
-					camera2 = camera/*.moveTo(players[i].x,players[i].y)*/;
+					players[i].interpolate(Date.now(),true);
 				}
 				else
 				{
-					camera2 = null;
+					players[i].interpolate(Date.now(),false);
 				}
-				players[i].interpolate(Date.now(),camera);
+				
 			}
 
 			for(var i in bullets)

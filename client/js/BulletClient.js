@@ -83,7 +83,7 @@
                 var y = Math.round(self.positions[i].y + ratio * (self.positions[i + 1].y - self.positions[i].y));
                 self.x = x;
                 self.y = y;
-                console.log('inter '+self.pseudo+' '+x+':'+y);
+                //console.log('inter '+self.pseudo+' '+x+':'+y);
                 self.positions.splice(0, i);
                 break;
             }
