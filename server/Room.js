@@ -54,6 +54,17 @@ var globale = require('./globale.js');
 
 	update()
 	{
+	   for(var i = 0; i < this.players.length; i++){
+	   	this.players[i].update();
+	   }
+
+	   for(var i = 0; i < this.bullets.length; i++){
+	   	this.bullets[i].update();
+	   }
+	}
+
+	updatePack()
+	{
 		/*if(this.currentRound === 0)
 		{
 			this.startNextRound();
@@ -65,7 +76,7 @@ var globale = require('./globale.js');
 		if(this.players.length !== 0)
 		{
 			if(this.gameover === false) {
-				var bufferPlayers = this.updatePlayers();
+				var bufferPlayers = this.getUpdatePackPlayers();
 				var bufferBullets = this.updateBullets();
 				var packBuffer = new ArrayBuffer((bufferPlayers.byteLength+bufferBullets.byteLength));
 				//console.log('update '+bufferBullets.byteLength);
@@ -130,7 +141,7 @@ var globale = require('./globale.js');
 
 	}
 
-	updatePlayers()
+	getUpdatePackPlayers()
 	{
 	    var sizeBufferPlayer = 4*12;
 	    var sizeBuffer = (sizeBufferPlayer*this.players.length+4);
@@ -142,7 +153,7 @@ var globale = require('./globale.js');
 	    for(var i = 0; i < this.players.length; i++)
 	    {
 	    	var player =  this.players[i];
-	        player.update();
+	        //player.update();
 	     	var updatePack = player.getUpdatePack();
 	    	for (var j = 0;j<updatePack.length;j++)
 	     	{
@@ -278,7 +289,7 @@ var globale = require('./globale.js');
 	    for(var i = 0; i < this.bullets.length;i++)
 	    {
 	        var bullet =  this.bullets[i];
-	        bullet.update();
+	        //bullet.update();
 	        if(bullet.toRemove)
 	        {
 	            this.removePack.bullet.push({id:parseInt(bullet.id*100000000)});

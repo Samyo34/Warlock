@@ -136,6 +136,12 @@ setInterval(function(){
 	
 },1000/25);
 
+//Loop for network
+setInterval(function(){
+	game.updatePack();
+},1000/15);
+
+
 // Loop for placing players in rooms
 setInterval(function(){
 

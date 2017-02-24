@@ -147,12 +147,7 @@ var BulletManager = function(){
 //BulletManagerlist = {};
 
 BulletManager.prototype.update = function(){
-    var sizeBufferBullet = 4*7;
-    var sizeBuffer = (sizeBufferBullet*Object.keys(this.BulletList).length);
-    var arrayBufferAllBullet = new ArrayBuffer(sizeBuffer);
-    var viewArrayBufferAllPlayer = new Int32Array(arrayBufferAllBullet);
-    var indexBullet = 0;
-    for(var i in this.BulletList)
+     for(var i in this.BulletList)
     {
         var bullet =  this.BulletList[i];
         bullet.update();
@@ -161,18 +156,24 @@ BulletManager.prototype.update = function(){
             removePack.bullet.push({id:parseInt(bullet.id*100000000)});
             delete this.BulletList[i];
         }
-        else
+    }
+}
+
+BulletManager.prototype.updatePack = function(){
+    var sizeBufferBullet = 4*7;
+    var sizeBuffer = (sizeBufferBullet*Object.keys(this.BulletList).length);
+    var arrayBufferAllBullet = new ArrayBuffer(sizeBuffer);
+    var viewArrayBufferAllPlayer = new Int32Array(arrayBufferAllBullet);
+    var indexBullet = 0;
+    for(var i in this.BulletList)
+    {
+        var bullet =  this.BulletList[i];
+        var updatePack = bullet.getUpdatePack();
+        for (var j = 0;j<updatePack.length;j++)
         {
-            var updatePack = bullet.getUpdatePack();
-            for (var j = 0;j<updatePack.length;j++)
-            {
-                viewArrayBufferAllPlayer[(indexBullet*updatePack.length)+j]=updatePack[j];
-            }
-            indexBullet++;
+            viewArrayBufferAllPlayer[(indexBullet*updatePack.length)+j]=updatePack[j];
         }
-
-
-
+        indexBullet++;
     }
     //console.log('bullets '+arrayBufferAllBulletManagerbyteLength);
     return arrayBufferAllBullet;

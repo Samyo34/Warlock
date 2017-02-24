@@ -386,6 +386,3 @@
 module.exports = {fireBall : fireBall , lightning : lightning, blink, blink,scurge : scurge};
 
 })();
-
-
-

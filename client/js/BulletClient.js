@@ -6,6 +6,8 @@
       //self.spellName = self.getNameByCode(self.spellCode);
       self.players = players;
 
+      self.positions = [];
+
       self.parentID = parseFloat(initPack.parent/100000000);
       self.x = initPack.x-camera.x;
       self.y = initPack.y-camera.y;
@@ -59,11 +61,35 @@
                 self.id = parseFloat(updatePack[0]/100000000);
                 self.spellName = updatePack[1];
                 self.parentID = parseFloat(updatePack[2]/100000000);
-                self.x = updatePack[3]-camera.x;
-                self.y = updatePack[4]-camera.y;
+                self.positions.push({x:(parseInt(updatePack[3])-camera.x),
+                                y:(parseInt(updatePack[4])-camera.y),
+                                });
+                self.positions[self.positions.length-1].t = Date.now();
+/*                self.x = updatePack[3]-camera.x;
+                self.y = updatePack[4]-camera.y;*/
                 self.orientation = parseFloat(updatePack[5]/100000000);
                 self.range =updatePack[6];
             };
+
+    self.interpolate = function(tps,camera){
+        var interptime = tps - 60;
+        //console.log(self.positions);
+        for(var i = 0; self.positions.length-2;i++){
+            if(self.positions[i].t <= interptime && self.positions[i + 1].t >= interptime){
+/*                self.preX = self.x;
+                self.preY = self.y;*/
+                var ratio = (interptime - self.positions[i].t)/(self.positions[i + 1].t - self.positions[i].t);
+                var x = Math.round(self.positions[i].x + ratio * (self.positions[i + 1].x - self.positions[i].x));
+                var y = Math.round(self.positions[i].y + ratio * (self.positions[i + 1].y - self.positions[i].y));
+                self.x = x;
+                self.y = y;
+                console.log('inter '+self.pseudo+' '+x+':'+y);
+                self.positions.splice(0, i);
+                break;
+            }
+        }
+    };
+
 
             self.getNameByCode = function(code)
             {

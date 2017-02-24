@@ -220,11 +220,11 @@
 				}
 				//console.log(debug);
 				var idPlayer = parseFloat(playerUpdate[0]/100000000);
-				if(idPlayer===selfId)
+/*				if(idPlayer===selfId)
 				{
 					camera.moveTo(playerUpdate[1],playerUpdate[2]);
-				}
-				//console.log('onUpdate '+idPlayer+' '+playerUpdate[0]+' '+playerUpdate[1]);
+				}*/
+				console.log('onUpdate '+idPlayer+' '+playerUpdate[0]+' '+playerUpdate[1]);
 				players[idPlayer].onUpdate(playerUpdate);
 			}
 
@@ -567,11 +567,26 @@
 
 		//=================================================================
 		// Update loop :
+		var camera2 = null;
 		setInterval(function(){
-			var t = Date.now();
+			
 			for(var i in players)
 			{
-				players[i].interpolate(t);
+
+				if(players[i].id===selfId)
+				{
+					camera2 = camera/*.moveTo(players[i].x,players[i].y)*/;
+				}
+				else
+				{
+					camera2 = null;
+				}
+				players[i].interpolate(Date.now(),camera);
+			}
+
+			for(var i in bullets)
+			{
+				bullets[i].interpolate(Date.now());
 			}
 			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
 			ctx.save();
@@ -580,7 +595,7 @@
 			drawBullets();
 			drawPlayers();
 			drawSpellIndicators();
-		},1000/60);
+		},1000/40);
 
 
 	</script>

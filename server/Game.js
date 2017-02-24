@@ -97,6 +97,10 @@ var Player = require('./Player.js');
             // Let's clean the empty rooms:
             this.cleanRooms();
         }
+
+        updatePack(){
+            this.gameRooms.updatePack();
+        }
     };
 
     module.exports = Game;

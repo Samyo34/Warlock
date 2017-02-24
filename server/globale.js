@@ -6,4 +6,3 @@ module.exports = {
 	SOCKET_LIST : {}
 
 }
-
