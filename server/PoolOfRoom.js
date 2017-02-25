@@ -84,6 +84,14 @@ var Room = require('./Room.js');
             }
         }
 
+        updatePack()
+        {
+               for(var i = 0; i < this.length; i++)
+            {
+                this[i].updatePack();
+            }
+        }
+
 
 
     };
@@ -91,10 +99,3 @@ var Room = require('./Room.js');
     module.exports = PoolOfRoom;
 
 })();
-
-
-
-
-
-
-

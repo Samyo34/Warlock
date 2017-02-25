@@ -189,8 +189,9 @@
 				{
 					camera.moveTo(data.player[i].x,data.player[i].y);
 				}
-				//console.log('addNew init '+data.player[i].id);
+
 				let id = parseFloat(data.player[i].id/100000000);
+				console.log('addNew init '+id/*data.player[i].id*/);
 				players[id] = new Player(data.player[i]);
 				/*console.log(players[data.player[i].id]);*/
 				//Player.list[data.player[i]]= new Player(data.player[i]);
@@ -227,12 +228,13 @@
 					playerUpdate.push(buffView[i+j]);
 				}
 				//console.log(debug);
-				let idPlayer = parseFloat(playerUpdate[0]/100000000);
-				if(idPlayer===selfId)
+
+				var idPlayer = parseFloat(playerUpdate[0]/100000000);
+/*				if(idPlayer===selfId)
 				{
 					camera.moveTo(playerUpdate[1],playerUpdate[2]);
-				}
-				//console.log('onUpdate '+idPlayer+' '+playerUpdate[0]+' '+playerUpdate[1]);
+				}*/
+				console.log('onUpdate '+idPlayer+' '+playerUpdate[0]+' '+playerUpdate[1]);
 				players[idPlayer].onUpdate(playerUpdate);
 			}
 
@@ -588,7 +590,27 @@
 
 		//=================================================================
 		// Update loop :
+		var camera2 = null;
 		setInterval(function(){
+
+			for(var i in players)
+			{
+
+				if(players[i].id===selfId)
+				{
+					players[i].interpolate(Date.now(),true);
+				}
+				else
+				{
+					players[i].interpolate(Date.now(),false);
+				}
+
+			}
+
+			for(var i in bullets)
+			{
+				bullets[i].interpolate(Date.now());
+			}
 			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
 			ctx.save();
 
@@ -597,7 +619,7 @@
 			drawBullets();
 			drawPlayers();
 			drawSpellIndicators();
-		},25);
+		},1000/40);
 
 
 	</script>
