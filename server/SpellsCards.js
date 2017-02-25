@@ -37,7 +37,8 @@ var scurge = require('./Spells.js').scurge;
 			// Let's update the cd
 			this.cdCurrent = this.cd;
 
-			return new fireBall(this.parent,
+			return new fireBall(
+				this.parent,
 				aimGoalPoint,
 				this.damages,
 				this.speed,
@@ -81,7 +82,7 @@ var scurge = require('./Spells.js').scurge;
 		this.cd = 100;
 		this.cdCurrent = 0;
 		this.cdProgress = 0;
- 		
+
  	}
 
 	updateCooldown () {
@@ -128,7 +129,7 @@ var scurge = require('./Spells.js').scurge;
 		this.cdCurrent = 0;
 		this.cdProgress = 0;
 		this.rangeAction = null;
- 		
+
  	}
 
 	updateCooldown() {

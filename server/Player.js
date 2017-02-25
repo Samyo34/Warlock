@@ -27,9 +27,9 @@ class Player{
 		//this.socket = socket;
 
 		//this.number = "" + Math.floor(10 * Math.random());
-	    this.size = 32; // car le sprite des wizard fait 32x32 pix
+	  this.size = 32; // car le sprite des wizard fait 32x32 pix
 
-	    this.time =0;
+	  this.time =0;
 
 		this.rotation = 0;
 		this.angularVelocity = 0;
@@ -39,39 +39,39 @@ class Player{
 		this.goalDest = {
 	        x:this.x,
 	        y:this.y
-	    };
+	  };
 
-	    this.isDead = false;
+    this.isDead = false;
 
-	    this.hpMax = 200;
-	    this.hp = 200;
+    this.hpMax = 200;
+    this.hp = 200;
 
-	    this.SPEED = 4;
+    this.SPEED = 4;
 
-	    this.friction = 1;
-	    this.currentSpeed = 0;
-	    this.isActive = true;
+    this.friction = 1;
+    this.currentSpeed = 0;
+    this.isActive = true;
 
-	    this.spellList = []; // array of spells available for the player
-	    this.spellList.push(new fireballCard(this));
-	    this.spellList.push(new blinkCard(this));
-	    this.spellList.push(new lightningCard(this));
-	    this.spellList.push(new scurgeCard(this));
+    this.spellList = []; // array of spells available for the player
+    this.spellList.push(new fireballCard(this));
+    this.spellList.push(new blinkCard(this));
+    this.spellList.push(new lightningCard(this));
+    this.spellList.push(new scurgeCard(this));
 
-	    //this.spellsParams = SpellsParam();
-	    this.spellsToCast = [];
+    //this.spellsParams = SpellsParam();
+    this.spellsToCast = [];
 
 		// velocity caused by the enemy spells. This velocity is added to the player one
 		this.enemySpellActionVelocity = {
 	        x:0,
 	        y:0
-	    };
+	  };
 
 		this.actionTime = 0; // time when the spell action is over
 		this.ratioSpeed = 1;
-	    this.actionDuration = 0; // duration of the spell action
+	  this.actionDuration = 0; // duration of the spell action
 
-	    this.targetVisible = false; // Is the player pressing a key for a spell
+	  this.targetVisible = false; // Is the player pressing a key for a spell
 		this.targetType = '';
 
 		this.Spell = [];
@@ -85,7 +85,7 @@ class Player{
 		this.mouseAngle = 0;
 		//this.room.players.push(this);
 	}
-	
+
 	initPlayer() {
 		this.spdX = 0;
 		this.spdY = 0;
@@ -106,9 +106,9 @@ class Player{
 		this.enemySpellActionVelocity = {
 	        x:0,
 	        y:0
-	    };
+	  };
 
-	    this.isShooting = false;
+	  this.isShooting = false;
 		this.isMoving = false;
 		this.aimGoalPoint = {
 			x:this.x,
@@ -169,10 +169,10 @@ class Player{
 			targetType: this.targetType,
 			isShooting: this.isShooting,
 			isMoving: this.isMoving,
-	        sizePlayer: this.size,
+	    sizePlayer: this.size,
 			isDead: this.isDead,
 			pseudo: this.pseudo,
-		};		
+		};
 	}
 
 	getCooldownsPack(){
@@ -212,7 +212,7 @@ class Player{
 		{
 			valuesArray[7] = parseInt(0);
 		}
-		
+
 		if(this.isDead)
 		{
 			valuesArray[8] = parseInt(1);
@@ -242,7 +242,7 @@ class Player{
 		valuesArray[11] = parseInt(this.size);
 		//valuesArray[12] = parseInt(10);
 		return valuesArray;
-	/*		return ''+this.id + ';' +
+		/*		return ''+this.id + ';' +
 		parseInt(this.x)+ ';' +
 		parseInt(this.y)+ ';' +
 		parseInt(this.rotation*100000)+ ';' +
@@ -295,42 +295,6 @@ class Player{
 		this.aimGoalPoint.x = aimGoalPoint.x;
 		this.aimGoalPoint.y = aimGoalPoint.y;
 		this.spellsToCast.push(this.getSpellByName(name));
-
-		/*if(name == "fireball")
-	replaceAll('data name')            this.aimGoalPoint.x = aimGoalPoint.x;
-	         this.aimGoalPoint.y = aimGoalPoint.y;
-	         this.spellsToCast.push(this.spellList[0]);
-		}
-		else if(name == "blink")
-		{
-	         this.aimGoalPoint.x = aimGoalPoint.x;
-	         this.aimGoalPoint.y = aimGoalPoint.y;
-	         this.spellsToCast.push(this.spellList[1]);
-		}
-		else if(name == "lightning")
-		{
-	         this.aimGoalPoint.x = aimGoalPoint.x;
-	         this.aimGoalPoint.y = aimGoalPoint.y;
-	         this.spellsToCast.push(this.spellList[2]);
-		}
-		else if (name == "scurge")
-	     {
-	         //console.log("scurge");
-	         spellDescriptor = { spellName:"scurge",
-	                             spellType:"bullet",
-	                             x:this.x,
-	                             y:this.y,
-	                             damages:10,
-	                             lifeTime:10,
-	                             cooldown:5000,
-	                             range: this.size*4};
-	         this.linkedSpells.push(spellDescriptor);
-	         this.spellsToCast.push(this.spellList[3]/*spellDescriptor);
-	     }
-	         //this.linkedSpells.push(spellDescriptor);
-	         //this.spellsToCast.push(this.spellList[3]);
-	     }
-	     */
 	}
 
 	// then, when the wizard have the right orientation we cast it
@@ -341,14 +305,6 @@ class Player{
 			var socket = globale.SOCKET_LIST[this.id];
 			socket.emit('cd',{name:this.spellsToCast[0].name,cd:this.spellsToCast[0].cd});
 			this.spellsToCast.shift();
-			/*var s = Spell(this, this.spellsToCast[0]);
-			var name = this.spellsToCast[0].spellName;
-			this.spellCooldowns[name].current = this.spellCooldowns[name].total;
-			this.spellsToCast.shift();*/
-	         /*if(this.linkedSpells[0])
-	         {
-	            this.linkedSpells.shift();
-	         }*/
 		}
 		else
 		{
@@ -433,7 +389,7 @@ class Player{
 				this.rotation += this.angularVelocity/1000; // Why /1000 ?
 			}
 		}
-		else 
+		else
 		{
 			if(Math.abs(this.x - this.goalDest.x) <= 8 && Math.abs(this.y - this.goalDest.y) <= 8 ) {
 				this.spdX = 0;
@@ -528,4 +484,4 @@ class Player{
 	}
 }
 
-module.exports = Player;	
+module.exports = Player;
