@@ -70,6 +70,9 @@ spellIndicator.prototype.draw = function() {
     ctx.globalCompositeOperation = 'source-over';
 };
 
+/**
+ * For a given key of a spell, return its ctx (canvas)
+ */
 function getRightCtx(key) {
     var n;
     switch (key) {
@@ -94,4 +97,3 @@ function getRightCtx(key) {
 
     return ctxSpellIndic;
 }
-

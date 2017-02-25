@@ -33,6 +33,7 @@ var isPressedR = false;
 			}
 		}
 	};
+
 	document.onkeyup = function(event){
 		if(event.keyCode === 65) { // key A
 			socket.emit('keyPress', {inputId: 'A', state: false});
@@ -61,31 +62,30 @@ var isPressedR = false;
 		console.log(event.which);
 		switch (event.which) {
 			case 1:
-            console.log('Left click');
-            socket.emit('mouseLeftClick',{
-               x:click_X,
-               y:click_Y
-           });
-            break;
-            case 2:
-            console.log('Middle click');
-            break;
-            case 3:
-            console.log('Right click : '+click_X+':'+click_Y);
-            socket.emit('mouseRightClick',{
-               x:click_X,
-               y:click_Y
-           });
-            break;
-            default:
-            console.log("Unknown click")
-        }
-    });
+	      console.log('Left click');
+	      socket.emit('mouseLeftClick',{
+	         x:click_X,
+	         y:click_Y
+	     });
+	      break;
+	    case 2:
+		    console.log('Middle click');
+		    break;
+	    case 3:
+		    console.log('Right click : '+click_X+':'+click_Y);
+		    socket.emit('mouseRightClick',{
+		       x:click_X,
+		       y:click_Y
+		   	});
+		    break;
+	    default:
+    	console.log("Unknown click")
+		}
+  });
+
 	$("#ctx").mousemove(function( event ) {
-		var parentOffset = $(this).parent().offset();
-		//or $(this).offset(); if you really just want the current element's offset
-		mouse_X = event.pageX - parentOffset.left;
-		mouse_Y = event.pageY - parentOffset.top;
+		mouse_X = event.pageX - $(this).offset().left;
+		mouse_Y = event.pageY - $(this).offset().top;
 	});
 
 	// Disable the popup triggered by the right click

@@ -119,12 +119,12 @@ io.sockets.on('connection', function(socket){
 			globale.SOCKET_LIST[i].emit('addToChat', player.pseudo + ': ' + data);
 		}
 	});
-	
+
 	socket.on('evalServer',function(data){
 		if(!DEBUG)
 			return;
 		var res = eval(data);
-		socket.emit('evalAnswer',res);		
+		socket.emit('evalAnswer',res);
 	});
 });
 
@@ -133,7 +133,7 @@ setInterval(function(){
 	//console.log(rooms)
 	// console.log(globale.SOCKET_LIST)
 	game.update();
-	
+
 },1000/25);
 
 //Loop for network
@@ -144,7 +144,6 @@ setInterval(function(){
 
 // Loop for placing players in rooms
 setInterval(function(){
-
 	game.findRoomForWaitingPlayer();
 	//console.log(game.gamePlayers)
 

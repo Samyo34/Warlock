@@ -66,7 +66,7 @@ var Player = function(initPack) {
             {
                 if(Date.now() > self.lastChangeTransiTime + 1000/25){
                     self.indexMove++;
-                    
+
                     //changement de transition
                     if(self.indexMove >= self.indexMoveX.length-1)
                     {
@@ -100,7 +100,7 @@ var Player = function(initPack) {
             }
             else
             {
-                if (self.isShooting === 1) 
+                if (self.isShooting === 1)
                 {
                     ctx.drawImage(Img.playerSheet_enemy, self.indexCastX[self.indexCast], self.indexCastY[self.indexCast], width, height, -(self.size/2), -(self.size/2), self.size, self.size);
                 }
@@ -158,7 +158,7 @@ var Player = function(initPack) {
         self.id = parseFloat(dataArray[0]/100000000);
         //self.number = dataArray[1];
 
-        console.log('on update : '+self.pseudo+' '+(parseInt(dataArray[1])-camera.x)+':'+(parseInt(dataArray[1])-camera.y));
+        //console.log('on update : '+self.pseudo+' '+(parseInt(dataArray[1])-camera.x)+':'+(parseInt(dataArray[1])-camera.y));
         self.positions.push({x:(parseInt(dataArray[1])/*-camera.x*/),
                             y:(parseInt(dataArray[2])/*-camera.y*/),
                             });
@@ -187,12 +187,13 @@ var Player = function(initPack) {
         for(var i = 0; self.positions.length-2;i++){
             //console.log(camera);
                 if(self.positions[i].t <= interptime && self.positions[i + 1].t >= interptime){
-/*                    self.preX = self.x;
+                    /*
+                    self.preX = self.x;
                     self.preY = self.y;*/
                     var ratio = (interptime - self.positions[i].t)/(self.positions[i + 1].t - self.positions[i].t);
                     var x = Math.round(self.positions[i].x + ratio * (self.positions[i + 1].x - self.positions[i].x));
                     var y = Math.round(self.positions[i].y + ratio * (self.positions[i + 1].y - self.positions[i].y));
-                    console.log(self.pseudo+" "+camera);
+                    //console.log(self.pseudo+" "+camera);
                     if(isSelfPlayer === true)
                     {
                         camera.moveTo(x,y);

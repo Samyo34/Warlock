@@ -109,7 +109,7 @@ var BulletManager = function(){
 			}
 		}
 	};
-	
+
 	self.getInitPack = function(){
 		return {
 			id:self.id,
@@ -140,7 +140,7 @@ var BulletManager = function(){
 	BulletManagerlist[self.id] = self;
 
 	initPack.bullet.push(self.getInitPack());
-	
+
 	return self;*/
 };
 
@@ -187,7 +187,7 @@ BulletManager.prototype.updatePack = function(){
 			removePack.bullet.push(bullet.id);
             console.log('remove bullet');
 		} else
-			pack.push(bullet.getUpdatePack());	
+			pack.push(bullet.getUpdatePack());
 	}
 	return pack;*/
 };
