@@ -61,19 +61,25 @@
 		// Variable which stores our ID
 		var selfId;
 
+		// First login page, we hide the other components:
 		$(".gameArea").css('display', 'none');
 		$('#ctx')[0].style.visibility = "hidden";
 
+		// When the player enter his pseudo, send it to the server:
 		$("#loginForm").submit(function(e){
 			e.preventDefault();
 			socket.emit("login", $("#pseudo").val());
 		});
 
+		// The server acknowledge the creation of the player
+		// Let's hide the login page
 		socket.on("playerCreated", function(data){
 			$(".loginPanel").css('display', 'none');
 		});
 
-		socket.on("gameStarted", function(data){
+		// When the server has created the game
+		// We display the room
+		socket.on("gameCreated", function(data){
 			$(".loginPanel").css('display', 'none');
 			$('#ctx')[0].style.visibility = "visible";
 			$(".gameArea").css('display', 'flex');
@@ -178,19 +184,19 @@
 			 delete bullets[i];
 			 }*/
 			// We add the players and the bullets already in game to our players and bullets lists
-			for(var i = 0 ; i < data.player.length; i++){
+			for(let i = 0 ; i < data.player.length; i++){
 				if(parseFloat(data.player[i].id/100000000) === selfId)
 				{
 					camera.moveTo(data.player[i].x,data.player[i].y);
 				}
 				//console.log('addNew init '+data.player[i].id);
-				var id = parseFloat(data.player[i].id/100000000);
+				let id = parseFloat(data.player[i].id/100000000);
 				players[id] = new Player(data.player[i]);
 				/*console.log(players[data.player[i].id]);*/
 				//Player.list[data.player[i]]= new Player(data.player[i]);
 
 			}
-			for(var i = 0 ; i < data.bullet.length; i++)
+			for(let i = 0 ; i < data.bullet.length; i++)
 			{
 				//console.log('add new bullet');
 				bullets[parseFloat(data.bullet[i].id/100000000)] =  new Bullet(data.bullet[i],players);
@@ -199,6 +205,8 @@
 		});
 
 		var cdArray = [];
+		var nbPlayer = 0;
+		var nbPlayerMax = 0;
 
 		// on "update" package reception:
 		socket.on('update',function(data){
@@ -208,18 +216,18 @@
 
 			var buffView = new Int32Array(data);
 			// console.log(buffView.length+ ' '+data.byteLength);
-			for(var i = 1; i < (buffView[0]*12)+1; i+=12)// for all players
+			for(let i = 1; i < (buffView[0]*12)+1; i+=12)// for all players
 			{
 
-				var playerUpdate = [];
-				var debug = i+': ';
-				for(var j =0;j<12;j++)// for all element concerning the player
+				let playerUpdate = [];
+				let debug = i+': ';
+				for(let j =0; j<12; j++)// for all element concerning the player
 				{
 					debug+=buffView[i+j] + '|';
 					playerUpdate.push(buffView[i+j]);
 				}
 				//console.log(debug);
-				var idPlayer = parseFloat(playerUpdate[0]/100000000);
+				let idPlayer = parseFloat(playerUpdate[0]/100000000);
 				if(idPlayer===selfId)
 				{
 					camera.moveTo(playerUpdate[1],playerUpdate[2]);
@@ -228,17 +236,17 @@
 				players[idPlayer].onUpdate(playerUpdate);
 			}
 
-			for (var i = (buffView[0]*12)+1;i<buffView.length;i+=7)// for all element concerning bullets
+			for (let i = (buffView[0]*12)+1; i<buffView.length; i+=7)// for all element concerning bullets
 			{
-				var bulletUpdated = [];
-				var debug = i+': ';
-				for (var j = 0; j<7;j++)
+				let bulletUpdated = [];
+				let debug = i+': ';
+				for (let j = 0; j<7; j++)
 				{
 					debug+=buffView[i+j] +'|';
 					bulletUpdated.push(buffView[i+j]);
 				}
 				//console.log(debug);
-				var idBullet = parseFloat(bulletUpdated[0]/100000000);
+				let idBullet = parseFloat(bulletUpdated[0]/100000000);
 				//console.log(bullets[idBullet]);
 				if(bullets[idBullet])
 				{
@@ -293,11 +301,11 @@
 		// on "remove" package reception:
 		socket.on('remove',function(data){
 			//{player:[12323],bullet:[12323,123123]}
-			for(var i = 0 ; i < data.player.length; i++){
+			for(let i = 0 ; i < data.player.length; i++){
 				delete players[parseFloat(data.player[i].id/100000000)];
 				//delete Player.list[data.player[i]];
 			}
-			for(var i = 0 ; i < data.bullet.length; i++)
+			for(let i = 0 ; i < data.bullet.length; i++)
 			{
 				console.log('remove bullet');
 				delete bullets[parseFloat(data.bullet[i].id/100000000)];
@@ -305,7 +313,7 @@
 		});
 
 		socket.on('cd',function(data){
-			for(var i = 0; i<spellIndicators.length;i++)
+			for(let i = 0; i<spellIndicators.length;i++)
 			{
 				//console.log('ccd '+' '+spellIndicators[i].spellName+ ':' +data.name);
 				if(spellIndicators[i].spellName === data.name)
@@ -318,9 +326,9 @@
 		});
 
 		socket.on('endCD',function(data){
-			for(var i = 0;i<data.spells.length;i++)
+			for(let i = 0;i<data.spells.length;i++)
 			{
-				for (var j = 0; j<spellIndicators.length;j++)
+				for (let j = 0; j<spellIndicators.length;j++)
 				{
 					if(spellIndicators[j].spellName === data.spells[i])
 					{
@@ -333,6 +341,9 @@
 
 		socket.on('infoRoom', function(data){
 			console.log("LoOL")
+			nbPlayer = data.nbPlayer;
+			nbPlayerMax = data.nbPlayerMax;
+
 			$("#playerNb").text(data.nbPlayer);
 			$("#playerNbMax").text(data.nbPlayerMax);
 			$("#round").text(data.round);
@@ -456,13 +467,13 @@
 			drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, "#557788", "#7799aa", true);
 		}
 		function drawLightning(x_start, y_start, x_aimPoint, y_aimPoint, color1, color2, drawOrbs) {
-			var x = x_start - x_aimPoint;
-			var y = y_start - y_aimPoint;
-			var segments = 10;
-			var distance = Math.sqrt(x * x + y * y);
-			var width = distance / segments;
-			var prevX = x_aimPoint;
-			var prevY = y_aimPoint;
+			let x = x_start - x_aimPoint;
+			let y = y_start - y_aimPoint;
+			let segments = 10;
+			let distance = Math.sqrt(x * x + y * y);
+			let width = distance / segments;
+			let prevX = x_aimPoint;
+			let prevY = y_aimPoint;
 
 			if(drawOrbs) {
 				// Draw point
@@ -474,11 +485,11 @@
 				ctx.fill();
 			}
 
-			for(var i = 0; i <= segments; i++) {
-				var magnitude = (width * i) / distance;
+			for(let i = 0; i <= segments; i++) {
+				let magnitude = (width * i) / distance;
 
-				var x3 = magnitude * x_start + (1 - magnitude) * x_aimPoint;
-				var y3 = magnitude * y_start + (1 - magnitude) * y_aimPoint;
+				let x3 = magnitude * x_start + (1 - magnitude) * x_aimPoint;
+				let y3 = magnitude * y_start + (1 - magnitude) * y_aimPoint;
 
 				if(i !== 0 && i !== segments) {
 					x3 += (Math.random() * width) - (width / 2);
@@ -542,21 +553,21 @@
 		//=================================================================
 		// Draw functions :
 		function drawBullets() {
-			for(var i in bullets)
+			for(let i in bullets)
 			{
 				console.log('draw bullets');
 				bullets[i].draw();
 			}
 		};
 		function drawPlayers() {
-			for(var i in players)
+			for(let i in players)
 			{
 				players[i].draw();
 				players[i].drawTarget();
 			}
 		};
 		function drawSpellIndicators() {
-			for (var i in spellIndicators)
+			for (let i in spellIndicators)
 			{
 				spellIndicators[i].draw();
 			}
@@ -565,12 +576,23 @@
 			ctx.drawImage(Img.map, camera.x, camera.y,camera.width,camera.height,0,0,camera.width,camera.height);
 		};
 
+		function drawIndicators () {
+			//ctx.drawImage(Img.map, camera.x, camera.y,camera.width,camera.height,0,0,camera.width,camera.height);
+			ctx.font = '42px Impact';
+			ctx.fillStyle="#000000"; // noir
+
+			let txt = "Waiting for player... (" + nbPlayer +"/" + nbPlayerMax + ")";
+			let txtSize = ctx.measureText(txt).width;
+			ctx.fillText(txt, ctx.canvas.clientWidth/2-txtSize/2, 50);
+		};
+
 		//=================================================================
 		// Update loop :
 		setInterval(function(){
 			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
 			ctx.save();
 
+			drawIndicators();
 			drawMap();
 			drawBullets();
 			drawPlayers();
@@ -581,4 +603,3 @@
 	</script>
 </body>
 </html>
-

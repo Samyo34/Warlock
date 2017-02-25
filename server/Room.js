@@ -10,7 +10,7 @@ var globale = require('./globale.js');
 		this.nbPlayerMax = nbPlayerMax;
 		this.nbPlayer = 0;
 		this.id = Math.random();
-		this.type = type;// deathmatch, ...
+		this.type = type; // deathmatch, ...
 
 		this.hasToBeRemoved = false;
 
@@ -159,7 +159,7 @@ var globale = require('./globale.js');
 		console.log("Add player " + player.id + " to room " + this.id)
 		player.room = this;
 		var socket = globale.SOCKET_LIST[player.id];
-		socket.emit("gameStarted", true);
+		socket.emit("gameCreated", true);
 
 		if(this.players.length < this.nbPlayerMax)
 		{
@@ -321,9 +321,9 @@ var globale = require('./globale.js');
 	{
 		if(this.currentRound <= this.nbRound)
 		{
-			console.log("start Round")
+			console.log("Start Round " + this.currentRound)
 			var positions = this.getPositions();
-			for(var i = 0; i<this.players.length;i++)
+			for(var i = 0; i<this.players.length; i++)
 			{
 				var p = this.players[i];
 				p.x = positions[i][0];
@@ -332,12 +332,13 @@ var globale = require('./globale.js');
 			}
 			this.currentRound++;
 
+			// Send to the client the updated infos:
 			this.updateInfoRoom();
 		}
 		else
 		{
 			console.log('Game Over !');
-			var debug = 'score : ';
+			var debug = 'Score : ';
 			for(var i = 0;i<this.players.length;i++)
 			{
 				debug+=this.players[i].id+ ':'+this.players[i].score +'|';
