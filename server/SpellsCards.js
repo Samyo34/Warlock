@@ -1,7 +1,3 @@
-/**
- * Class for the spellcard fireball
- */
-
 var Spells = require('./Spells.js');
 var fireBall = require('./Spells.js').fireBall;
 var lightning = require('./Spells.js').lightning;
@@ -9,6 +5,10 @@ var blink = require('./Spells.js').blink;
 var scurge = require('./Spells.js').scurge;
 
 (function(){
+
+	/**
+	 * Class for the spellcard fireball
+	 */
 	class fireballCard {
 		constructor(parent){
 			this.name = "fireball";

@@ -1,12 +1,11 @@
-/**
- * Class for the spell fireBall
- */
-
 function getInt32Array() {
     return new Int32Array(7);
 }
 
 (function() {
+    /**
+    * Class for the spell fireball
+    */
     class fireBall {
         constructor(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
             this.id = Math.random();
@@ -110,17 +109,18 @@ function getInt32Array() {
     };
 
     /**
- * Class for the spell blink
- */
+    * Class for the spell blink
+    */
     class blink {
         constructor(parent, aimGoalPoint) {
             parent.x = aimGoalPoint.x;
             parent.y = aimGoalPoint.y;
         }
     };
+
     /**
- * Class for the spell lightning
- */
+    * Class for the spell lightning
+    */
     class lightning {
         constructor(parent, aimGoalPoint, damages, speed, range, action, actionTime, lifeTime) {
             this.id = Math.random();
@@ -228,8 +228,8 @@ function getInt32Array() {
     };
 
     /**
- * Class for the spell scurge
- */
+    * Class for the spell scurge
+    */
     class scurge {
         constructor(parent, damages, lifeTime, range, action, actionTime) {
             this.id = Math.random();
@@ -332,8 +332,7 @@ function getInt32Array() {
     module.exports = {
         fireBall: fireBall,
         lightning: lightning,
-        blink,
-        blink,
+        blink: blink,
         scurge: scurge
     };
 
