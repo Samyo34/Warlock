@@ -498,7 +498,7 @@
 			ctx.font = '42px Impact';
 			ctx.fillStyle="#000000"; // noir
 
-			let txt = "Waiting for player... (" + nbPlayer +"/" + nbPlayerMax + ")";
+			let txt = "Waiting for players... (" + nbPlayer +"/" + nbPlayerMax + ")";
 			let txtSize = ctx.measureText(txt).width;
 			ctx.fillText(txt, ctx.canvas.clientWidth/2-txtSize/2, 50);
 		};
@@ -529,11 +529,11 @@
 			ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
 			ctx.save();
 
-			drawIndicators();
 			drawMap();
 			drawBullets();
 			drawPlayers();
 			drawSpellIndicators();
+			drawIndicators();
 		},1000/40);
 
 
